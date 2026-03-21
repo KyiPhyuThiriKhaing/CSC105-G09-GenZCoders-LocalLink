@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 
 const userSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -33,7 +34,7 @@ function LoginPage() {
         </div>
         
         <div id="CreateForgot-Password" className="flex items-center justify-between mt-2 text-sm w-67 text-white italic">
-          <a href="#">Create new account</a>
+          <a href="#"><Link to="/signup">Create new account</Link></a>
           <a href="#">Forgot Password?</a>
         </div>
 
