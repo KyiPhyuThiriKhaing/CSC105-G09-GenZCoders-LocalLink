@@ -17,6 +17,7 @@ import AdminPage from "./pages/AdminPage.tsx";
 import AdminDashboardPage from "./pages/AdminDashboardPage.tsx";
 import SubmissionsPage from "./pages/SubmissionsPage.tsx";
 import UsersPage from "./pages/UsersPage.tsx";
+import MyProfilePage from "./pages/MyProfilePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -46,23 +47,30 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <ProfilePage />,
+        children: [
+          {
+            path: "my-profile",
+            element: <MyProfilePage />,
+          },
+          {
+            path: "verify",
+            element: <VerifyPage />,
+          },
+          {
+            path: "history",
+            element: <HistoryPage />,
+          },
+          {
+            path: "settings",
+            element: <SettingsPage />,
+          },
+          {
+            path: "chat",
+            element: <ChatPage />,
+          },
+        ],
       },
-      {
-        path: "verify",
-        element: <VerifyPage />,
-      },
-      {
-        path: "history",
-        element: <HistoryPage />,
-      },
-      {
-        path: "settings",
-        element: <SettingsPage />,
-      },
-      {
-        path: "chat",
-        element: <ChatPage />,
-      },
+      {},
     ],
   },
   {
