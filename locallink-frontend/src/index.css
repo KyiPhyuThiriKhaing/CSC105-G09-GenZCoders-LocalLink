@@ -1,18 +1,2 @@
 @import "tailwindcss";
 
-/* LocalLink theme tokens
-	 - Minimal base tokens for light/dark mode.
-	 - Page-specific tokens (colors, shadows) go in their own CSS files.
-*/
-:root {
-	--ll-white: #ffffff;
-	--ll-black: #000000;
-	--ll-ink: #1f1233;
-	--ll-ink-muted: #5b4a78;
-}
-
-:root[data-theme="dark"] {
-	--ll-ink: #f7f2ff;
-	--ll-ink-muted: rgba(247, 242, 255, 0.72);
-}
-
