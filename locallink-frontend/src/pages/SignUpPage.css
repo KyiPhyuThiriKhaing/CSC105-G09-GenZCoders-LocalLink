@@ -2,7 +2,7 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: #ffffff;
+  background: #000000;
   border-top-left-radius: 28px;
   border-bottom-left-radius: 28px;
   clip-path: polygon(0 0, 78% 0, 100% 50%, 78% 100%, 0 100%);
