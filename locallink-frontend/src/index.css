@@ -1,2 +1,49 @@
 @import "tailwindcss";
 
+:root {
+	--color-brand-primary: #9810fa;
+	--color-brand-primary-hover: #7f0ed2;
+	--color-brand-soft: #f3e8ff;
+	--color-brand-accent: #c084fc;
+	--color-brand-primary-700: #5b21b6;
+	--color-brand-primary-600: #6d28d9;
+	--color-brand-primary-500: #9333ea;
+	--color-brand-pink-500: #ec4899;
+	--color-brand-focus: #a855f78c;
+	--color-brand-focus-ring: #a855f72e;
+	--color-ink-strong: #1f1233;
+	--color-ink-strong-70: #1f1233b3;
+	--color-ink-strong-45: #1f123373;
+	--color-ink-border-soft: #1f123329;
+	--color-ink-border-faint: #1f12331f;
+	--color-text-muted: #5b4a78;
+	--color-link: #701fc9;
+	--color-danger: #b41756;
+}
+
+@layer utilities {
+	.bg-brand-soft {
+		background-color: var(--color-brand-soft);
+	}
+
+	.bg-brand-primary {
+		background-color: var(--color-brand-primary);
+	}
+
+	.text-brand-primary {
+		color: var(--color-brand-primary);
+	}
+
+	.border-brand-primary {
+		border-color: var(--color-brand-primary);
+	}
+
+	.hover\:bg-brand-primary-hover:hover {
+		background-color: var(--color-brand-primary-hover);
+	}
+
+	.ring-brand-accent {
+		--tw-ring-color: var(--color-brand-accent);
+	}
+}
+

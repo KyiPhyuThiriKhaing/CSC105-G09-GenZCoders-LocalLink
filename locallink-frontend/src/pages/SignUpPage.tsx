@@ -10,7 +10,6 @@ import {
   LockClosedIcon,
   PersonIcon,
 } from "@radix-ui/react-icons";
-import "./SignUpPage.css";
 
 const signUpSchema = z
   .object({
@@ -25,6 +24,24 @@ const signUpSchema = z
   });
 
 type SignUpFormData = z.infer<typeof signUpSchema>;
+
+type PasswordToggleButtonProps = {
+  isVisible: boolean;
+  onToggle: () => void;
+};
+
+function PasswordToggleButton({ isVisible, onToggle }: PasswordToggleButtonProps) {
+  return (
+    <button
+      type="button"
+      className="absolute right-2 inline-flex items-center justify-center rounded-md p-1.5 text-[var(--color-ink-strong-70)] transition hover:text-[var(--color-ink-strong)]"
+      onClick={onToggle}
+      aria-label={isVisible ? "Hide password" : "Show password"}
+    >
+      {isVisible ? <EyeNoneIcon aria-hidden="true" /> : <EyeOpenIcon aria-hidden="true" />}
+    </button>
+  );
+}
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,27 +67,33 @@ function SignUpPage() {
   };
 
   const inputClass =
-    "h-11 w-full rounded-xl border border-[#1f123329] bg-white/85 px-3 text-sm text-[#1f1233] outline-none transition placeholder:text-[#1f123373] focus:border-[#a855f78c] focus:bg-white/95 focus:ring-4 focus:ring-[#a855f72e]";
+    "h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white/85 px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-focus)] focus:bg-white/95 focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]";
+
+  const labelClass = "text-sm font-semibold text-[var(--color-ink-strong)]";
+  const fieldErrorClass = "text-[0.82rem] text-[var(--color-danger)]";
 
   return (
-    <main className="grid min-h-screen place-items-start bg-gradient-to-br from-[#5b21b6] to-[#ec4899] px-5 py-6 sm:px-6 sm:py-8 md:place-items-center md:py-10">
+    <main className="grid min-h-screen place-items-start bg-gradient-to-br from-[var(--color-brand-primary-700)] to-[var(--color-brand-pink-500)] px-5 py-6 sm:px-6 sm:py-8 md:place-items-center md:py-10">
       <section
-        className="relative grid min-h-[560px] w-full max-w-[920px] overflow-hidden rounded-[28px] bg-gradient-to-br from-[#6d28d9] to-[#ec4899] shadow-[0_12px_24px_rgba(31,18,51,0.12),0_28px_56px_rgba(31,18,51,0.24),0_52px_104px_rgba(31,18,51,0.32)] md:grid-cols-[1.1fr_0.9fr]"
+        className="relative grid min-h-[560px] w-full max-w-[920px] overflow-hidden rounded-[28px] bg-gradient-to-br from-[var(--color-brand-primary-600)] to-[var(--color-brand-pink-500)] shadow-[0_12px_24px_rgba(31,18,51,0.12),0_28px_56px_rgba(31,18,51,0.24),0_52px_104px_rgba(31,18,51,0.32)] md:grid-cols-[1.1fr_0.9fr]"
         aria-label="Sign up"
       >
         <div className="relative z-10 isolate grid content-start gap-7 overflow-hidden px-7 py-10 md:px-12 md:py-12">
-          <div className="ll-signup-panel-shape pointer-events-none" aria-hidden="true" />
+          <div
+            className="pointer-events-none absolute inset-0 -z-10 bg-white rounded-l-[28px] [clip-path:polygon(0_0,78%_0,100%_50%,78%_100%,0_100%)] max-[860px]:rounded-[28px] max-[860px]:[clip-path:none]"
+            aria-hidden="true"
+          />
 
           <header className="relative z-10">
-            <h1 className="pb-4 text-[clamp(2rem,3vw,2.75rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-[#1f1233]">
+            <h1 className="pb-4 text-[clamp(2rem,3vw,2.75rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-[var(--color-ink-strong)]">
               Sign up
             </h1>
-            <p className="text-[0.95rem] text-[#5b4a78]">Create your account to get started.</p>
+            <p className="text-[0.95rem] text-[var(--color-text-muted)]">Create your account to get started.</p>
           </header>
 
           <form className="relative z-10 grid w-full gap-3.5 md:pr-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-1.5">
-              <label className="text-sm font-semibold text-[#1f1233]" htmlFor="fullName">
+              <label className={labelClass} htmlFor="fullName">
                 <span className="inline-flex items-center gap-1.5">
                   <PersonIcon aria-hidden="true" />
                   Full name
@@ -83,11 +106,11 @@ function SignUpPage() {
                 autoComplete="name"
                 {...register("fullName")}
               />
-              {errors.fullName && <p className="text-[0.82rem] text-[#b41756]">{errors.fullName.message}</p>}
+              {errors.fullName && <p className={fieldErrorClass}>{errors.fullName.message}</p>}
             </div>
 
             <div className="grid gap-1.5">
-              <label className="text-sm font-semibold text-[#1f1233]" htmlFor="email">
+              <label className={labelClass} htmlFor="email">
                 <span className="inline-flex items-center gap-1.5">
                   <EnvelopeClosedIcon aria-hidden="true" />
                   Email
@@ -101,11 +124,11 @@ function SignUpPage() {
                 autoComplete="email"
                 {...register("email")}
               />
-              {errors.email && <p className="text-[0.82rem] text-[#b41756]">{errors.email.message}</p>}
+              {errors.email && <p className={fieldErrorClass}>{errors.email.message}</p>}
             </div>
 
             <div className="grid gap-1.5">
-              <label className="text-sm font-semibold text-[#1f1233]" htmlFor="password">
+              <label className={labelClass} htmlFor="password">
                 <span className="inline-flex items-center gap-1.5">
                   <LockClosedIcon aria-hidden="true" />
                   Password
@@ -120,24 +143,16 @@ function SignUpPage() {
                   autoComplete="new-password"
                   {...register("password")}
                 />
-                <button
-                  type="button"
-                  className="absolute right-2 inline-flex items-center justify-center rounded-md p-1.5 text-[#1f1233b3] transition hover:text-[#1f1233]"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeNoneIcon aria-hidden="true" />
-                  ) : (
-                    <EyeOpenIcon aria-hidden="true" />
-                  )}
-                </button>
+                <PasswordToggleButton
+                  isVisible={showPassword}
+                  onToggle={() => setShowPassword(!showPassword)}
+                />
               </div>
-              {errors.password && <p className="text-[0.82rem] text-[#b41756]">{errors.password.message}</p>}
+              {errors.password && <p className={fieldErrorClass}>{errors.password.message}</p>}
             </div>
 
             <div className="grid gap-1.5">
-              <label className="text-sm font-semibold text-[#1f1233]" htmlFor="confirmPassword">
+              <label className={labelClass} htmlFor="confirmPassword">
                 <span className="inline-flex items-center gap-1.5">
                   <LockClosedIcon aria-hidden="true" />
                   Confirm password
@@ -152,33 +167,25 @@ function SignUpPage() {
                   autoComplete="new-password"
                   {...register("confirmPassword")}
                 />
-                <button
-                  type="button"
-                  className="absolute right-2 inline-flex items-center justify-center rounded-md p-1.5 text-[#1f1233b3] transition hover:text-[#1f1233]"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeNoneIcon aria-hidden="true" />
-                  ) : (
-                    <EyeOpenIcon aria-hidden="true" />
-                  )}
-                </button>
+                <PasswordToggleButton
+                  isVisible={showPassword}
+                  onToggle={() => setShowPassword(!showPassword)}
+                />
               </div>
               {errors.confirmPassword && (
-                <p className="text-[0.82rem] text-[#b41756]">{errors.confirmPassword.message}</p>
+                <p className={fieldErrorClass}>{errors.confirmPassword.message}</p>
               )}
             </div>
 
             <button
-              className="group mt-3 grid h-[46px] w-full grid-cols-[1fr_auto] items-center rounded-full border border-[#1f12331f] bg-white px-2 pl-4 text-[#1f1233] transition hover:-translate-y-[3px] hover:bg-[#9333ea] hover:text-white hover:shadow-[0_12px_32px_rgba(168,85,247,0.28)] disabled:cursor-not-allowed disabled:saturate-90"
+              className="group mt-3 grid h-[46px] w-full grid-cols-[1fr_auto] items-center rounded-full border border-[var(--color-ink-border-faint)] bg-white px-2 pl-4 text-[var(--color-ink-strong)] transition hover:-translate-y-[3px] hover:bg-[var(--color-brand-primary-500)] hover:text-white hover:shadow-[0_12px_32px_rgba(168,85,247,0.28)] disabled:cursor-not-allowed disabled:saturate-90"
               type="submit"
               aria-disabled={isSubmitting}
               disabled={isSubmitting}
             >
               <span className="text-[0.98rem] font-bold tracking-[0.01em]">Create account</span>
               <span
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#9333ea] to-[#ec4899] text-white transition group-hover:-translate-x-1 group-hover:scale-x-[-1] group-hover:bg-white/20"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-brand-primary-500)] to-[var(--color-brand-pink-500)] text-white transition group-hover:-translate-x-1 group-hover:scale-x-[-1] group-hover:bg-white/20"
                 aria-hidden="true"
               >
                 <svg
@@ -200,9 +207,9 @@ function SignUpPage() {
             </button>
           </form>
 
-          <p className="relative z-10 mt-1 text-[0.92rem] text-[#5b4a78]">
+          <p className="relative z-10 mt-1 text-[0.92rem] text-[var(--color-text-muted)]">
             Already have an account?{" "}
-            <Link to="/login" className="font-bold text-[#701fc9] hover:underline">
+            <Link to="/login" className="font-bold text-[var(--color-link)] hover:underline">
               Log in
             </Link>
           </p>

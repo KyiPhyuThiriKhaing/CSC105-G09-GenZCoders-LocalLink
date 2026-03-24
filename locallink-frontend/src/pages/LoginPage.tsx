@@ -17,8 +17,8 @@ function LoginPage() {
   });
 
   return (
-    <div className="flex items-center justify-center h-screen bg-[#F3E8FF]">
-      <div id="LoginPlate" className="flex flex-col items-center w-150 h-130 bg-[#9810FA] rounded-4xl pt-15">
+    <div className="flex items-center justify-center h-screen bg-brand-soft">
+      <div id="LoginPlate" className="flex flex-col items-center w-150 h-130 bg-brand-primary rounded-4xl pt-15">
         <h1 className="flex items-center justify-center text-white text-5xl font-bold pt-10">Login</h1>
         {/* <p className="text-white text-sm italic">Welcome Back! Sign in to your account</p> */}
         <div className="mt-10">
