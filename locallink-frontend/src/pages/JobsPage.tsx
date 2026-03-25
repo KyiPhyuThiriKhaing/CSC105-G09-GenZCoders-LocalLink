@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { MagnifyingGlassIcon, PlusIcon, ClockIcon } from "@radix-ui/react-icons";
+import { Link } from "react-router-dom";
 
 const MapPinIcon = ({ className }: { className?: string }) => (
   <svg
@@ -163,9 +164,12 @@ export default function JobsPage() {
                     <div className="font-bold text-gray-900">
                       {job.feeRange}
                     </div>
-                    <button className="text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 px-4 py-1.5 rounded-md transition-colors">
+                    <Link 
+                      to={`/jobs/${job.id}`}
+                      className="text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 px-4 py-1.5 rounded-md transition-colors"
+                    >
                       View Details
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
