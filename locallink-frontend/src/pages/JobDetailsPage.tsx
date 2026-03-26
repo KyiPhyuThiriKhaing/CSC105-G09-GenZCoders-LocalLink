@@ -24,7 +24,7 @@ I'll be there to help lift, I just need one extra person. Should take about an h
 
 export default function JobDetailsPage() {
   const { id } = useParams();
-  
+
   // In a real app we'd fetch data by ID. Here we use the hardcoded mock.
   const job = MOCK_JOB_DETAIL;
 

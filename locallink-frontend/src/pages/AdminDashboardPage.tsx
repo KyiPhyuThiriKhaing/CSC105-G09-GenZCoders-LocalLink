@@ -1,7 +1,11 @@
+import AdminLayout from "../components/AdminPageComponents/AdminLayout";
+
 export default function AdminDashboardPage() {
   return (
-    <div className="flex items-center justify-center h-screen bg-brand-soft">
-      <h1 className="text-5xl font-bold text-brand-primary">Admin Dashboard</h1>
-    </div>
+    <AdminLayout>
+      <div className="flex min-h-[calc(100vh-11rem)] items-center justify-center rounded-2xl border border-[var(--color-ink-border-faint)] bg-brand-soft/80">
+        <h1 className="text-5xl font-bold text-brand-primary">Admin Dashboard</h1>
+      </div>
+    </AdminLayout>
   );
 }
