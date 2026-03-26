@@ -21,6 +21,14 @@ const STATUS_STYLES: Record<SubmissionStatus, string> = {
   Rejected: "bg-red-100 text-red-800 border-red-200",
 };
 
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+
 export default function AdminSubmissionDetailsPanel({ submission, isOpen, onClose }: AdminSubmissionDetailsPanelProps) {
   useEffect(() => {
     if (!isOpen) {
@@ -71,6 +79,16 @@ export default function AdminSubmissionDetailsPanel({ submission, isOpen, onClos
             </div>
 
             <div className="flex-1 space-y-5 px-4 py-5 sm:px-6">
+              <section className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white p-4">
+                <div className="flex flex-col items-center text-center">
+                  <div className="grid h-20 w-20 place-items-center rounded-2xl bg-[var(--color-brand-primary)] text-3xl font-extrabold text-white">
+                    {getInitials(submission.name)}
+                  </div>
+                  <h3 className="mt-3 text-xl font-extrabold text-[var(--color-ink-strong)]">{submission.name}</h3>
+                  <p className="mt-1 text-sm text-[var(--color-text-muted)]">{submission.email}</p>
+                </div>
+              </section>
+
               <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_STYLES[submission.status]}`}>
                 {submission.status}
               </span>
@@ -142,12 +160,34 @@ export default function AdminSubmissionDetailsPanel({ submission, isOpen, onClos
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
+                  onClick={() => {
+                    const shouldApprove = window.confirm(
+                      "Are you sure you want to approve this submission?",
+                    );
+
+                    if (!shouldApprove) {
+                      return;
+                    }
+
+                    window.alert("Submission approved (UI placeholder).");
+                  }}
                   className="inline-flex items-center justify-center rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
                 >
                   Approve
                 </button>
                 <button
                   type="button"
+                  onClick={() => {
+                    const shouldReject = window.confirm(
+                      "Are you sure you want to reject this submission?",
+                    );
+
+                    if (!shouldReject) {
+                      return;
+                    }
+
+                    window.alert("Submission rejected (UI placeholder).");
+                  }}
                   className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
                 >
                   Reject

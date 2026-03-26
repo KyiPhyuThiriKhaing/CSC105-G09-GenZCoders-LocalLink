@@ -11,14 +11,27 @@ const STATUS_STYLES: Record<SubmissionStatus, string> = {
   Rejected: "bg-red-100 text-red-800 border-red-200",
 };
 
+const getInitials = (name: string) =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+
 export default function AdminSubmissionCard({ submission, onReview }: AdminSubmissionCardProps) {
   return (
     <article className="rounded-2xl border border-[var(--color-ink-border-faint)] bg-white p-4 shadow-[0_10px_24px_rgba(31,18,51,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgba(152,16,250,0.14)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="text-base font-bold text-[var(--color-ink-strong)] sm:text-lg">{submission.name}</h3>
-          <p className="mt-1 text-sm text-[var(--color-text-muted)] break-all">{submission.email}</p>
-          <p className="mt-1 text-xs text-[var(--color-text-muted)]">Submitted on {submission.date}</p>
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[var(--color-brand-primary)] text-sm font-bold text-white">
+            {getInitials(submission.name)}
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-base font-bold text-[var(--color-ink-strong)] sm:text-lg">{submission.name}</h3>
+            <p className="mt-1 text-sm text-[var(--color-text-muted)] break-all">{submission.email}</p>
+            <p className="mt-1 text-xs text-[var(--color-text-muted)]">Submitted on {submission.date}</p>
+          </div>
         </div>
         <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[submission.status]}`}>
           {submission.status}

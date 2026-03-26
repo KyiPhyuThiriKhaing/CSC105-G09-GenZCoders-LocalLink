@@ -109,10 +109,12 @@ const SUBMISSIONS: Submission[] = [
 
 const ITEMS_PER_PAGE = 6;
 type StatusFilter = "All" | Submission["status"];
+type SortOrder = "latest-to-oldest" | "oldest-to-latest";
 
 export default function AdminSubmissionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("latest-to-oldest");
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
@@ -125,10 +127,27 @@ export default function AdminSubmissionsPage() {
 
   const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE));
 
+  const sortedSubmissions = useMemo(() => {
+    const submissionsToSort = [...filteredSubmissions];
+
+    submissionsToSort.sort((a, b) => {
+      const aTime = new Date(a.date).getTime();
+      const bTime = new Date(b.date).getTime();
+
+      if (sortOrder === "oldest-to-latest") {
+        return aTime - bTime;
+      }
+
+      return bTime - aTime;
+    });
+
+    return submissionsToSort;
+  }, [filteredSubmissions, sortOrder]);
+
   const pagedSubmissions = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredSubmissions.slice(start, start + ITEMS_PER_PAGE);
-  }, [currentPage, filteredSubmissions]);
+    return sortedSubmissions.slice(start, start + ITEMS_PER_PAGE);
+  }, [currentPage, sortedSubmissions]);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) {
@@ -182,6 +201,22 @@ export default function AdminSubmissionsPage() {
           <option value="Pending">Pending</option>
           <option value="Approved">Approved</option>
           <option value="Rejected">Rejected</option>
+        </select>
+
+        <label className="sr-only" htmlFor="admin-submissions-sort-order">
+          Sort submissions by date
+        </label>
+        <select
+          id="admin-submissions-sort-order"
+          value={sortOrder}
+          onChange={(event) => {
+            setSortOrder(event.target.value as SortOrder);
+            setCurrentPage(1);
+          }}
+          className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm font-medium text-[var(--color-ink-strong)] outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-focus-ring)] sm:w-56"
+        >
+          <option value="latest-to-oldest">Latest to oldest</option>
+          <option value="oldest-to-latest">Oldest to latest</option>
         </select>
       </div>
 
