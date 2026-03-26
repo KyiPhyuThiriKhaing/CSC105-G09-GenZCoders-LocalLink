@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 type NavItem = {
     label: string;
@@ -128,24 +128,88 @@ type SidebarProps = {
 };
 
 function Sidebar({ activeKey }: SidebarProps) {
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+    const openLogoutModal = () => setIsLogoutModalOpen(true);
+    const closeLogoutModal = () => setIsLogoutModalOpen(false);
+
+    const handleLogoutConfirm = () => {
+        // Placeholder until logout API/auth flow is implemented.
+        closeLogoutModal();
+    };
+
     return (
-        <aside className="self-stretch min-h-[calc(100vh-3rem)] w-60 shrink-0 rounded-3xl bg-white/95 p-4 sm:p-5">
-            <nav className="space-y-1">
-                {items.map((item) => (
-                    <a
-                        key={item.label}
-                        href={item.href}
-                        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white ${activeKey === item.label
+        <>
+            <aside className="self-stretch min-h-[calc(100vh-3rem)] w-60 shrink-0 rounded-3xl bg-white/95 p-4 sm:p-5">
+                <nav className="space-y-1">
+                    {items.map((item) => {
+                        const sharedClassName = `flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white ${activeKey === item.label
                             ? "bg-brand-soft text-brand-primary"
                             : "text-(--color-ink-strong) hover:bg-brand-soft hover:text-brand-primary"
-                            }`}
-                    >
-                        <span className="text-brand-primary">{item.icon}</span>
-                        <span>{item.label}</span>
-                    </a>
-                ))}
-            </nav>
-        </aside>
+                            }`;
+
+                        if (item.label === "Log Out") {
+                            return (
+                                <button
+                                    key={item.label}
+                                    type="button"
+                                    onClick={openLogoutModal}
+                                    className={sharedClassName}
+                                >
+                                    <span className="text-brand-primary">{item.icon}</span>
+                                    <span>{item.label}</span>
+                                </button>
+                            );
+                        }
+
+                        return (
+                            <a
+                                key={item.label}
+                                href={item.href}
+                                className={sharedClassName}
+                            >
+                                <span className="text-brand-primary">{item.icon}</span>
+                                <span>{item.label}</span>
+                            </a>
+                        );
+                    })}
+                </nav>
+            </aside>
+
+            {isLogoutModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="logout-modal-title"
+                >
+                    <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
+                        <h2 id="logout-modal-title" className="text-lg font-bold text-(--color-ink-strong)">
+                            Confirm Log Out
+                        </h2>
+                        <p className="mt-2 text-sm text-slate-600">
+                            Are you sure you want to log out?
+                        </p>
+                        <div className="mt-5 flex justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={closeLogoutModal}
+                                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleLogoutConfirm}
+                                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                            >
+                                Log Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }
 
