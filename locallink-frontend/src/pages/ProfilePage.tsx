@@ -15,7 +15,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-brand-soft text-(--color-ink-strong)">
-      <div className="mx-auto flex max-w-6xl gap-6 px-4 pb-12 pt-6 sm:px-6 lg:px-8 lg:pt-8">
+      <div className="flex gap-6 px-6 pb-12 pt-6 lg:pt-8">
         <Sidebar activeKey="My Profile" />
 
         <div className="flex-1 space-y-5">

@@ -129,7 +129,7 @@ type SidebarProps = {
 
 function Sidebar({ activeKey }: SidebarProps) {
     return (
-        <aside className="w-full max-w-60 border-r border-(--color-ink-border-soft) bg-white/95 p-4 sm:p-5">
+        <aside className="w-60 shrink-0 rounded-3xl bg-white/95 p-4 sm:p-5">
             <nav className="space-y-1">
                 {items.map((item) => (
                     <a
