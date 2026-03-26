@@ -25,14 +25,22 @@ const NAV_ITEMS = [
   },
 ] as const;
 
-function AdminSidebar() {
+type AdminSidebarProps = {
+  className?: string;
+  onNavigate?: () => void;
+};
+
+function AdminSidebar({ className = "", onNavigate }: AdminSidebarProps) {
   const location = useLocation();
 
   const isActivePath = (path: string) =>
     location.pathname === path || location.pathname.startsWith(`${path}/`);
 
+  const sidebarClassName =
+    `flex h-full w-[240px] shrink-0 flex-col bg-[var(--color-brand-primary-700)] px-4 py-5 ${className}`;
+
   return (
-    <aside className="flex h-screen w-[240px] shrink-0 flex-col bg-[var(--color-brand-primary-700)] px-4 py-5">
+    <aside className={sidebarClassName}>
       <div className="pb-5">
         <h1 className="inline-flex items-center gap-2 text-lg font-semibold tracking-wide text-[var(--color-brand-soft)]">
           <span className="grid h-6 w-6 place-items-center rounded-md bg-[var(--color-brand-primary)] text-white">
@@ -53,6 +61,7 @@ function AdminSidebar() {
             label={item.label}
             Icon={item.Icon}
             isActive={isActivePath(item.to)}
+            onClick={onNavigate}
           />
         ))}
       </nav>

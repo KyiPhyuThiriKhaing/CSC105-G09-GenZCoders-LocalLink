@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+import { HamburgerMenuIcon, Cross2Icon } from "@radix-ui/react-icons";
 import AdminSidebar from "./AdminSidebar";
 
 type AdminLayoutProps = {
@@ -6,10 +7,46 @@ type AdminLayoutProps = {
 };
 
 function AdminLayout({ children }: AdminLayoutProps) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen bg-brand-soft">
-      <AdminSidebar />
-      <main className="flex-1 bg-[var(--color-brand-soft)] p-8">
+    <div className="min-h-screen bg-brand-soft md:flex">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[var(--color-ink-border-soft)] bg-[var(--color-brand-primary-700)] px-4 py-3 md:hidden">
+        <div>
+          <p className="text-base font-semibold text-[var(--color-brand-soft)]">Admin Portal</p>
+          <p className="text-xs text-[var(--color-brand-accent)]">Account Validation</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsSidebarOpen((prev) => !prev)}
+          className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--color-ink-border-soft)] bg-white/10 text-white"
+          aria-label={isSidebarOpen ? "Close menu" : "Open menu"}
+        >
+          {isSidebarOpen ? <Cross2Icon className="h-4 w-4" /> : <HamburgerMenuIcon className="h-4 w-4" />}
+        </button>
+      </header>
+
+      <div
+        className={`fixed inset-0 z-40 bg-[var(--color-ink-strong)]/45 transition-opacity md:hidden ${
+          isSidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+        onClick={() => setIsSidebarOpen(false)}
+        aria-hidden="true"
+      />
+
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-[240px] transition-transform duration-200 md:hidden ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <AdminSidebar className="h-dvh" onNavigate={() => setIsSidebarOpen(false)} />
+      </div>
+
+      <div className="hidden md:block md:h-screen md:shrink-0">
+        <AdminSidebar className="h-screen" />
+      </div>
+
+      <main className="flex-1 bg-[var(--color-brand-soft)] p-4 md:p-8">
         <div className="h-full min-h-[calc(100vh-4rem)] rounded-2xl border border-[var(--color-ink-border-faint)] bg-white/75 p-6 shadow-[0_8px_24px_rgba(31,18,51,0.08)]">
           {children ?? <div className="h-full rounded-xl border border-dashed border-[var(--color-ink-border-soft)]" />}
         </div>

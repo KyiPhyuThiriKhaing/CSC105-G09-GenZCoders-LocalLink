@@ -6,12 +6,14 @@ type AdminSidebarItemProps = {
   label: string;
   Icon: ComponentType<{ className?: string }>;
   isActive: boolean;
+  onClick?: () => void;
 };
 
-function AdminSidebarItem({ to, label, Icon, isActive }: AdminSidebarItemProps) {
+function AdminSidebarItem({ to, label, Icon, isActive, onClick }: AdminSidebarItemProps) {
   return (
     <NavLink
       to={to}
+      onClick={onClick}
       className={
         "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors " +
         (isActive
