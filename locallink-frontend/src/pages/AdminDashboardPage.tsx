@@ -1,5 +1,5 @@
 import AdminLayout from "../components/AdminPageComponents/AdminLayout";
-import AdminDashboardContent from "../features/admin/dashboard/AdminDashboardPage";
+import AdminDashboardContent from "../components/AdminPageComponents/features/admin/dashboard/AdminDashboardPage";
 
 export default function AdminDashboardPage() {
   return (

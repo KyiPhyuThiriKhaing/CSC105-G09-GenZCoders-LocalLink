@@ -10,7 +10,7 @@ function AdminLayout({ children }: AdminLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-brand-soft md:flex">
+    <div className="min-h-screen bg-brand-soft md:flex md:h-screen md:overflow-hidden">
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[var(--color-ink-border-soft)] bg-[var(--color-brand-primary-700)] px-4 py-3 md:hidden">
         <div>
           <p className="text-base font-semibold text-[var(--color-brand-soft)]">Admin Portal</p>
@@ -46,8 +46,8 @@ function AdminLayout({ children }: AdminLayoutProps) {
         <AdminSidebar className="h-screen" />
       </div>
 
-      <main className="flex-1 bg-[var(--color-brand-soft)] p-4 md:p-8">
-        <div className="h-full min-h-[calc(100vh-4rem)] rounded-2xl border border-[var(--color-ink-border-faint)] bg-white/75 p-6 shadow-[0_8px_24px_rgba(31,18,51,0.08)]">
+      <main className="flex-1 bg-[var(--color-brand-soft)] p-4 md:h-full md:overflow-y-auto md:p-6">
+        <div className="h-full min-h-0 rounded-2xl border border-[var(--color-ink-border-faint)] bg-white/75 p-6 shadow-[0_8px_24px_rgba(31,18,51,0.08)]">
           {children ?? <div className="h-full rounded-xl border border-dashed border-[var(--color-ink-border-soft)]" />}
         </div>
       </main>
