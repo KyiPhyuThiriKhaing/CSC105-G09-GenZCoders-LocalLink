@@ -1,19 +1,12 @@
-import { Outlet, useLocation } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
+
 
 export default function VerifyPage() {
-  const { pathname } = useLocation();
-  const isBaseVerify =
-    pathname === "/profile/verify" || pathname === "/profile/verify/";
-
-  if (!isBaseVerify) {
-    return <Outlet />;
-  }
+  
 
   return (
     <div className="min-h-screen bg-brand-soft text-(--color-ink-strong)">
       <div className="flex gap-6 px-6 pb-12 pt-6 lg:pt-8">
-        <Sidebar activeKey="Verification" />
+        
 
         <div className="flex-1 space-y-5">
           <section className="rounded-3xl border border-black/5 bg-white px-6 py-7 shadow-[0_2px_8px_rgba(15,23,42,0.08)]">

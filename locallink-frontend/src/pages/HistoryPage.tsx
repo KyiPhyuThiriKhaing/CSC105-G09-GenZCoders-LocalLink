@@ -1,4 +1,3 @@
-import Sidebar from "../components/Sidebar";
 import HistoryColumn from "../components/HistoryPageComponents/HistoryColumn";
 
 const jobsApplied = [
@@ -22,7 +21,6 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-brand-soft text-(--color-ink-strong)">
       <div className="mx-auto flex max-w-6xl gap-6 px-4 pb-12 pt-6 sm:px-6 lg:px-8 lg:pt-8">
-        <Sidebar activeKey="History" />
 
         <div className="grid flex-1 grid-cols-1 gap-5 lg:grid-cols-3">
           <HistoryColumn title="Jobs Applied" items={jobsApplied} />
