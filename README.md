@@ -16,7 +16,7 @@
 | Student ID | GitHub Username      | Week 6-8 (Assigned Feature) | Week 11 (Progress)                         | Week 12 (Progress)                         |
 |------------|----------------------|-----------------------------|--------------------------------------------|--------------------------------------------|
 | 839        | YukinoTakkashi1998   | Login system                | Designed login UI, added form validation   | Connected login to backend, fixed bugs     |
-|            |                      |                             |                                            |                                            |
+|       839     |          takkashiasdf           |            12312314sdasdf                 |                 123123123                           |              123123123                              |
 |            |                      |                             |                                            |                                            |
 |            |                      |                             |                                            |                                            |
 
