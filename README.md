@@ -15,7 +15,7 @@
 
 | Student ID | GitHub Username      | Week 6-8 (Assigned Feature) | Week 11 (Progress Report)                  | Week 12 (Progress Report)                  |
 |------------|----------------------|-----------------------------|--------------------------------------------|--------------------------------------------|
-| 839        | YukinoTakkashi1998   | Admin Page Front-End        |                                            |                                            |
+| 839        | YukinoTakkashi1998   | Admin Panel                 |                                            |                                            |
 |            |                      |                             |                                            |                                            |
 |            |                      |                             |                                            |                                            |
 |            |                      |                             |                                            |                                            |
