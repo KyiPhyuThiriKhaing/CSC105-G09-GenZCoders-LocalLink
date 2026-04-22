@@ -6,7 +6,7 @@
 |----------------------|-------------|------------------------|
 | Gloria Everest       |             |                        |
 | Min Thuta            | 68130500839 | YukinoTakkashi1998     |
-| Nang Thiri Htet Hsu  |             |                        |
+| Nang Thiri Htet Hsu  | 68130500853 | laurahsu-loop          |
 | Wunna Moe San        |             |                        |
 
 ---
