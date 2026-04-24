@@ -1,4 +1,3 @@
-import React from "react";
 import { ArrowLeftIcon, DrawingPinIcon, ClockIcon } from "@radix-ui/react-icons";
 import { Link, useParams } from "react-router-dom";
 
