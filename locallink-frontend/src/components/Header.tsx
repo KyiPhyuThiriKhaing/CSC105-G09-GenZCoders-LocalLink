@@ -79,13 +79,6 @@ function Header() {
         : "text-slate-500 hover:text-slate-900"
     }`;
 
-  const mobileLinkClassName = ({ isActive }: { isActive: boolean }) =>
-    `block py-3 text-2xl font-bold transition-colors ${
-      isActive
-        ? "text-(--color-brand-primary)"
-        : "text-slate-900 hover:text-(--color-brand-primary)"
-    }`;
-
   return (
     <>
       <header
@@ -208,23 +201,69 @@ function Header() {
         </div>
       </header>
 
-      {/* Mobile Fullscreen Navigation Overlay */}
+      {/* Mobile Sidebar Navigation */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-white/95 backdrop-blur-3xl md:hidden animate-in fade-in pt-24 px-6 flex flex-col">
-          <nav className="flex flex-col space-y-4">
-            <NavLink to="/" className={mobileLinkClassName}>
+        <div className="fixed inset-y-0 right-0 z-40 flex w-full max-w-xs flex-col border-l border-slate-200 bg-white shadow-2xl md:hidden">
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
+                Menu
+              </p>
+              <p className="text-base font-bold text-slate-900">Navigate</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+              aria-label="Close menu"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <nav className="flex flex-col gap-2 px-4 py-5">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
+                }`
+              }
+            >
               Home
             </NavLink>
-            <NavLink to="/jobs" className={mobileLinkClassName}>
+            <NavLink
+              to="/jobs"
+              className={({ isActive }) =>
+                `rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
+                }`
+              }
+            >
               Jobs
             </NavLink>
-            <div className="h-px w-full bg-slate-100 my-4" />
+            <div className="my-3 h-px bg-slate-100" />
             {profileMenuItems.map((item) => (
               <NavLink
                 key={item.label}
                 to={item.to}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `block py-3 text-lg font-bold transition-colors ${isActive ? "text-(--color-brand-primary)" : "text-slate-600"}`
+                  `rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                    isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
+                  }`
                 }
               >
                 {item.label}
@@ -232,10 +271,10 @@ function Header() {
             ))}
           </nav>
 
-          <div className="mt-auto pb-10">
+          <div className="mt-auto border-t border-slate-200 px-4 py-5">
             <button
               onClick={handleOpenLogoutModal}
-              className="w-full rounded-2xl bg-red-50 py-4 text-base font-bold text-red-600 transition hover:bg-red-100"
+              className="w-full rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100"
             >
               Sign out
             </button>
