@@ -3,157 +3,105 @@ import { MagnifyingGlassIcon, PlusIcon, ClockIcon, DrawingPinIcon } from "@radix
 import { Link } from "react-router-dom";
 
 const MOCK_JOBS = [
-  {
-    id: "1",
-    title: "Help move small furniture",
-    image: "https://images.unsplash.com/photo-1585421514738-01798e348b17?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    location: "Downtown / 1.2 miles away",
-    feeRange: "฿200 - ฿350",
-    timeRange: "1–2 hours",
-    postedAt: "2h ago",
-  },
-  {
-    id: "2",
-    title: "Dog walking (2 dogs)",
-    image: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    location: "Westside Park / 0.5 miles away",
-    feeRange: "฿150 - ฿200",
-    timeRange: "45 mins",
-    postedAt: "4h ago",
-  },
-  {
-    id: "3",
-    title: "High-school Math Tutoring",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    location: "Local Library / 3.0 miles away",
-    feeRange: "฿300 - ฿400 / hr",
-    timeRange: "1.5 hours",
-    postedAt: "5h ago",
-  },
-  {
-    id: "4",
-    title: "Grocery Pickup & Delivery",
-    image: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    location: "Whole Foods / 2.1 miles away",
-    feeRange: "฿150 + tips",
-    timeRange: "1 hour",
-    postedAt: "1d ago",
-  },
-  {
-    id: "5",
-    title: "Assemble IKEA desk",
-    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    location: "North Suburbs / 4.5 miles away",
-    feeRange: "฿400 - ฿550",
-    timeRange: "2–3 hours",
-    postedAt: "1d ago",
-  },
-  {
-    id: "6",
-    title: "Yard work & Leaf raking",
-    image: "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-    location: "Eastside / 2.8 miles away",
-    feeRange: "฿250 - ฿400",
-    timeRange: "3 hours",
-    postedAt: "2d ago",
-  },
+  { id: "1", title: "Help move small furniture", image: "https://images.unsplash.com/photo-1585421514738-01798e348b17?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Downtown / 1.2 miles away", feeRange: "฿200 - ฿350", timeRange: "1–2 hours", postedAt: "2h ago" },
+  { id: "2", title: "Dog walking (2 dogs)", image: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Westside Park / 0.5 miles away", feeRange: "฿150 - ฿200", timeRange: "45 mins", postedAt: "4h ago" },
+  { id: "3", title: "High-school Math Tutoring", image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Local Library / 3.0 miles away", feeRange: "฿300 - ฿400 / hr", timeRange: "1.5 hours", postedAt: "5h ago" },
+  { id: "4", title: "Grocery Pickup & Delivery", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Whole Foods / 2.1 miles away", feeRange: "฿150 + tips", timeRange: "1 hour", postedAt: "1d ago" },
+  { id: "5", title: "Assemble IKEA desk", image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "North Suburbs / 4.5 miles away", feeRange: "฿400 - ฿550", timeRange: "2–3 hours", postedAt: "1d ago" },
+  { id: "6", title: "Yard work & Leaf raking", image: "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Eastside / 2.8 miles away", feeRange: "฿250 - ฿400", timeRange: "3 hours", postedAt: "2d ago" },
 ];
 
 export default function JobsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredJobs = MOCK_JOBS.filter((job) =>
-    job.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredJobs = MOCK_JOBS.filter((job) => job.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="min-h-screen bg-[#fafafa] pb-16">
-      <div className="border-b border-[var(--color-ink-border-soft)] bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-[var(--color-ink-strong)] sm:text-2xl">
-                Mini Jobs
-              </h1>
-              <p className="mt-0.5 text-sm text-[var(--color-text-muted)]">
-                Find local chores and earn quickly
-              </p>
-            </div>
+    <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="relative overflow-hidden bg-white border-b border-slate-200">
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-brand-soft)]/50 to-transparent pointer-events-none" />
+        <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+          <div className="mb-10 text-center max-w-2xl mx-auto">
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl mb-4">
+              Local <span className="text-[var(--color-brand-primary)]">Mini Jobs</span>
+            </h1>
+            <p className="text-lg text-slate-600">
+              Discover opportunities nearby. Help your neighbors and earn quickly on your own schedule.
+            </p>
+          </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <div className="relative flex-1">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <MagnifyingGlassIcon className="h-4 w-4 text-[var(--color-text-muted)]" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search jobs…"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white py-2.5 pl-9 pr-3 text-sm text-[var(--color-ink-strong)] placeholder:text-[var(--color-text-muted)] outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
-                />
-              </div>
-              <button className="flex items-center justify-center gap-1.5 rounded-xl bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--color-brand-primary-hover)] focus-visible:outline-none sm:shrink-0">
-                <PlusIcon className="h-4 w-4" />
-                Post Job
-              </button>
+          <div className="mx-auto max-w-3xl flex flex-col gap-4 sm:flex-row shadow-[0_12px_40px_-15px_rgba(0,0,0,0.1)] rounded-2xl sm:rounded-full bg-white p-2 border border-slate-100">
+            <div className="relative flex-1 flex items-center bg-white rounded-full">
+              <MagnifyingGlassIcon className="absolute left-5 h-5 w-5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search for jobs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent py-4 pl-14 pr-6 text-base font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
+              />
             </div>
+            <button className="flex items-center justify-center gap-2 rounded-full bg-[var(--color-brand-primary)] px-8 py-4 text-sm font-bold text-white transition-all hover:bg-[var(--color-brand-primary-hover)] hover:scale-[1.02] shadow-lg shadow-[var(--color-brand-primary)]/20 sm:w-auto">
+              <PlusIcon className="h-5 w-5" />
+              Post a Job
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-slate-900">Latest Opportunities</h2>
+          <span className="text-sm font-medium text-slate-500">{filteredJobs.length} jobs available</span>
+        </div>
+
         {filteredJobs.length === 0 ? (
-          <div className="py-20 text-center">
-            <p className="text-[var(--color-text-muted)]">No jobs found matching &ldquo;{searchQuery}&rdquo;</p>
+          <div className="flex flex-col items-center justify-center rounded-[2rem] border-2 border-dashed border-slate-200 bg-white py-24 px-6 text-center">
+            <div className="bg-slate-50 p-4 rounded-full mb-4">
+              <MagnifyingGlassIcon className="h-8 w-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">No jobs found</h3>
+            <p className="mt-2 text-slate-500 max-w-sm">We couldn't find anything matching "{searchQuery}". Try searching with different keywords.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {filteredJobs.map((job) => (
-              <div
+              <Link
                 key={job.id}
-                className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--color-ink-border-soft)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                to={`/jobs/${job.id}`}
+                className="group flex flex-col overflow-hidden rounded-[2rem] bg-white shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.1)] outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-brand-focus-ring)]"
               >
-                <div className="relative h-44 overflow-hidden">
-                  <img
-                    src={job.image}
-                    alt={job.title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                  />
-                  <div className="absolute top-3 right-3 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-[var(--color-ink-strong)] shadow-sm">
+                <div className="relative h-56 overflow-hidden">
+                  <div className="absolute inset-0 bg-slate-100 animate-pulse" />
+                  <img src={job.image} alt={job.title} className="relative z-10 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                  <div className="absolute top-4 right-4 z-20 rounded-full bg-white/95 backdrop-blur-sm px-3 py-1.5 text-xs font-bold text-slate-900 shadow-sm transition-transform group-hover:scale-105">
                     {job.postedAt}
                   </div>
                 </div>
 
-                <div className="flex flex-grow flex-col p-5">
-                  <h3 className="mb-3 text-base font-bold leading-snug text-[var(--color-ink-strong)] line-clamp-2">
+                <div className="flex flex-grow flex-col p-6 lg:p-7">
+                  <h3 className="mb-4 text-xl font-bold leading-tight text-slate-900 line-clamp-2 group-hover:text-[var(--color-brand-primary)] transition-colors">
                     {job.title}
                   </h3>
 
-                  <div className="mt-auto mb-4 space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
-                      <DrawingPinIcon className="h-3.5 w-3.5 shrink-0 text-[var(--color-brand-primary)]" />
+                  <div className="space-y-2.5 mb-6">
+                    <div className="flex items-center gap-2.5 text-sm font-medium text-slate-500">
+                      <DrawingPinIcon className="h-4 w-4 text-slate-400 group-hover:text-[var(--color-brand-primary)] transition-colors" />
                       <span className="truncate">{job.location}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
-                      <ClockIcon className="h-3.5 w-3.5 shrink-0 text-[var(--color-brand-primary)]" />
+                    <div className="flex items-center gap-2.5 text-sm font-medium text-slate-500">
+                      <ClockIcon className="h-4 w-4 text-slate-400 group-hover:text-[var(--color-brand-primary)] transition-colors" />
                       <span>{job.timeRange}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-[var(--color-ink-border-faint)] pt-4">
-                    <span className="text-base font-bold text-[var(--color-ink-strong)]">
-                      {job.feeRange}
-                    </span>
-                    <Link
-                      to={`/jobs/${job.id}`}
-                      className="rounded-lg bg-[var(--color-brand-soft)] px-4 py-1.5 text-sm font-semibold text-[var(--color-brand-primary)] transition hover:bg-[var(--color-brand-primary)] hover:text-white focus-visible:outline-none"
-                    >
+                  <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-5">
+                    <span className="text-xl font-extrabold text-slate-900">{job.feeRange}</span>
+                    <span className="inline-flex items-center justify-center rounded-xl bg-slate-50 px-4 py-2 text-sm font-bold text-[var(--color-brand-primary)] opacity-0 transition-all duration-300 group-hover:bg-[var(--color-brand-soft)] group-hover:opacity-100">
                       View Details
-                    </Link>
+                    </span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
