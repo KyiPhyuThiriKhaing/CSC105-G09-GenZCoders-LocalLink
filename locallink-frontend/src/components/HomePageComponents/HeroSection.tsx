@@ -1,75 +1,90 @@
 import { Link } from "react-router-dom";
 
 function HeroSection() {
-    return (
-        <section className="mx-auto max-w-5xl">
-            <div className="overflow-hidden rounded-2xl bg-[#1e1252] px-5 py-10 shadow-[0_8px_40px_rgba(30,18,82,0.22)] sm:rounded-[28px] sm:px-10 sm:py-14 lg:px-14 lg:py-16">
-                <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-                    <div className="text-white">
-                        <p className="mb-3 inline-flex items-center rounded-full border border-white/15 px-3 py-1 text-sm font-semibold text-white/70">
-                            Local Link · Community powered
-                        </p>
-                        <h1 className="text-3xl font-extrabold leading-[1.05] sm:text-4xl lg:text-[2.75rem]">
-                            Find Local Help for Any Task
-                        </h1>
-                        <p className="mt-4 max-w-2xl text-base text-white/65 sm:text-lg leading-relaxed">
-                            Connect with trusted local helpers for everyday tasks. From dog walking to furniture moving, find the perfect person for your needs.
-                        </p>
+  return (
+    <section className="relative mx-auto mt-4 max-w-6xl">
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 px-6 py-16 shadow-2xl sm:px-12 sm:py-20 lg:px-16 lg:py-24">
+        {/* Abstract background decorative elements */}
+        <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[var(--color-brand-primary)] opacity-20 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-600 opacity-20 blur-3xl" />
 
-                        <div className="mt-8 flex flex-wrap gap-3">
-                            <Link
-                                to="/jobs"
-                                className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#1e1252] transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-                            >
-                                Find Helpers
-                            </Link>
-                            <Link
-                                to="/signup"
-                                className="inline-flex items-center justify-center rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white/80 transition hover:border-white/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                            >
-                                Post a Task
-                            </Link>
-                        </div>
-                    </div>
+        <div className="relative z-10 grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
+          <div className="text-white">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[var(--color-brand-soft)] backdrop-blur-md">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-brand-soft)] opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--color-brand-soft)]"></span>
+              </span>
+              Community Powered
+            </span>
+            
+            <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
+              Find Local Help <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-brand-soft)] to-blue-200">Across the street.</span>
+            </h1>
+            
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-300 sm:text-xl">
+              Connect with trusted neighbors for everyday tasks. From dog walking to furniture moving, find the perfect person right in your community.
+            </p>
 
-                    <div>
-                        <div className="rounded-2xl bg-white p-5 shadow-[0_4px_24px_rgba(0,0,0,0.22)]">
-                            <div className="grid gap-4 rounded-xl border border-[var(--color-ink-border-soft)] p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm font-semibold text-[var(--color-ink-strong)]">Today&apos;s matches</p>
-                                        <p className="text-xs text-[var(--color-text-muted)]">Based on your location</p>
-                                    </div>
-                                    <span className="rounded-full bg-[var(--color-brand-soft)] px-3 py-1 text-xs font-semibold text-[var(--color-brand-primary)]">Live</span>
-                                </div>
-                                <div className="grid gap-2">
-                                    {[
-                                        { title: "Furniture Assembly", sub: "2 helpers available nearby", price: "฿1,500" },
-                                        { title: "Dog Walking", sub: "Book in 5 minutes", price: "฿600" },
-                                        { title: "Grocery Pickup", sub: "Same-day delivery", price: "฿400" },
-                                    ].map((item) => (
-                                        <div key={item.title} className="flex items-center justify-between rounded-lg border border-[var(--color-ink-border-soft)] px-3 py-2.5">
-                                            <div>
-                                                <p className="text-sm font-semibold text-[var(--color-ink-strong)]">{item.title}</p>
-                                                <p className="text-xs text-[var(--color-text-muted)]">{item.sub}</p>
-                                            </div>
-                                            <span className="text-sm font-bold text-[var(--color-brand-primary)]">{item.price}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <button
-                                    type="button"
-                                    className="mt-1 inline-flex w-full items-center justify-center rounded-full bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--color-brand-primary-hover)] focus-visible:outline-none"
-                                >
-                                    View all categories
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link
+                to="/jobs"
+                className="inline-flex h-14 items-center justify-center rounded-full bg-white px-8 text-base font-bold text-slate-900 transition-all hover:bg-slate-100 hover:scale-105 shadow-lg shadow-white/10"
+              >
+                Browse Mini Jobs
+              </Link>
+              <Link
+                to="/signup"
+                className="inline-flex h-14 items-center justify-center rounded-full border-2 border-white/20 bg-white/5 px-8 text-base font-bold text-white transition-all hover:bg-white/10 hover:border-white/40 hover:scale-105 backdrop-blur-md"
+              >
+                Post a Task
+              </Link>
             </div>
-        </section>
-    );
+          </div>
+
+          <div className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
+            <div className="rounded-[2rem] bg-white/10 p-2 backdrop-blur-xl border border-white/10 shadow-2xl">
+              <div className="rounded-[1.5rem] bg-white p-6 shadow-inner">
+                <div className="mb-6 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-extrabold text-slate-900">Today's matches</h3>
+                    <p className="text-sm font-medium text-slate-500">Based on your location</p>
+                  </div>
+                  <span className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-600 border border-emerald-100">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    Live
+                  </span>
+                </div>
+                
+                <div className="grid gap-3">
+                  {[
+                    { title: "Furniture Assembly", sub: "2 helpers nearby", price: "฿1,500" },
+                    { title: "Dog Walking", sub: "Book in 5 mins", price: "฿600" },
+                    { title: "Grocery Pickup", sub: "Same-day delivery", price: "฿400" },
+                  ].map((item, idx) => (
+                    <div key={idx} className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 transition-all hover:border-[var(--color-brand-primary)]/30 hover:bg-white hover:shadow-md">
+                      <div>
+                        <p className="text-sm font-bold text-slate-900 group-hover:text-[var(--color-brand-primary)] transition-colors">{item.title}</p>
+                        <p className="mt-0.5 text-xs font-medium text-slate-500">{item.sub}</p>
+                      </div>
+                      <span className="text-base font-extrabold text-slate-900">{item.price}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <button
+                  type="button"
+                  className="mt-6 w-full rounded-xl bg-[var(--color-brand-soft)] py-3.5 text-sm font-bold text-[var(--color-brand-primary)] transition-colors hover:bg-[var(--color-brand-primary)] hover:text-white"
+                >
+                  View all categories
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default HeroSection;
