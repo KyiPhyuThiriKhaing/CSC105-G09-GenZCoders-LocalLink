@@ -6,10 +6,13 @@ type AdminSubmissionListProps = {
   onReview: (submission: Submission) => void;
 };
 
-export default function AdminSubmissionList({ submissions, onReview }: AdminSubmissionListProps) {
+export default function AdminSubmissionList({
+  submissions,
+  onReview,
+}: AdminSubmissionListProps) {
   if (submissions.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[var(--color-ink-border-soft)] bg-white/70 px-4 py-10 text-center text-sm text-[var(--color-text-muted)]">
+      <div className="rounded-2xl border border-dashed border-(--color-ink-border-soft) bg-white/70 px-4 py-10 text-center text-sm text-(--color-text-muted)">
         No submissions on this page.
       </div>
     );
@@ -18,7 +21,11 @@ export default function AdminSubmissionList({ submissions, onReview }: AdminSubm
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       {submissions.map((submission) => (
-        <AdminSubmissionCard key={submission.id} submission={submission} onReview={onReview} />
+        <AdminSubmissionCard
+          key={submission.id}
+          submission={submission}
+          onReview={onReview}
+        />
       ))}
     </div>
   );

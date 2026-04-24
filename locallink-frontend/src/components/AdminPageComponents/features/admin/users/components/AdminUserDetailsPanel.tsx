@@ -7,7 +7,10 @@ import {
 } from "@radix-ui/react-icons";
 import { useEffect } from "react";
 import AdminUserDangerZone from "./AdminUserDangerZone";
-import type { AdminUser, UserStatus } from "../../../../../../data/mockAdminData";
+import type {
+  AdminUser,
+  UserStatus,
+} from "../../../../../../data/mockAdminData";
 
 export interface AdminUserDetailsPanelProps {
   user: AdminUser | null;
@@ -54,7 +57,10 @@ export default function AdminUserDetailsPanel({
   }, [isOpen]);
 
   return (
-    <div className={`fixed inset-0 z-50 ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!isOpen}>
+    <div
+      className={`fixed inset-0 z-50 ${isOpen ? "pointer-events-auto" : "pointer-events-none"}`}
+      aria-hidden={!isOpen}
+    >
       <button
         type="button"
         aria-label="Close user details panel"
@@ -63,76 +69,102 @@ export default function AdminUserDetailsPanel({
       />
 
       <aside
-        className={`absolute right-0 top-0 z-10 h-dvh w-full max-w-full overflow-y-auto overscroll-y-contain border-l border-[var(--color-ink-border-faint)] bg-white shadow-[-14px_0_38px_rgba(31,18,51,0.24)] transition-transform duration-300 ease-out sm:w-[30rem] md:w-[34rem] ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        className={`absolute right-0 top-0 z-10 h-dvh w-full max-w-full overflow-y-auto overscroll-y-contain border-l border-(--color-ink-border-faint) bg-white shadow-[-14px_0_38px_rgba(31,18,51,0.24)] transition-transform duration-300 ease-out sm:w-120 md:w-136 ${isOpen ? "translate-x-0" : "translate-x-full"}`}
         role="dialog"
         aria-modal="true"
         aria-label="User details"
       >
         {user ? (
           <div className="flex min-h-full flex-col">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-ink-border-faint)] bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-(--color-ink-border-faint) bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
               <div>
-                <h2 className="text-lg font-bold text-[var(--color-ink-strong)]">User Details</h2>
-                <p className="mt-1 text-xs text-[var(--color-text-muted)]">Review and manage account status</p>
+                <h2 className="text-lg font-bold text-(--color-ink-strong)">
+                  User Details
+                </h2>
+                <p className="mt-1 text-xs text-(--color-text-muted)">
+                  Review and manage account status
+                </p>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--color-ink-border-soft)] text-[var(--color-text-muted)] transition hover:border-[var(--color-brand-primary)] hover:bg-[var(--color-brand-primary)] hover:text-white"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-(--color-ink-border-soft) text-(--color-text-muted) transition hover:border-(--color-brand-primary) hover:bg-(--color-brand-primary) hover:text-white"
               >
                 <Cross2Icon />
               </button>
             </div>
 
             <div className="flex-1 space-y-5 px-4 py-5 sm:px-6">
-              <section className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white p-4">
+              <section className="rounded-xl border border-(--color-ink-border-faint) bg-white p-4">
                 <div className="flex flex-col items-center text-center">
-                  <div className="grid h-20 w-20 place-items-center rounded-2xl bg-[var(--color-brand-primary)] text-3xl font-extrabold text-white">
+                  <div className="grid h-20 w-20 place-items-center rounded-2xl bg-(--color-brand-primary) text-3xl font-extrabold text-white">
                     {getInitials(user.name)}
                   </div>
-                  <h3 className="mt-3 text-xl font-extrabold text-[var(--color-ink-strong)]">{user.name}</h3>
-                  <p className="mt-1 text-sm text-[var(--color-text-muted)]">{user.email}</p>
+                  <h3 className="mt-3 text-xl font-extrabold text-(--color-ink-strong)">
+                    {user.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-(--color-text-muted)">
+                    {user.email}
+                  </p>
                 </div>
               </section>
 
-              <section className="rounded-xl border border-[var(--color-ink-border-faint)] bg-brand-soft/45 p-4">
-                <h3 className="text-sm font-bold text-[var(--color-ink-strong)]">User Information</h3>
-                <dl className="mt-3 grid grid-cols-1 gap-2 text-sm text-[var(--color-text-muted)] sm:grid-cols-2">
+              <section className="rounded-xl border border-(--color-ink-border-faint) bg-brand-soft/45 p-4">
+                <h3 className="text-sm font-bold text-(--color-ink-strong)">
+                  User Information
+                </h3>
+                <dl className="mt-3 grid grid-cols-1 gap-2 text-sm text-(--color-text-muted) sm:grid-cols-2">
                   <div className="flex items-start gap-2 rounded-lg bg-white/70 p-2">
-                    <PersonIcon className="mt-0.5 text-[var(--color-brand-primary)]" />
+                    <PersonIcon className="mt-0.5 text-(--color-brand-primary)" />
                     <div>
-                      <dt className="text-xs uppercase tracking-wide">Full Name</dt>
-                      <dd className="mt-0.5 font-medium text-[var(--color-ink-strong)]">{user.name}</dd>
+                      <dt className="text-xs uppercase tracking-wide">
+                        Full Name
+                      </dt>
+                      <dd className="mt-0.5 font-medium text-(--color-ink-strong)">
+                        {user.name}
+                      </dd>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 rounded-lg bg-white/70 p-2">
-                    <EnvelopeClosedIcon className="mt-0.5 text-[var(--color-brand-primary)]" />
+                    <EnvelopeClosedIcon className="mt-0.5 text-(--color-brand-primary)" />
                     <div>
                       <dt className="text-xs uppercase tracking-wide">Email</dt>
-                      <dd className="mt-0.5 break-all font-medium text-[var(--color-ink-strong)]">{user.email}</dd>
+                      <dd className="mt-0.5 break-all font-medium text-(--color-ink-strong)">
+                        {user.email}
+                      </dd>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 rounded-lg bg-white/70 p-2">
-                    <MobileIcon className="mt-0.5 text-[var(--color-brand-primary)]" />
+                    <MobileIcon className="mt-0.5 text-(--color-brand-primary)" />
                     <div>
                       <dt className="text-xs uppercase tracking-wide">Phone</dt>
-                      <dd className="mt-0.5 font-medium text-[var(--color-ink-strong)]">{user.phone}</dd>
+                      <dd className="mt-0.5 font-medium text-(--color-ink-strong)">
+                        {user.phone}
+                      </dd>
                     </div>
                   </div>
                   <div className="flex items-start gap-2 rounded-lg bg-white/70 p-2">
-                    <CalendarIcon className="mt-0.5 text-[var(--color-brand-primary)]" />
+                    <CalendarIcon className="mt-0.5 text-(--color-brand-primary)" />
                     <div>
-                      <dt className="text-xs uppercase tracking-wide">Joined</dt>
-                      <dd className="mt-0.5 font-medium text-[var(--color-ink-strong)]">{user.joinedAt}</dd>
+                      <dt className="text-xs uppercase tracking-wide">
+                        Joined
+                      </dt>
+                      <dd className="mt-0.5 font-medium text-(--color-ink-strong)">
+                        {user.joinedAt}
+                      </dd>
                     </div>
                   </div>
                 </dl>
               </section>
 
-              <section className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white p-4">
-                <h3 className="text-sm font-bold text-[var(--color-ink-strong)]">Account Status</h3>
+              <section className="rounded-xl border border-(--color-ink-border-faint) bg-white p-4">
+                <h3 className="text-sm font-bold text-(--color-ink-strong)">
+                  Account Status
+                </h3>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_STYLES[user.status]}`}>
+                  <span
+                    className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_STYLES[user.status]}`}
+                  >
                     {user.status}
                   </span>
 

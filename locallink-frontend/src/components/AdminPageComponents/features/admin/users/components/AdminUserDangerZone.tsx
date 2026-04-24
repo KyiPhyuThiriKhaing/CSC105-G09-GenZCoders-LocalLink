@@ -2,15 +2,21 @@ type AdminUserDangerZoneProps = {
   userName: string;
 };
 
-export default function AdminUserDangerZone({ userName }: AdminUserDangerZoneProps) {
+export default function AdminUserDangerZone({
+  userName,
+}: AdminUserDangerZoneProps) {
   return (
     <section className="rounded-xl border border-red-200 bg-red-50 p-4">
       <h3 className="text-sm font-bold text-red-700">Danger Zone</h3>
-      <p className="mt-1 text-xs text-red-600">These actions are irreversible</p>
+      <p className="mt-1 text-xs text-red-600">
+        These actions are irreversible
+      </p>
 
       <div className="mt-3 rounded-lg border border-red-200 bg-white p-3">
-        <p className="text-sm font-semibold text-[var(--color-ink-strong)]">Delete User Account</p>
-        <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+        <p className="text-sm font-semibold text-(--color-ink-strong)">
+          Delete User Account
+        </p>
+        <p className="mt-1 text-xs text-(--color-text-muted)">
           Permanently remove {userName} and associated account records.
         </p>
         <button
@@ -24,7 +30,9 @@ export default function AdminUserDangerZone({ userName }: AdminUserDangerZonePro
               return;
             }
 
-            window.alert("This is a UI placeholder. No deletion logic is connected.");
+            window.alert(
+              "This is a UI placeholder. No deletion logic is connected.",
+            );
           }}
           className="mt-3 inline-flex items-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
         >

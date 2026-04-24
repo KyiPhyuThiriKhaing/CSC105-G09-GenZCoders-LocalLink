@@ -16,7 +16,12 @@ function AdminDashboardStatsGrid({ stats }: AdminDashboardStatsGridProps) {
   return (
     <section className={styles.statsGrid} aria-label="Dashboard statistics">
       {stats.map((stat) => (
-        <AdminDashboardStatCard key={stat.label} label={stat.label} value={stat.value} Icon={stat.Icon} />
+        <AdminDashboardStatCard
+          key={stat.label}
+          label={stat.label}
+          value={stat.value}
+          Icon={stat.Icon}
+        />
       ))}
     </section>
   );

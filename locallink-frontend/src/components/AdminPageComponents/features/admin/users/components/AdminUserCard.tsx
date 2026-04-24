@@ -1,4 +1,7 @@
-import type { AdminUser, UserStatus } from "../../../../../../data/mockAdminData";
+import type {
+  AdminUser,
+  UserStatus,
+} from "../../../../../../data/mockAdminData";
 
 export interface AdminUserCardProps {
   user: AdminUser;
@@ -21,26 +24,35 @@ const getInitials = (name: string) =>
 
 export default function AdminUserCard({ user, onClick }: AdminUserCardProps) {
   return (
-    <article className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white px-3 py-2.5 shadow-[0_8px_18px_rgba(31,18,51,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(152,16,250,0.14)]">
+    <article className="rounded-xl border border-(--color-ink-border-faint) bg-white px-3 py-2.5 shadow-[0_8px_18px_rgba(31,18,51,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(152,16,250,0.14)]">
       <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-3">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[var(--color-brand-primary)] text-xs font-bold text-white">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-(--color-brand-primary) text-xs font-bold text-white">
           {getInitials(user.name)}
         </div>
 
         <div className="min-w-0 shrink basis-full sm:basis-auto">
-          <h3 className="truncate text-sm font-bold text-[var(--color-ink-strong)]">{user.name}</h3>
+          <h3 className="truncate text-sm font-bold text-(--color-ink-strong)">
+            {user.name}
+          </h3>
         </div>
 
-        <p className="max-w-[16rem] truncate text-xs text-[var(--color-text-muted)]" title={user.email}>
+        <p
+          className="max-w-[16rem] truncate text-xs text-(--color-text-muted)"
+          title={user.email}
+        >
           {user.email}
         </p>
-        <p className="text-xs text-[var(--color-text-muted)]">Joined {user.joinedAt}</p>
-        <span className="rounded-full border border-[var(--color-ink-border-faint)] px-2 py-0.5 text-xs text-[var(--color-text-muted)]">
+        <p className="text-xs text-(--color-text-muted)">
+          Joined {user.joinedAt}
+        </p>
+        <span className="rounded-full border border-(--color-ink-border-faint) px-2 py-0.5 text-xs text-(--color-text-muted)">
           {user.phone}
         </span>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[user.status]}`}>
+          <span
+            className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[user.status]}`}
+          >
             {user.status}
           </span>
 

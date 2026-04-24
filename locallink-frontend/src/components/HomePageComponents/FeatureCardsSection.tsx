@@ -5,13 +5,15 @@ function FeatureCardsSection() {
     <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
       <div className="mb-12 text-center max-w-2xl mx-auto">
         <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl text-balance">
-          Why choose <span className="text-[var(--color-brand-primary)]">Local Link?</span>
+          Why choose{" "}
+          <span className="text-(--color-brand-primary)">Local Link?</span>
         </h2>
         <p className="mt-4 text-lg leading-relaxed text-slate-600">
-          Everything you need to find flexible work or get an extra hand from neighbors you can trust.
+          Everything you need to find flexible work or get an extra hand from
+          neighbors you can trust.
         </p>
       </div>
-      
+
       <div className="grid gap-6 sm:grid-cols-2 lg:gap-8">
         <PromoCard
           title="Find Work Near You"

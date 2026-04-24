@@ -10,7 +10,12 @@ const PROFILE_NAV = [
 ];
 
 function getActiveKey(pathname: string): string | undefined {
-  if (pathname === "/profile" || pathname === "/profile/" || pathname.startsWith("/profile/my-profile")) return "My Profile";
+  if (
+    pathname === "/profile" ||
+    pathname === "/profile/" ||
+    pathname.startsWith("/profile/my-profile")
+  )
+    return "My Profile";
   if (pathname.startsWith("/profile/verify")) return "Verification";
   if (pathname.startsWith("/profile/history")) return "History";
   if (pathname.startsWith("/profile/settings")) return "Settings";
@@ -36,7 +41,7 @@ export default function ProfilePage() {
             className={({ isActive }) =>
               `shrink-0 border-b-2 px-5 py-4 text-sm font-bold whitespace-nowrap transition-colors ${
                 isActive
-                  ? "border-[var(--color-brand-primary)] text-[var(--color-brand-primary)]"
+                  ? "border-(--color-brand-primary) text-(--color-brand-primary)"
                   : "border-transparent text-slate-500 hover:text-slate-900"
               }`
             }

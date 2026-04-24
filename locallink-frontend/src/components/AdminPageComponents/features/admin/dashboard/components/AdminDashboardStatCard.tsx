@@ -7,7 +7,11 @@ type AdminDashboardStatCardProps = {
   Icon: ComponentType<{ className?: string }>;
 };
 
-function AdminDashboardStatCard({ label, value, Icon }: AdminDashboardStatCardProps) {
+function AdminDashboardStatCard({
+  label,
+  value,
+  Icon,
+}: AdminDashboardStatCardProps) {
   return (
     <article className={styles.statCard}>
       <div className={styles.statTop}>

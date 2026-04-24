@@ -6,7 +6,11 @@ type AdminDashboardActionCardProps = {
   onClick?: () => void;
 };
 
-function AdminDashboardActionCard({ title, text, onClick }: AdminDashboardActionCardProps) {
+function AdminDashboardActionCard({
+  title,
+  text,
+  onClick,
+}: AdminDashboardActionCardProps) {
   return (
     <button type="button" onClick={onClick} className={styles.actionCard}>
       <p className={styles.actionTitle}>{title}</p>

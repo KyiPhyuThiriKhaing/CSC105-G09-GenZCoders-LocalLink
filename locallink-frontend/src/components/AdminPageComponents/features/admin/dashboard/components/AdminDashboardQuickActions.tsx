@@ -11,7 +11,9 @@ type AdminDashboardQuickActionsProps = {
   actions: ActionItem[];
 };
 
-function AdminDashboardQuickActions({ actions }: AdminDashboardQuickActionsProps) {
+function AdminDashboardQuickActions({
+  actions,
+}: AdminDashboardQuickActionsProps) {
   return (
     <section className={styles.actionsWrap}>
       <h2 className={styles.actionsTitle}>Quick Actions</h2>

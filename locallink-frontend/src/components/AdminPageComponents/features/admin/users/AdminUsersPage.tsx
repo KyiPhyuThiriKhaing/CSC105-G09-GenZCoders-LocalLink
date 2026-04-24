@@ -22,19 +22,23 @@ export default function AdminUsersPage() {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return users.filter((user) => {
-      const matchesStatus = statusFilter === "All" ? true : user.status === statusFilter;
+      const matchesStatus =
+        statusFilter === "All" ? true : user.status === statusFilter;
       const matchesSearch =
         normalizedSearch.length === 0
           ? true
           : user.name.toLowerCase().includes(normalizedSearch) ||
-          user.email.toLowerCase().includes(normalizedSearch) ||
-          user.phone.toLowerCase().includes(normalizedSearch);
+            user.email.toLowerCase().includes(normalizedSearch) ||
+            user.phone.toLowerCase().includes(normalizedSearch);
 
       return matchesStatus && matchesSearch;
     });
   }, [users, searchTerm, statusFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredUsers.length / ITEMS_PER_PAGE),
+  );
 
   const sortedUsers = useMemo(() => {
     const usersToSort = [...filteredUsers];
@@ -61,7 +65,9 @@ export default function AdminUsersPage() {
   const totalUsers = users.length;
   const activeUsers = users.filter((user) => user.status === "Active").length;
   const pendingUsers = users.filter((user) => user.status === "Pending").length;
-  const suspendedUsers = users.filter((user) => user.status === "Suspended").length;
+  const suspendedUsers = users.filter(
+    (user) => user.status === "Suspended",
+  ).length;
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) {
@@ -106,28 +112,46 @@ export default function AdminUsersPage() {
   return (
     <div className="relative w-full">
       <header>
-        <h1 className="text-2xl font-extrabold text-[var(--color-ink-strong)] sm:text-3xl">Users Management</h1>
-        <p className="mt-1 text-sm text-[var(--color-text-muted)] sm:text-base">
+        <h1 className="text-2xl font-extrabold text-(--color-ink-strong) sm:text-3xl">
+          Users Management
+        </h1>
+        <p className="mt-1 text-sm text-(--color-text-muted) sm:text-base">
           Manage user accounts and permissions
         </p>
       </header>
 
       <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white p-3">
-          <p className="text-sm font-semibold text-[var(--color-text-muted)]">Total Users</p>
-          <p className="mt-1 text-3xl font-extrabold text-[var(--color-ink-strong)]">{totalUsers}</p>
+        <div className="rounded-xl border border-(--color-ink-border-faint) bg-white p-3">
+          <p className="text-sm font-semibold text-(--color-text-muted)">
+            Total Users
+          </p>
+          <p className="mt-1 text-3xl font-extrabold text-(--color-ink-strong)">
+            {totalUsers}
+          </p>
         </div>
-        <div className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white p-3">
-          <p className="text-sm font-semibold text-[var(--color-text-muted)]">Active Users</p>
-          <p className="mt-1 text-3xl font-extrabold text-green-600">{activeUsers}</p>
+        <div className="rounded-xl border border-(--color-ink-border-faint) bg-white p-3">
+          <p className="text-sm font-semibold text-(--color-text-muted)">
+            Active Users
+          </p>
+          <p className="mt-1 text-3xl font-extrabold text-green-600">
+            {activeUsers}
+          </p>
         </div>
-        <div className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white p-3">
-          <p className="text-sm font-semibold text-[var(--color-text-muted)]">Verification Pending</p>
-          <p className="mt-1 text-3xl font-extrabold text-yellow-600">{pendingUsers}</p>
+        <div className="rounded-xl border border-(--color-ink-border-faint) bg-white p-3">
+          <p className="text-sm font-semibold text-(--color-text-muted)">
+            Verification Pending
+          </p>
+          <p className="mt-1 text-3xl font-extrabold text-yellow-600">
+            {pendingUsers}
+          </p>
         </div>
-        <div className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white p-3">
-          <p className="text-sm font-semibold text-[var(--color-text-muted)]">Suspended Users</p>
-          <p className="mt-1 text-3xl font-extrabold text-red-600">{suspendedUsers}</p>
+        <div className="rounded-xl border border-(--color-ink-border-faint) bg-white p-3">
+          <p className="text-sm font-semibold text-(--color-text-muted)">
+            Suspended Users
+          </p>
+          <p className="mt-1 text-3xl font-extrabold text-red-600">
+            {suspendedUsers}
+          </p>
         </div>
       </div>
 
@@ -141,7 +165,7 @@ export default function AdminUsersPage() {
           value={searchTerm}
           onChange={(event) => handleSearchChange(event.target.value)}
           placeholder="Search users by name, email, or phone"
-          className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-focus-ring)]"
+          className="h-11 w-full rounded-xl border border-(--color-ink-border-soft) bg-white px-3 text-sm text-(--color-ink-strong) outline-none transition placeholder:text-(--color-text-muted) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring)"
         />
 
         <label className="sr-only" htmlFor="admin-users-status-filter">
@@ -150,8 +174,10 @@ export default function AdminUsersPage() {
         <select
           id="admin-users-status-filter"
           value={statusFilter}
-          onChange={(event) => handleFilterChange(event.target.value as StatusFilter)}
-          className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm font-medium text-[var(--color-ink-strong)] outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-focus-ring)] sm:w-56"
+          onChange={(event) =>
+            handleFilterChange(event.target.value as StatusFilter)
+          }
+          className="h-11 w-full rounded-xl border border-(--color-ink-border-soft) bg-white px-3 text-sm font-medium text-(--color-ink-strong) outline-none transition focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring) sm:w-56"
         >
           <option value="All">All statuses</option>
           <option value="Active">Active</option>
@@ -169,7 +195,7 @@ export default function AdminUsersPage() {
             setSortOrder(event.target.value as SortOrder);
             setCurrentPage(1);
           }}
-          className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm font-medium text-[var(--color-ink-strong)] outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-2 focus:ring-[var(--color-brand-focus-ring)] sm:w-56"
+          className="h-11 w-full rounded-xl border border-(--color-ink-border-soft) bg-white px-3 text-sm font-medium text-(--color-ink-strong) outline-none transition focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring) sm:w-56"
         >
           <option value="latest-to-oldest">Latest to oldest</option>
           <option value="oldest-to-latest">Oldest to latest</option>
@@ -178,7 +204,11 @@ export default function AdminUsersPage() {
 
       <div className="mt-5">
         <AdminUserList users={pagedUsers} onSelectUser={handleViewDetails} />
-        <AdminPagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        <AdminPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <AdminUserDetailsPanel
