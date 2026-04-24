@@ -3,6 +3,7 @@ import { authRouter } from "./auth.routes";
 import { usersRouter } from "./users.routes";
 import { jobsRouter } from "./jobs.routes";
 import { submissionsRouter } from "./submissions.routes";
+import { adminRouter } from "./admin.routes";
 
 export const apiRouter = Router();
 
@@ -14,3 +15,4 @@ apiRouter.use("/auth", authRouter);
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/jobs", jobsRouter);
 apiRouter.use("/submissions", submissionsRouter);
+apiRouter.use("/admin", adminRouter);
