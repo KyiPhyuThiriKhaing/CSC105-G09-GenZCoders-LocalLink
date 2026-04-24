@@ -3,7 +3,6 @@ import {
   CameraIcon,
   GlobeIcon,
   Share1Icon,
-  BackpackIcon,
   MagnifyingGlassIcon,
   ExclamationTriangleIcon,
 } from "@radix-ui/react-icons";
@@ -13,7 +12,7 @@ export default function MyProfilePage() {
   const user = currentUser;
 
   return (
-    <div className="max-w-4xl space-y-12 pb-10">
+    <div className="mx-auto max-w-4xl px-4 pb-10 sm:px-6 lg:px-8 space-y-12">
       <div className="group relative -mx-4 overflow-hidden rounded-b-[3rem] bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 pb-16 pt-32 sm:-mx-6 sm:rounded-[3rem] sm:pt-40 lg:-mx-8 lg:rounded-[4em]">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-(--color-brand-primary) opacity-20 blur-3xl"></div>
@@ -35,11 +34,11 @@ export default function MyProfilePage() {
           <p className="mt-2 text-lg font-medium text-slate-300 flex items-center justify-center gap-2">
             <GlobeIcon /> {user.location}
           </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <button className="flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-bold text-slate-900 transition-all hover:scale-105 hover:bg-(--color-brand-soft) hover:text-(--color-brand-primary) shadow-lg">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-bold text-slate-900 transition-all hover:scale-105 hover:bg-(--color-brand-soft) hover:text-(--color-brand-primary) shadow-lg">
               <Pencil1Icon /> Edit Profile
             </button>
-            <button className="flex items-center gap-2 rounded-2xl bg-slate-800/50 px-6 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all border border-white/10 hover:bg-slate-700/50 hover:scale-105">
+            <button className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl bg-slate-800/50 px-6 py-3 text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all border border-white/10 hover:bg-slate-700/50 hover:scale-105">
               <Share1Icon /> Share
             </button>
           </div>
@@ -54,15 +53,6 @@ export default function MyProfilePage() {
               About Me
             </h2>
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-slate-700">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
-                  <BackpackIcon className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-400">Role</p>
-                  <p className="text-sm font-bold">{user.role}</p>
-                </div>
-              </div>
               <div className="flex items-center gap-3 text-slate-700">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
                   <MagnifyingGlassIcon className="h-5 w-5" />
