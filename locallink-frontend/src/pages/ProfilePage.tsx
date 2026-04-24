@@ -23,10 +23,10 @@ export default function ProfilePage() {
   const activeKey = getActiveKey(pathname);
 
   return (
-    <div className="min-h-screen bg-[var(--color-brand-soft)]">
+    <div className="min-h-screen bg-slate-50">
       {/* Mobile-only horizontal tab bar */}
       <nav
-        className="sticky top-0 z-30 flex overflow-x-auto border-b border-[var(--color-ink-border-soft)] bg-white lg:hidden"
+        className="sticky top-16 z-30 flex overflow-x-auto border-b border-slate-200 bg-white/90 backdrop-blur-md lg:hidden"
         aria-label="Profile navigation"
       >
         {PROFILE_NAV.map((item) => (
@@ -34,10 +34,10 @@ export default function ProfilePage() {
             key={item.key}
             to={item.href}
             className={({ isActive }) =>
-              `shrink-0 border-b-2 px-4 py-3 text-sm font-semibold whitespace-nowrap transition ${
+              `shrink-0 border-b-2 px-5 py-4 text-sm font-bold whitespace-nowrap transition-colors ${
                 isActive
                   ? "border-[var(--color-brand-primary)] text-[var(--color-brand-primary)]"
-                  : "border-transparent text-[var(--color-text-muted)] hover:text-[var(--color-ink-strong)]"
+                  : "border-transparent text-slate-500 hover:text-slate-900"
               }`
             }
           >
@@ -47,9 +47,9 @@ export default function ProfilePage() {
       </nav>
 
       {/* Layout: sidebar (desktop) + content */}
-      <div className="mx-auto max-w-6xl px-4 pb-12 pt-4 sm:px-6 lg:flex lg:gap-6 lg:px-8 lg:pt-8">
+      <div className="mx-auto max-w-6xl px-4 pt-6 pb-20 sm:px-6 lg:flex lg:gap-10 lg:px-8 lg:pt-14 lg:pb-24">
         {/* Sidebar — desktop only */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block w-64 shrink-0">
           <Sidebar activeKey={activeKey} />
         </div>
 

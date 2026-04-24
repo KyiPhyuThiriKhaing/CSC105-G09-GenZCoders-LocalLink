@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
+import { PersonIcon, CheckCircledIcon, ClockIcon, GearIcon, ChatBubbleIcon, ExitIcon } from "@radix-ui/react-icons";
 
 type NavItem = {
     label: string;
@@ -7,120 +9,12 @@ type NavItem = {
 };
 
 const items: NavItem[] = [
-    {
-        label: "My Profile",
-        href: "/profile/my-profile",
-        icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4Zm0 2c-3.33 0-6 1.57-6 3.5V19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-1.5C18 15.57 15.33 14 12 14Z"
-                    fill="currentColor"
-                />
-            </svg>
-        ),
-    },
-    {
-        label: "Verification",
-        href: "/profile/verify",
-        icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                    d="m10.2 15.2-3.4-3.4 1.4-1.4 2 2 4.6-4.6 1.4 1.4-6 6Z"
-                    fill="currentColor"
-                />
-                <path
-                    d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z"
-                    stroke="currentColor"
-                    strokeWidth="1.2"
-                    fill="none"
-                />
-            </svg>
-        ),
-    },
-    {
-        label: "History",
-        href: "/profile/history",
-        icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                    d="M12 6v6l4 2"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-                <path
-                    d="M21 12a9 9 0 1 1-3.08-6.74"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-                <path
-                    d="M19 5v3h-3"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            </svg>
-        ),
-    },
-    {
-        label: "Settings",
-        href: "/profile/settings",
-        icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                    d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.03 7.03 0 0 0-1.63-.94L14.5 2.5a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 0-.5.5l-.3 2.42c-.6.24-1.16.56-1.68.94l-2.38-.96a.5.5 0 0 0-.62.22L2.6 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.05.64-.05.94 0 .31.01.63.05.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .62.22l2.38-.96c.52.38 1.08.7 1.68.94l.3 2.42a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5l.3-2.42c.6-.24 1.16-.56 1.68-.94l2.39.96a.5.5 0 0 0 .61-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"
-                    fill="currentColor"
-                />
-            </svg>
-        ),
-    },
-    {
-        label: "Chat",
-        href: "/profile/chat",
-        icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                    d="M4 5h16v9a2 2 0 0 1-2 2H7l-3 3V5Z"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-                <path
-                    d="M7 9h10M7 12h6"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                />
-            </svg>
-        ),
-    },
-    {
-        label: "Log Out",
-        href: "/logout",
-        icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                    d="M15 17v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v2"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-                <path
-                    d="M10 12h10m0 0-3-3m3 3-3 3"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                />
-            </svg>
-        ),
-    },
+    { label: "My Profile", href: "/profile/my-profile", icon: <PersonIcon className="h-5 w-5" /> },
+    { label: "Verification", href: "/profile/verify", icon: <CheckCircledIcon className="h-5 w-5" /> },
+    { label: "History", href: "/profile/history", icon: <ClockIcon className="h-5 w-5" /> },
+    { label: "Settings", href: "/profile/settings", icon: <GearIcon className="h-5 w-5" /> },
+    { label: "Chat", href: "/profile/chat", icon: <ChatBubbleIcon className="h-5 w-5" /> },
+    { label: "Log Out", href: "/logout", icon: <ExitIcon className="h-5 w-5" /> },
 ];
 
 type SidebarProps = {
@@ -132,21 +26,22 @@ function Sidebar({ activeKey }: SidebarProps) {
 
     const openLogoutModal = () => setIsLogoutModalOpen(true);
     const closeLogoutModal = () => setIsLogoutModalOpen(false);
-
-    const handleLogoutConfirm = () => {
-        // Placeholder until logout API/auth flow is implemented.
-        closeLogoutModal();
-    };
+    const handleLogoutConfirm = () => closeLogoutModal();
 
     return (
         <>
-            <aside className="w-56 shrink-0 rounded-2xl bg-white p-4">
-                <nav className="space-y-1">
+            <aside className="sticky top-32">
+                <nav className="flex flex-col gap-1.5">
                     {items.map((item) => {
-                        const sharedClassName = `flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white ${activeKey === item.label
-                            ? "bg-brand-soft text-brand-primary"
-                            : "text-(--color-ink-strong) hover:bg-brand-soft hover:text-brand-primary"
-                            }`;
+                        const sharedClassName = `group flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-focus-ring)] ${
+                            activeKey === item.label
+                                ? "bg-[var(--color-brand-primary)] text-white shadow-md shadow-[var(--color-brand-primary)]/20"
+                                : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900"
+                        }`;
+
+                        const iconClassName = `transition-transform group-hover:scale-110 ${
+                             activeKey === item.label ? "text-white" : "text-slate-400 group-hover:text-[var(--color-brand-primary)]"
+                        }`;
 
                         if (item.label === "Log Out") {
                             return (
@@ -154,57 +49,32 @@ function Sidebar({ activeKey }: SidebarProps) {
                                     key={item.label}
                                     type="button"
                                     onClick={openLogoutModal}
-                                    className={sharedClassName}
+                                    className="group mt-4 flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left text-sm font-bold text-red-600 transition-all hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-100"
                                 >
-                                    <span className="text-brand-primary">{item.icon}</span>
+                                    <span className="text-red-400 transition-transform group-hover:scale-110 group-hover:text-red-600">{item.icon}</span>
                                     <span>{item.label}</span>
                                 </button>
                             );
                         }
 
                         return (
-                            <a
-                                key={item.label}
-                                href={item.href}
-                                className={sharedClassName}
-                            >
-                                <span className="text-brand-primary">{item.icon}</span>
+                            <Link key={item.label} to={item.href} className={sharedClassName}>
+                                <span className={iconClassName}>{item.icon}</span>
                                 <span>{item.label}</span>
-                            </a>
+                            </Link>
                         );
                     })}
                 </nav>
             </aside>
 
             {isLogoutModalOpen && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="logout-modal-title"
-                >
-                    <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
-                        <h2 id="logout-modal-title" className="text-lg font-bold text-(--color-ink-strong)">
-                            Confirm Log Out
-                        </h2>
-                        <p className="mt-2 text-sm text-slate-600">
-                            Are you sure you want to log out?
-                        </p>
-                        <div className="mt-5 flex justify-end gap-2">
-                            <button
-                                type="button"
-                                onClick={closeLogoutModal}
-                                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleLogoutConfirm}
-                                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
-                            >
-                                Log Out
-                            </button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm animate-in fade-in">
+                    <div className="w-full max-w-sm rounded-[2rem] bg-white p-6 shadow-2xl animate-in zoom-in-95">
+                        <h2 className="text-xl font-bold text-slate-900">Sign out</h2>
+                        <p className="mt-2.5 text-sm text-slate-500">Are you sure you want to log out of your account?</p>
+                        <div className="mt-8 flex gap-3">
+                            <button onClick={closeLogoutModal} className="w-full rounded-2xl border border-slate-200 p-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50">Cancel</button>
+                            <button onClick={handleLogoutConfirm} className="w-full rounded-2xl bg-red-600 p-3 text-sm font-bold text-white transition hover:bg-red-700 shadow-lg shadow-red-600/20">Sign Out</button>
                         </div>
                     </div>
                 </div>

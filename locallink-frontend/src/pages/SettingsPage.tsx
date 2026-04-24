@@ -1,93 +1,100 @@
 export default function SettingsPage() {
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-lg font-bold text-[var(--color-ink-strong)]">Account Settings</h1>
-        <p className="mt-0.5 text-sm text-[var(--color-text-muted)]">Manage your email and password.</p>
+    <div className="max-w-2xl">
+      <div className="mb-10">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Account Settings</h1>
+        <p className="mt-2 text-base text-slate-500">Manage your email address, password, and security preferences.</p>
       </div>
 
-      <section className="rounded-2xl border border-[var(--color-ink-border-soft)] bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="mb-4 text-base font-bold text-[var(--color-ink-strong)]">Change Email</h2>
-        <div className="space-y-3">
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[var(--color-ink-strong)]" htmlFor="current-email">
-              Current Email
-            </label>
-            <input
-              id="current-email"
-              type="email"
-              placeholder="you@example.com"
-              className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
-            />
+      <div className="space-y-12">
+        <section>
+          <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
+            <h2 className="text-lg font-bold text-slate-900">Email Address</h2>
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[var(--color-ink-strong)]" htmlFor="new-email">
-              New Email
-            </label>
-            <input
-              id="new-email"
-              type="email"
-              placeholder="new-email@example.com"
-              className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
-            />
+          
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-bold text-slate-700" htmlFor="current-email">
+                Current Email
+              </label>
+              <input
+                id="current-email"
+                type="email"
+                placeholder="you@example.com"
+                className="h-12 w-full rounded-2xl border-2 border-slate-100 bg-slate-50 px-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[var(--color-brand-primary)] focus:bg-white focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-bold text-slate-700" htmlFor="new-email">
+                New Email
+              </label>
+              <input
+                id="new-email"
+                type="email"
+                placeholder="new-email@example.com"
+                className="h-12 w-full rounded-2xl border-2 border-slate-100 bg-slate-50 px-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[var(--color-brand-primary)] focus:bg-white focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
+              />
+            </div>
           </div>
-          <div className="pt-1">
-            <button
-              type="button"
-              className="rounded-xl bg-[var(--color-brand-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--color-brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-accent)]"
-            >
+          
+          <div className="mt-6 flex justify-end">
+            <button className="rounded-xl bg-slate-900 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-slate-800 hover:scale-105 hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200">
               Update Email
             </button>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="rounded-2xl border border-[var(--color-ink-border-soft)] bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="mb-4 text-base font-bold text-[var(--color-ink-strong)]">Change Password</h2>
-        <div className="space-y-3">
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[var(--color-ink-strong)]" htmlFor="current-password">
-              Current Password
-            </label>
-            <input
-              id="current-password"
-              type="password"
-              placeholder="Enter current password"
-              className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
-            />
+        <section>
+          <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
+            <h2 className="text-lg font-bold text-slate-900">Change Password</h2>
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[var(--color-ink-strong)]" htmlFor="new-password">
-              New Password
-            </label>
-            <input
-              id="new-password"
-              type="password"
-              placeholder="Enter new password"
-              className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
-            />
+          
+          <div className="space-y-6">
+            <div className="max-w-md">
+              <label className="mb-2 block text-sm font-bold text-slate-700" htmlFor="current-password">
+                Current Password
+              </label>
+              <input
+                id="current-password"
+                type="password"
+                placeholder="Enter current password"
+                className="h-12 w-full rounded-2xl border-2 border-slate-100 bg-slate-50 px-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[var(--color-brand-primary)] focus:bg-white focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
+              />
+            </div>
+            
+            <div className="grid gap-6 sm:grid-cols-2 max-w-2xl">
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700" htmlFor="new-password">
+                  New Password
+                </label>
+                <input
+                  id="new-password"
+                  type="password"
+                  placeholder="Enter new password"
+                  className="h-12 w-full rounded-2xl border-2 border-slate-100 bg-slate-50 px-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[var(--color-brand-primary)] focus:bg-white focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-bold text-slate-700" htmlFor="confirm-password">
+                  Confirm Password
+                </label>
+                <input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="Confirm new password"
+                  className="h-12 w-full rounded-2xl border-2 border-slate-100 bg-slate-50 px-4 text-sm font-medium text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-[var(--color-brand-primary)] focus:bg-white focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-[var(--color-ink-strong)]" htmlFor="confirm-password">
-              Confirm New Password
-            </label>
-            <input
-              id="confirm-password"
-              type="password"
-              placeholder="Confirm new password"
-              className="h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
-            />
-          </div>
-          <div className="pt-1">
-            <button
-              type="button"
-              className="rounded-xl bg-[var(--color-brand-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--color-brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-accent)]"
-            >
+          
+          <div className="mt-6 flex justify-end">
+            <button className="rounded-xl bg-slate-900 px-6 py-3 text-sm font-bold text-white transition-all hover:bg-slate-800 hover:scale-105 hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200">
               Update Password
             </button>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }
