@@ -1,4 +1,5 @@
 import { ClockIcon, CheckCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
+import { otherUsers } from "../data/mockUsers";
 
 export default function HistoryPage() {
   const jobsApplied = [
@@ -14,8 +15,8 @@ export default function HistoryPage() {
   ];
 
   const jobsAccepted = [
-    { title: "Pet Sitting", user: "Sarah Johnson", price: "฿600", active: true },
-    { title: "Snow Shoveling", user: "Mike Davis", price: "฿400", active: false },
+    { title: "Pet Sitting", user: otherUsers[0].name, price: "฿600", active: true },
+    { title: "Snow Shoveling", user: otherUsers[1].name, price: "฿400", active: false },
   ];
 
   return (

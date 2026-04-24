@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { currentUser } from "../data/mockUsers";
 
 type ProfileMenuItem = {
   label: string;
@@ -68,22 +69,20 @@ function Header() {
   const handleLogoutConfirm = () => setIsLogoutModalOpen(false);
 
   const linkClassName = ({ isActive }: { isActive: boolean }) =>
-    `relative text-sm font-bold transition-all duration-200 ${
-      isActive
-        ? "text-[var(--color-brand-primary)] after:absolute after:left-0 after:-bottom-1.5 after:h-[2px] after:w-full after:bg-[var(--color-brand-primary)] after:rounded-t-full"
-        : "text-slate-500 hover:text-slate-900"
+    `relative text-sm font-bold transition-all duration-200 ${isActive
+      ? "text-[var(--color-brand-primary)] after:absolute after:left-0 after:-bottom-1.5 after:h-[2px] after:w-full after:bg-[var(--color-brand-primary)] after:rounded-t-full"
+      : "text-slate-500 hover:text-slate-900"
     }`;
 
   const mobileLinkClassName = ({ isActive }: { isActive: boolean }) =>
-    `block py-3 text-2xl font-bold transition-colors ${
-      isActive ? "text-[var(--color-brand-primary)]" : "text-slate-900 hover:text-[var(--color-brand-primary)]"
+    `block py-3 text-2xl font-bold transition-colors ${isActive ? "text-[var(--color-brand-primary)]" : "text-slate-900 hover:text-[var(--color-brand-primary)]"
     }`;
 
   return (
     <>
       <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${scrolled ? "bg-white/85 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.04)] border-b border-white/20" : "bg-white border-b border-transparent"}`}>
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 sm:px-6">
-          
+
           <div className="flex items-center gap-4">
             <NavLink to="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
               <img src="/locallink.png" alt="" className="h-8 w-auto" aria-hidden="true" />
@@ -103,14 +102,14 @@ function Header() {
                 className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-200 ${isProfileMenuOpen ? 'border-[var(--color-brand-primary)] bg-[var(--color-brand-soft)] shadow-sm scale-105' : 'border-slate-100 bg-slate-50 hover:border-slate-200 hover:bg-slate-100'}`}
                 onClick={() => setIsProfileMenuOpen((prev) => !prev)}
               >
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Profile" className="h-full w-full rounded-full object-cover" />
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}&backgroundColor=f8fafc`} alt="Profile" className="h-full w-full rounded-full object-cover" />
               </button>
 
               {isProfileMenuOpen && (
                 <div className="absolute right-0 top-[4.25rem] z-50 w-60 overflow-hidden rounded-[1.5rem] border border-white/50 bg-white/95 p-2 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-in fade-in slide-in-from-top-2">
                   <div className="px-4 py-3 mb-1 border-b border-slate-100">
-                    <p className="text-sm font-bold text-slate-900">Alex Johnson</p>
-                    <p className="text-xs text-slate-500">alex@example.com</p>
+                    <p className="text-sm font-bold text-slate-900">{currentUser.name}</p>
+                    <p className="text-xs text-slate-500">{currentUser.name.split(' ').join('.').toLowerCase()}@example.com</p>
                   </div>
                   {profileMenuItems.map((item) => (
                     <NavLink
@@ -142,7 +141,7 @@ function Header() {
               aria-label="Toggle menu"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${isMobileMenuOpen ? "rotate-90 hidden" : "block"}`}>
-                <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+                <line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" />
               </svg>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${isMobileMenuOpen ? "block" : "hidden"}`}>
                 <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
@@ -165,7 +164,7 @@ function Header() {
               </NavLink>
             ))}
           </nav>
-          
+
           <div className="mt-auto pb-10">
             <button
               onClick={handleOpenLogoutModal}

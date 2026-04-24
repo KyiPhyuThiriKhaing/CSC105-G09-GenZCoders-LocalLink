@@ -1,25 +1,19 @@
 import { Pencil1Icon, CameraIcon, GlobeIcon, Share1Icon, BackpackIcon, MagnifyingGlassIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { currentUser } from "../data/mockUsers";
 
 export default function MyProfilePage() {
-  const user = {
-    name: "John Doe",
-    role: "Local Service Provider",
-    location: "Bangkok, Thailand",
-    bio: "Passionate about helping people with daily tasks and providing reliable community services.",
-    skills: ["Lawn Mowing", "House Cleaning", "Pet Sitting"],
-    joined: "March 2026",
-  };
+  const user = currentUser;
 
   return (
     <div className="max-w-4xl space-y-12 pb-10">
       <div className="group relative -mx-4 overflow-hidden rounded-b-[3rem] bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 pb-16 pt-32 sm:-mx-6 sm:rounded-[3rem] sm:pt-40 lg:-mx-8 lg:rounded-[4em]">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
         <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full bg-[var(--color-brand-primary)] opacity-20 blur-3xl"></div>
-        
+
         <div className="relative z-10 mx-auto max-w-2xl px-6 text-center">
           <div className="relative mx-auto mb-6 h-32 w-32 shrink-0">
             <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=John&backgroundColor=f8fafc"
+              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.name)}&backgroundColor=f8fafc`}
               alt="Profile"
               className="h-full w-full rounded-[2rem] border-4 border-white/10 bg-white object-cover shadow-2xl transition-transform duration-500 group-hover:scale-105"
             />

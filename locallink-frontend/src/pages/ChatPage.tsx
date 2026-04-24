@@ -1,10 +1,11 @@
 import { PaperPlaneIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { currentUser, otherUsers } from "../data/mockUsers";
 
 export default function ChatPage() {
   const conversations = [
-    { id: 1, name: "Sarah Johnson", lastMessage: "Yes, 3 PM works for me!", time: "10:42 AM", unread: 2 },
-    { id: 2, name: "Mike Davis", lastMessage: "Can you bring your own tools?", time: "Yesterday", unread: 0 },
-    { id: 3, name: "Emma Smith", lastMessage: "Thank you for the excellent service", time: "Mon", unread: 0 },
+    { id: otherUsers[0].id, name: otherUsers[0].name, lastMessage: "Yes, 3 PM works for me!", time: "10:42 AM", unread: 2 },
+    { id: otherUsers[1].id, name: otherUsers[1].name, lastMessage: "Can you bring your own tools?", time: "Yesterday", unread: 0 },
+    { id: otherUsers[2].id, name: otherUsers[2].name, lastMessage: "Thank you for the excellent service", time: "Mon", unread: 0 },
   ];
 
   return (
@@ -24,12 +25,11 @@ export default function ChatPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {conversations.map((chat) => (
+          {conversations.map((chat, idx) => (
             <div
               key={chat.id}
-              className={`flex cursor-pointer items-start gap-3 p-4 transition-colors ${
-                chat.id === 1 ? 'bg-[var(--color-brand-soft)]/20 border-l-4 border-[var(--color-brand-primary)]' : 'hover:bg-slate-100 border-l-4 border-transparent'
-              }`}
+              className={`flex cursor-pointer items-start gap-3 p-4 transition-colors ${idx === 0 ? 'bg-[var(--color-brand-soft)]/20 border-l-4 border-[var(--color-brand-primary)]' : 'hover:bg-slate-100 border-l-4 border-transparent'
+                }`}
             >
               <div className="relative">
                 <img
@@ -65,12 +65,12 @@ export default function ChatPage() {
         <div className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah Johnson&backgroundColor=e2e8f0"
-              alt="Sarah Johnson"
+              src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${otherUsers[0].name}&backgroundColor=e2e8f0`}
+              alt={otherUsers[0].name}
               className="h-10 w-10 rounded-full object-cover"
             />
             <div>
-              <h2 className="text-base font-bold text-slate-900">Sarah Johnson</h2>
+              <h2 className="text-base font-bold text-slate-900">{otherUsers[0].name}</h2>
               <p className="text-xs font-medium text-emerald-500 flex items-center gap-1">
                 <span className="h-2 w-2 rounded-full bg-emerald-500"></span> Online
               </p>
@@ -82,9 +82,9 @@ export default function ChatPage() {
         {/* Messages List */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
           <div className="flex items-end gap-2">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah Johnson&backgroundColor=e2e8f0" className="h-8 w-8 rounded-full mb-1" alt="" />
+            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${otherUsers[0].name}&backgroundColor=e2e8f0`} className="h-8 w-8 rounded-full mb-1" alt="" />
             <div className="rounded-2xl rounded-bl-none bg-white p-3 shadow-sm border border-slate-100 max-w-md">
-              <p className="text-sm font-medium text-slate-800">Hi John! I saw your proposal for the pet sitting job this weekend. Are you still available?</p>
+              <p className="text-sm font-medium text-slate-800">Hi {currentUser.name.split(' ')[0]}! I saw your proposal for the pet sitting job this weekend. Are you still available?</p>
               <span className="mt-1 block text-[10px] text-slate-400">10:30 AM</span>
             </div>
           </div>
@@ -97,15 +97,15 @@ export default function ChatPage() {
           </div>
 
           <div className="flex items-end gap-2">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah Johnson&backgroundColor=e2e8f0" className="h-8 w-8 rounded-full mb-1" alt="" />
+            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${otherUsers[0].name}&backgroundColor=e2e8f0`} className="h-8 w-8 rounded-full mb-1" alt="" />
             <div className="rounded-2xl rounded-bl-none bg-white p-3 shadow-sm border border-slate-100 max-w-md">
               <p className="text-sm font-medium text-slate-800">I need someone from Saturday morning until Sunday evening. We can discuss the exact feeding schedule if that works for you.</p>
               <span className="mt-1 block text-[10px] text-slate-400">10:40 AM</span>
             </div>
           </div>
 
-           <div className="flex items-end gap-2">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah Johnson&backgroundColor=e2e8f0" className="h-8 w-8 rounded-full mb-1" alt="" />
+          <div className="flex items-end gap-2">
+            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${otherUsers[0].name}&backgroundColor=e2e8f0`} className="h-8 w-8 rounded-full mb-1" alt="" />
             <div className="rounded-2xl rounded-bl-none bg-white p-3 shadow-sm border border-slate-100 max-w-md">
               <p className="text-sm font-medium text-slate-800">Yes, 3 PM works for me!</p>
               <span className="mt-1 block text-[10px] text-slate-400">10:42 AM</span>
