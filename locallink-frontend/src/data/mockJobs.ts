@@ -1,6 +1,22 @@
 import { otherUsers } from "./mockUsers";
+import { z } from "zod";
 
-export const MOCK_JOBS = [
+export type Job = {
+  id: string;
+  title: string;
+  image: string;
+  location: string;
+  feeRange: string;
+  timeRange: string;
+  postedAt: string;
+  description: string;
+  poster: {
+    name: string;
+    avatar: string;
+  };
+};
+
+export const MOCK_JOBS: Job[] = [
   {
     id: "1",
     title: "Help move small furniture",
@@ -149,3 +165,44 @@ export const MOCK_HISTORY_ACCEPTED = [
     active: false,
   },
 ];
+
+const CREATED_JOBS_KEY = "locallink.createdJobs";
+
+function parseStoredJobs() {
+  if (typeof window === "undefined") {
+    return [] as Job[];
+  }
+
+  try {
+    const raw = window.localStorage.getItem(CREATED_JOBS_KEY);
+    if (!raw) {
+      return [] as Job[];
+    }
+    const parsed = JSON.parse(raw) as Job[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [] as Job[];
+  }
+}
+
+export function getJobs(): Job[] {
+  return [...parseStoredJobs(), ...MOCK_JOBS];
+}
+
+export function saveJob(job: Job) {
+  const stored = parseStoredJobs();
+  window.localStorage.setItem(CREATED_JOBS_KEY, JSON.stringify([job, ...stored]));
+}
+
+export const jobPostSchema = z.object({
+  title: z.string().min(10, "Please provide a descriptive job title."),
+  location: z.string().min(5, "Enter the job location or area.").max(80),
+  image: z.string().url("Enter a valid image URL.").or(z.literal("")),
+  feeRange: z.string().min(3, "Enter an expected pay range."),
+  timeRange: z.string().min(3, "Enter the estimated duration."),
+  contact: z.string().min(5, "Enter how applicants should contact you."),
+  description: z.string().min(20, "Tell helpers more about the task.").max(1000),
+  requirements: z.string().max(400).optional(),
+});
+
+export type JobPostFormValues = z.infer<typeof jobPostSchema>;

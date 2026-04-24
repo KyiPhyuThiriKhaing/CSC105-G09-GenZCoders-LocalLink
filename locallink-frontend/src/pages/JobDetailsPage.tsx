@@ -4,11 +4,12 @@ import {
   ClockIcon,
 } from "@radix-ui/react-icons";
 import { Link, useParams } from "react-router-dom";
-import { MOCK_JOBS } from "../data/mockJobs";
+import { getJobs } from "../data/mockJobs";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
-  const job = MOCK_JOBS.find((j) => j.id === id) || MOCK_JOBS[0];
+  const jobs = getJobs();
+  const job = jobs.find((j) => j.id === id) || jobs[0];
 
   return (
     <div className="min-h-screen bg-white pb-24 lg:pb-20">

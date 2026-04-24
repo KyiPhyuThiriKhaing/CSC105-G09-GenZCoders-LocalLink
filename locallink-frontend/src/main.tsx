@@ -19,6 +19,7 @@ import AdminDashboardPage from "./pages/AdminDashboardPage.tsx";
 import SubmissionsPage from "./pages/SubmissionsPage.tsx";
 import UsersPage from "./pages/UsersPage.tsx";
 import MyProfilePage from "./pages/MyProfilePage.tsx";
+import PostJobPage from "./pages/PostJobPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "jobs",
         element: <JobsPage />,
+      },
+      {
+        path: "jobs/post",
+        element: <PostJobPage />,
       },
       {
         path: "jobs/:id",

@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
-import { MOCK_JOBS } from "../data/mockJobs";
-import JobPostDialog from "../components/JobPostDialog";
+import { getJobs } from "../data/mockJobs";
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState(MOCK_JOBS);
+  const [jobs, setJobs] = useState(() => getJobs());
+  useEffect(() => {
+    setJobs(getJobs());
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredJobs = jobs.filter((job) =>
@@ -39,29 +41,12 @@ export default function JobsPage() {
                 className="w-full bg-transparent py-4 pl-14 pr-6 text-base font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
-            <JobPostDialog
-              onCreate={(values) => {
-                setJobs((currentJobs) => [
-                  ...currentJobs,
-                  {
-                    id: Date.now().toString(),
-                    title: values.title,
-                    location: values.location,
-                    feeRange: values.feeRange,
-                    timeRange: values.timeRange,
-                    postedAt: "Just now",
-                    description: values.description,
-                    image:
-                      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
-                    poster: {
-                      name: "You",
-                      avatar:
-                        "https://api.dicebear.com/7.x/avataaars/svg?seed=You&backgroundColor=e2e8f0",
-                    },
-                  },
-                ]);
-              }}
-            />
+            <Link
+              to="/jobs/post"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-(--color-brand-primary) px-8 py-4 text-sm font-bold text-white shadow-lg shadow-(--color-brand-primary)/25 transition-all hover:bg-(--color-brand-primary-hover) hover:scale-[1.02]"
+            >
+              Post a Job
+            </Link>
           </div>
         </div>
       </div>
