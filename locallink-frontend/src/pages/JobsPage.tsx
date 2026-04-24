@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { MagnifyingGlassIcon, PlusIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
-
-const MOCK_JOBS = [
-  { id: "1", title: "Help move small furniture", image: "https://images.unsplash.com/photo-1585421514738-01798e348b17?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Downtown / 1.2 miles away", feeRange: "฿200 - ฿350", timeRange: "1–2 hours", postedAt: "2h ago" },
-  { id: "2", title: "Dog walking (2 dogs)", image: "https://images.unsplash.com/photo-1541599540903-216a46ca1dc0?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Westside Park / 0.5 miles away", feeRange: "฿150 - ฿200", timeRange: "45 mins", postedAt: "4h ago" },
-  { id: "3", title: "High-school Math Tutoring", image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Local Library / 3.0 miles away", feeRange: "฿300 - ฿400 / hr", timeRange: "1.5 hours", postedAt: "5h ago" },
-  { id: "4", title: "Grocery Pickup & Delivery", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Whole Foods / 2.1 miles away", feeRange: "฿150 + tips", timeRange: "1 hour", postedAt: "1d ago" },
-  { id: "5", title: "Assemble IKEA desk", image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "North Suburbs / 4.5 miles away", feeRange: "฿400 - ฿550", timeRange: "2–3 hours", postedAt: "1d ago" },
-  { id: "6", title: "Yard work & Leaf raking", image: "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", location: "Eastside / 2.8 miles away", feeRange: "฿250 - ฿400", timeRange: "3 hours", postedAt: "2d ago" },
-];
+import { MOCK_JOBS } from "../data/mockJobs";
 
 export default function JobsPage() {
   const [searchQuery, setSearchQuery] = useState("");

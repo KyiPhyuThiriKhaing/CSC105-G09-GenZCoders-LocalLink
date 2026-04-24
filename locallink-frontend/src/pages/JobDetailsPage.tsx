@@ -1,26 +1,10 @@
 import { ArrowLeftIcon, DrawingPinIcon, ClockIcon } from "@radix-ui/react-icons";
 import { Link, useParams } from "react-router-dom";
-import { otherUsers } from "../data/mockUsers";
-
-const MOCK_JOB_DETAIL = {
-  id: "1",
-  title: "Help move small furniture",
-  image: "https://images.unsplash.com/photo-1585421514738-01798e348b17?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
-  location: "Downtown / 1.2 miles away",
-  feeRange: "฿200 - ฿350",
-  timeRange: "1–2 hours",
-  postedAt: "2h ago",
-  description: `I need an extra pair of hands to help move a small couch, a coffee table, and a few boxes from my living room downstairs to a moving truck.\n\nThere is an elevator in the building, so no heavy lifting down the stairs is required. The items are not overly heavy, but definitely require two people to carry safely without scratching the walls.\n\nI'll be there to help lift, I just need one extra person. Should take about an hour, maybe a bit more depending on how fast we move.`,
-  poster: {
-    name: otherUsers[0].name,
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(otherUsers[0].name)}&backgroundColor=e2e8f0`,
-  },
-};
+import { MOCK_JOBS } from "../data/mockJobs";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
-  void id;
-  const job = MOCK_JOB_DETAIL;
+  const job = MOCK_JOBS.find(j => j.id === id) || MOCK_JOBS[0];
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24 lg:pb-20">

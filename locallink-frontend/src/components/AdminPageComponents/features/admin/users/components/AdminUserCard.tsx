@@ -1,9 +1,9 @@
-import type { AdminUser, UserStatus } from "../types";
+import type { AdminUser, UserStatus } from "../../../../../../data/mockAdminData";
 
-type AdminUserCardProps = {
+export interface AdminUserCardProps {
   user: AdminUser;
-  onViewDetails: (user: AdminUser) => void;
-};
+  onClick: () => void;
+}
 
 const STATUS_STYLES: Record<UserStatus, string> = {
   Active: "bg-green-100 text-green-800 border-green-200",
@@ -19,7 +19,7 @@ const getInitials = (name: string) =>
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
 
-export default function AdminUserCard({ user, onViewDetails }: AdminUserCardProps) {
+export default function AdminUserCard({ user, onClick }: AdminUserCardProps) {
   return (
     <article className="rounded-xl border border-[var(--color-ink-border-faint)] bg-white px-3 py-2.5 shadow-[0_8px_18px_rgba(31,18,51,0.07)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(152,16,250,0.14)]">
       <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-3">
@@ -46,7 +46,7 @@ export default function AdminUserCard({ user, onViewDetails }: AdminUserCardProp
 
           <button
             type="button"
-            onClick={() => onViewDetails(user)}
+            onClick={onClick}
             className="inline-flex items-center rounded-lg bg-brand-primary px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-primary-hover"
           >
             View details →

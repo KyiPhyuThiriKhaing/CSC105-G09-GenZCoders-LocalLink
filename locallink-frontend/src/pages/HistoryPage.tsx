@@ -1,23 +1,10 @@
 import { ClockIcon, CheckCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
-import { otherUsers } from "../data/mockUsers";
+import { MOCK_HISTORY_APPLIED, MOCK_HISTORY_OFFERED, MOCK_HISTORY_ACCEPTED } from "../data/mockJobs";
 
 export default function HistoryPage() {
-  const jobsApplied = [
-    { title: "Lawn Mowing Service", location: "Downtown, Springfield", price: "฿350", status: "Contacted" },
-    { title: "Dog Walking", location: "Riverside Park", price: "฿200", status: "Pending" },
-    { title: "Grocery Delivery", location: "Oak Street", price: "฿250", status: "Pending" },
-  ];
-
-  const jobsOffered = [
-    { title: "House Cleaning", date: "Mar 20, 2026", price: "฿750", applicants: 8 },
-    { title: "Furniture Assembly", date: "Mar 18, 2026", price: "฿500", applicants: 5 },
-    { title: "Plant Watering", date: "Mar 16, 2026", price: "฿150", applicants: 12 },
-  ];
-
-  const jobsAccepted = [
-    { title: "Pet Sitting", user: otherUsers[0].name, price: "฿600", active: true },
-    { title: "Snow Shoveling", user: otherUsers[1].name, price: "฿400", active: false },
-  ];
+  const jobsApplied = MOCK_HISTORY_APPLIED;
+  const jobsOffered = MOCK_HISTORY_OFFERED;
+  const jobsAccepted = MOCK_HISTORY_ACCEPTED;
 
   return (
     <div className="max-w-4xl">

@@ -7,14 +7,14 @@ import {
 } from "@radix-ui/react-icons";
 import { useEffect } from "react";
 import AdminUserDangerZone from "./AdminUserDangerZone";
-import type { AdminUser, UserStatus } from "../types";
+import type { AdminUser, UserStatus } from "../../../../../../data/mockAdminData";
 
-type AdminUserDetailsPanelProps = {
+export interface AdminUserDetailsPanelProps {
   user: AdminUser | null;
   isOpen: boolean;
   onClose: () => void;
-  onStatusChange: (userId: number, status: UserStatus) => void;
-};
+  onUpdateStatus: (userId: number, status: AdminUser["status"]) => void;
+}
 
 const STATUS_STYLES: Record<UserStatus, string> = {
   Active: "bg-green-100 text-green-800 border-green-200",
@@ -34,7 +34,7 @@ export default function AdminUserDetailsPanel({
   user,
   isOpen,
   onClose,
-  onStatusChange,
+  onUpdateStatus,
 }: AdminUserDetailsPanelProps) {
   useEffect(() => {
     if (!isOpen) {
@@ -146,7 +146,7 @@ export default function AdminUserDetailsPanel({
                         if (!shouldSuspend) {
                           return;
                         }
-                        onStatusChange(user.id, "Suspended");
+                        onUpdateStatus(user.id, "Suspended");
                       }}
                       className="inline-flex items-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
                     >
@@ -157,7 +157,7 @@ export default function AdminUserDetailsPanel({
                   {user.status === "Suspended" ? (
                     <button
                       type="button"
-                      onClick={() => onStatusChange(user.id, "Active")}
+                      onClick={() => onUpdateStatus(user.id, "Active")}
                       className="inline-flex items-center rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
                     >
                       Activate User

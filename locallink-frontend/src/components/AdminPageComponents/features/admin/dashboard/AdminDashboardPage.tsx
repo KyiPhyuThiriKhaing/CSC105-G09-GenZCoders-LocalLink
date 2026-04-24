@@ -9,12 +9,13 @@ import styles from "./AdminDashboardPage.module.css";
 import AdminDashboardHeader from "./components/AdminDashboardHeader";
 import AdminDashboardStatsGrid from "./components/AdminDashboardStatsGrid";
 import AdminDashboardQuickActions from "./components/AdminDashboardQuickActions";
+import { MOCK_DASHBOARD_STATS } from "../../../../../data/mockAdminData";
 
 const DASHBOARD_STATS = [
-  { label: "Total Submissions", value: 8, Icon: FileTextIcon },
-  { label: "Pending Review", value: 4, Icon: ClockIcon },
-  { label: "Approved", value: 2, Icon: CheckCircledIcon },
-  { label: "Rejected", value: 2, Icon: CrossCircledIcon },
+  { ...MOCK_DASHBOARD_STATS[0], Icon: FileTextIcon },
+  { ...MOCK_DASHBOARD_STATS[1], Icon: ClockIcon },
+  { ...MOCK_DASHBOARD_STATS[2], Icon: CheckCircledIcon },
+  { ...MOCK_DASHBOARD_STATS[3], Icon: CrossCircledIcon },
 ] as const;
 
 function AdminDashboardPage() {

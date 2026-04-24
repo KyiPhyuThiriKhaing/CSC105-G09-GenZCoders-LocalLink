@@ -2,97 +2,15 @@ import { useMemo, useState } from "react";
 import AdminPagination from "../submissions/components/AdminPagination";
 import AdminUserDetailsPanel from "./components/AdminUserDetailsPanel";
 import AdminUserList from "./components/AdminUserList";
-import type { AdminUser, UserStatus } from "./types";
-
-const USERS: AdminUser[] = [
-  {
-    id: 1,
-    name: "Liam Carter",
-    email: "liam.carter@example.com",
-    phone: "+1 202-555-0101",
-    joinedAt: "2026-01-10",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Ava Martinez",
-    email: "ava.martinez@example.com",
-    phone: "+1 202-555-0102",
-    joinedAt: "2026-01-15",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Noah Kim",
-    email: "noah.kim@example.com",
-    phone: "+1 202-555-0103",
-    joinedAt: "2026-01-20",
-    status: "Pending",
-  },
-  {
-    id: 4,
-    name: "Sophia Ahmed",
-    email: "sophia.ahmed@example.com",
-    phone: "+1 202-555-0104",
-    joinedAt: "2026-01-25",
-    status: "Active",
-  },
-  {
-    id: 5,
-    name: "Ethan Rivera",
-    email: "ethan.rivera@example.com",
-    phone: "+1 202-555-0105",
-    joinedAt: "2026-02-02",
-    status: "Active",
-  },
-  {
-    id: 6,
-    name: "Mia Thompson",
-    email: "mia.thompson@example.com",
-    phone: "+1 202-555-0106",
-    joinedAt: "2026-02-08",
-    status: "Suspended",
-  },
-  {
-    id: 7,
-    name: "Lucas Brooks",
-    email: "lucas.brooks@example.com",
-    phone: "+1 202-555-0107",
-    joinedAt: "2026-02-11",
-    status: "Active",
-  },
-  {
-    id: 8,
-    name: "Isabella Young",
-    email: "isabella.young@example.com",
-    phone: "+1 202-555-0108",
-    joinedAt: "2026-02-15",
-    status: "Pending",
-  },
-  {
-    id: 9,
-    name: "James Patel",
-    email: "james.patel@example.com",
-    phone: "+1 202-555-0109",
-    joinedAt: "2026-02-19",
-    status: "Active",
-  },
-  {
-    id: 10,
-    name: "Emily Chen",
-    email: "emily.chen@example.com",
-    phone: "+1 202-555-0110",
-    joinedAt: "2026-02-22",
-    status: "Suspended",
-  },
-];
+import type { AdminUser, UserStatus } from "../../../../../data/mockAdminData";
+import { MOCK_ADMIN_USERS } from "../../../../../data/mockAdminData";
 
 const ITEMS_PER_PAGE = 8;
 type StatusFilter = "All" | UserStatus;
 type SortOrder = "latest-to-oldest" | "oldest-to-latest";
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<AdminUser[]>(USERS);
+  const [users, setUsers] = useState<AdminUser[]>(MOCK_ADMIN_USERS);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
@@ -109,8 +27,8 @@ export default function AdminUsersPage() {
         normalizedSearch.length === 0
           ? true
           : user.name.toLowerCase().includes(normalizedSearch) ||
-            user.email.toLowerCase().includes(normalizedSearch) ||
-            user.phone.toLowerCase().includes(normalizedSearch);
+          user.email.toLowerCase().includes(normalizedSearch) ||
+          user.phone.toLowerCase().includes(normalizedSearch);
 
       return matchesStatus && matchesSearch;
     });
@@ -259,7 +177,7 @@ export default function AdminUsersPage() {
       </div>
 
       <div className="mt-5">
-        <AdminUserList users={pagedUsers} onViewDetails={handleViewDetails} />
+        <AdminUserList users={pagedUsers} onSelectUser={handleViewDetails} />
         <AdminPagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </div>
 
@@ -267,7 +185,7 @@ export default function AdminUsersPage() {
         user={selectedUser}
         isOpen={isPanelOpen}
         onClose={() => setIsPanelOpen(false)}
-        onStatusChange={handleStatusChange}
+        onUpdateStatus={handleStatusChange}
       />
     </div>
   );

@@ -2,110 +2,8 @@ import { useMemo, useState } from "react";
 import AdminPagination from "./components/AdminPagination";
 import AdminSubmissionDetailsPanel from "./components/AdminSubmissionDetailsPanel";
 import AdminSubmissionList from "./components/AdminSubmissionList";
-import type { Submission } from "./types";
-
-const SUBMISSIONS: Submission[] = [
-  {
-    id: 1,
-    name: "Liam Carter",
-    email: "liam.carter@example.com",
-    phone: "+1 202-555-0101",
-    date: "2026-03-10",
-    status: "Pending",
-    documents: ["National ID.pdf", "Utility Bill.pdf", "Selfie Verification.jpg"],
-    notes: "Recently moved to a new address and uploaded the latest utility bill for verification.",
-  },
-  {
-    id: 2,
-    name: "Ava Martinez",
-    email: "ava.martinez@example.com",
-    phone: "+1 202-555-0102",
-    date: "2026-03-10",
-    status: "Approved",
-    documents: ["Passport.pdf", "Proof of Address.pdf"],
-    notes: "Documents are clear and match submitted profile details.",
-  },
-  {
-    id: 3,
-    name: "Noah Kim",
-    email: "noah.kim@example.com",
-    phone: "+1 202-555-0103",
-    date: "2026-03-11",
-    status: "Rejected",
-    documents: ["Student ID.png", "Phone Bill.pdf"],
-    notes: "Identity document is expired. User should upload a valid government ID.",
-  },
-  {
-    id: 4,
-    name: "Sophia Ahmed",
-    email: "sophia.ahmed@example.com",
-    phone: "+1 202-555-0104",
-    date: "2026-03-12",
-    status: "Pending",
-    documents: ["Driver License.pdf", "Bank Statement.pdf", "Residence Permit.pdf"],
-    notes: "Name spelling differs slightly between bank statement and profile.",
-  },
-  {
-    id: 5,
-    name: "Ethan Rivera",
-    email: "ethan.rivera@example.com",
-    phone: "+1 202-555-0105",
-    date: "2026-03-12",
-    status: "Approved",
-    documents: ["Passport.pdf", "Credit Card Statement.pdf"],
-    notes: "All details aligned; verification checks complete.",
-  },
-  {
-    id: 6,
-    name: "Mia Thompson",
-    email: "mia.thompson@example.com",
-    phone: "+1 202-555-0106",
-    date: "2026-03-13",
-    status: "Pending",
-    documents: ["National ID.pdf", "Rent Agreement.pdf", "Profile Photo.jpg"],
-    notes: "Address proof is valid but profile photo has glare; may request re-upload.",
-  },
-  {
-    id: 7,
-    name: "Lucas Brooks",
-    email: "lucas.brooks@example.com",
-    phone: "+1 202-555-0107",
-    date: "2026-03-14",
-    status: "Rejected",
-    documents: ["Temporary ID.pdf", "Utility Bill.png"],
-    notes: "Temporary ID type is not accepted for account verification.",
-  },
-  {
-    id: 8,
-    name: "Isabella Young",
-    email: "isabella.young@example.com",
-    phone: "+1 202-555-0108",
-    date: "2026-03-15",
-    status: "Pending",
-    documents: ["Passport.pdf", "Tax Document.pdf", "Proof of Residency.pdf"],
-    notes: "Documents complete, pending final manual review by admin.",
-  },
-  {
-    id: 9,
-    name: "James Patel",
-    email: "james.patel@example.com",
-    phone: "+1 202-555-0109",
-    date: "2026-03-15",
-    status: "Approved",
-    documents: ["Driver License.pdf", "Insurance Statement.pdf"],
-    notes: "Identity and address details verified successfully.",
-  },
-  {
-    id: 10,
-    name: "Emily Chen",
-    email: "emily.chen@example.com",
-    phone: "+1 202-555-0110",
-    date: "2026-03-16",
-    status: "Pending",
-    documents: ["National ID.pdf", "Bank Statement.pdf", "Residency Card.pdf"],
-    notes: "Awaiting confirmation for one supporting document that appears cropped.",
-  },
-];
+import { MOCK_ADMIN_SUBMISSIONS } from "../../../../../data/mockAdminData";
+import type { Submission } from "../../../../../data/mockAdminData";
 
 const ITEMS_PER_PAGE = 6;
 type StatusFilter = "All" | Submission["status"];
@@ -120,9 +18,9 @@ export default function AdminSubmissionsPage() {
 
   const filteredSubmissions = useMemo(() => {
     if (statusFilter === "All") {
-      return SUBMISSIONS;
+      return MOCK_ADMIN_SUBMISSIONS;
     }
-    return SUBMISSIONS.filter((submission) => submission.status === statusFilter);
+    return MOCK_ADMIN_SUBMISSIONS.filter((submission) => submission.status === statusFilter);
   }, [statusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE));
