@@ -73,48 +73,46 @@ export default function JobsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredJobs.map((job) => (
               <Link
                 key={job.id}
                 to={`/jobs/${job.id}`}
-                className="group flex flex-col overflow-hidden rounded-4xl bg-white shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-slate-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.1)] outline-none focus-visible:ring-4 focus-visible:ring-(--color-brand-focus-ring)"
+                className="group flex flex-col overflow-hidden rounded-[1.5rem] bg-white border border-slate-200 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.18)] transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-18px_rgba(15,23,42,0.18)] focus-visible:ring-4 focus-visible:ring-(--color-brand-focus-ring)"
               >
-                <div className="relative h-56 overflow-hidden">
-                  <div className="absolute inset-0 bg-slate-100 animate-pulse" />
+                <div className="relative h-44 overflow-hidden">
+                  <div className="absolute inset-0 bg-slate-100" />
                   <img
                     src={job.image}
                     alt={job.title}
                     className="relative z-10 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute top-4 right-4 z-20 rounded-full bg-white/95 backdrop-blur-sm px-3 py-1.5 text-xs font-bold text-slate-900 shadow-sm transition-transform group-hover:scale-105">
+                  <div className="absolute top-3 right-3 z-20 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-slate-900 shadow-sm">
                     {job.postedAt}
                   </div>
                 </div>
 
-                <div className="flex grow flex-col p-6 lg:p-7">
-                  <h3 className="mb-4 text-xl font-bold leading-tight text-slate-900 line-clamp-2 group-hover:text-(--color-brand-primary) transition-colors">
+                <div className="flex grow flex-col p-4 sm:p-5">
+                  <h3 className="mb-3 text-lg font-semibold leading-tight text-slate-900 line-clamp-2 group-hover:text-(--color-brand-primary) transition-colors">
                     {job.title}
                   </h3>
 
-                  <div className="space-y-2.5 mb-6">
-                    <div className="flex items-center gap-2.5 text-sm font-medium text-slate-500">
+                  <div className="space-y-2 mb-5 text-sm text-slate-600">
+                    <div className="flex items-center gap-2">
                       <DrawingPinIcon className="h-4 w-4 text-slate-400 group-hover:text-(--color-brand-primary) transition-colors" />
                       <span className="truncate">{job.location}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-sm font-medium text-slate-500">
+                    <div className="flex items-center gap-2">
                       <ClockIcon className="h-4 w-4 text-slate-400 group-hover:text-(--color-brand-primary) transition-colors" />
                       <span>{job.timeRange}</span>
                     </div>
                   </div>
 
-                  <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-5">
-                    <span className="text-xl font-extrabold text-slate-900">
-                      {job.feeRange}
-                    </span>
-                    <span className="inline-flex items-center justify-center rounded-xl bg-slate-50 px-4 py-2 text-sm font-bold text-(--color-brand-primary) opacity-0 transition-all duration-300 group-hover:bg-(--color-brand-soft) group-hover:opacity-100">
-                      View Details
+                  <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-4 text-sm">
+                    <span className="font-bold text-slate-900">{job.feeRange}</span>
+                    <span className="inline-flex items-center justify-center rounded-2xl bg-slate-100 px-3 py-1.5 font-semibold text-(--color-brand-primary) transition-colors group-hover:bg-(--color-brand-soft)">
+                      View
                     </span>
                   </div>
                 </div>
