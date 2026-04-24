@@ -16,9 +16,13 @@ const jobPostSchema = z.object({
   requirements: z.string().max(400).optional(),
 });
 
-type JobPostFormValues = z.infer<typeof jobPostSchema>;
+export type JobPostFormValues = z.infer<typeof jobPostSchema>;
 
-export default function JobPostDialog() {
+type JobPostDialogProps = {
+  onCreate?: (values: JobPostFormValues) => void;
+};
+
+export default function JobPostDialog({ onCreate }: JobPostDialogProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<JobPostFormValues>({
     resolver: zodResolver(jobPostSchema),
@@ -36,6 +40,7 @@ export default function JobPostDialog() {
   const { register, handleSubmit, formState, reset } = form;
 
   const onSubmit = (values: JobPostFormValues) => {
+    onCreate?.(values);
     toast.success("Your job post is ready and visible to the community.");
     console.log("Job posted:", values);
     reset();

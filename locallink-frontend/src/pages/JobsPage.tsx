@@ -5,8 +5,10 @@ import { MOCK_JOBS } from "../data/mockJobs";
 import JobPostDialog from "../components/JobPostDialog";
 
 export default function JobsPage() {
+  const [jobs, setJobs] = useState(MOCK_JOBS);
   const [searchQuery, setSearchQuery] = useState("");
-  const filteredJobs = MOCK_JOBS.filter((job) =>
+
+  const filteredJobs = jobs.filter((job) =>
     job.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
@@ -37,7 +39,29 @@ export default function JobsPage() {
                 className="w-full bg-transparent py-4 pl-14 pr-6 text-base font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
-            <JobPostDialog />
+            <JobPostDialog
+              onCreate={(values) => {
+                setJobs((currentJobs) => [
+                  ...currentJobs,
+                  {
+                    id: Date.now().toString(),
+                    title: values.title,
+                    location: values.location,
+                    feeRange: values.feeRange,
+                    timeRange: values.timeRange,
+                    postedAt: "Just now",
+                    description: values.description,
+                    image:
+                      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+                    poster: {
+                      name: "You",
+                      avatar:
+                        "https://api.dicebear.com/7.x/avataaars/svg?seed=You&backgroundColor=e2e8f0",
+                    },
+                  },
+                ]);
+              }}
+            />
           </div>
         </div>
       </div>
