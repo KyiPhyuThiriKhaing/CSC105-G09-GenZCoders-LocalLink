@@ -4,10 +4,10 @@
 
 | Name                 | Student ID  | GitHub Username        |
 |----------------------|-------------|------------------------|
-| Gloria Everest       |             |                        |
+| Gloria Everest       | 68130500851 | KyiPhyuThiriKhaing     |
 | Min Thuta            | 68130500839 | YukinoTakkashi1998     |
 | Nan Thiri Htet Su    | 68130500853 | laurahsu-loop          |
-| Wunna Moe San        |             |                        |
+| Wunna Moe San        | 68130500835 | wunnakueleon           |
 
 ---
 
