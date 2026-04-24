@@ -1,12 +1,8 @@
 import { useState } from "react";
-import {
-  MagnifyingGlassIcon,
-  PlusIcon,
-  ClockIcon,
-  DrawingPinIcon,
-} from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
 import { MOCK_JOBS } from "../data/mockJobs";
+import JobPostDialog from "../components/JobPostDialog";
 
 export default function JobsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,10 +37,7 @@ export default function JobsPage() {
                 className="w-full bg-transparent py-4 pl-14 pr-6 text-base font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
-            <button className="flex items-center justify-center gap-2 rounded-full bg-(--color-brand-primary) px-8 py-4 text-sm font-bold text-white transition-all hover:bg-(--color-brand-primary-hover) hover:scale-[1.02] shadow-lg shadow-(--color-brand-primary)/20 sm:w-auto">
-              <PlusIcon className="h-5 w-5" />
-              Post a Job
-            </button>
+            <JobPostDialog />
           </div>
         </div>
       </div>
