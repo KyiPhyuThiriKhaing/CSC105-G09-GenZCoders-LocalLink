@@ -68,9 +68,12 @@ function Header() {
   };
 
   return (
-    <header className="bg-brand-primary px-2 py-3 text-white sm:px-3">
-      <div className="flex w-full items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Local Link</h1>
+    <header className="bg-[var(--color-brand-primary)] px-5 py-3.5 text-white sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4">
+        <h1 className="flex items-center gap-2">
+          <img src="/locallink.png" alt="" className="h-8 w-auto" aria-hidden="true" />
+          <span className="text-lg font-extrabold tracking-tight">Local Link</span>
+        </h1>
 
         <nav className="flex items-center gap-5">
           <NavLink to="/" className={linkClassName}>

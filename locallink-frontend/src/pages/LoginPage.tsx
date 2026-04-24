@@ -26,13 +26,15 @@ function PasswordToggleButton({ isVisible, onToggle }: PasswordToggleButtonProps
   return (
     <button
       type="button"
-      className="absolute right-2 inline-flex items-center justify-center rounded-md p-1.5 text-[var(--color-ink-strong-70)] transition hover:text-[var(--color-ink-strong)]"
+      className="absolute right-2 inline-flex items-center justify-center rounded-md p-1.5 text-[var(--color-ink-strong-45)] transition hover:text-[var(--color-ink-strong)]"
       onClick={onToggle}
     >
       {isVisible ? <EyeNoneIcon /> : <EyeOpenIcon />}
     </button>
   );
 }
+
+const FEATURES = ["Verified local helpers", "Secure payments", "Real-time messaging"];
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -51,36 +53,31 @@ function LoginPage() {
 
   const onSubmit = async (data: UserFormData) => {
     void data;
-    // Hook up to backend later.
     await new Promise((resolve) => setTimeout(resolve, 250));
   };
 
   const inputClass =
-    "h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white/85 px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-focus)] focus:bg-white/95 focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]";
+    "h-11 w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white px-3 text-sm text-[var(--color-ink-strong)] outline-none transition placeholder:text-[var(--color-ink-strong-45)] focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]";
 
   const labelClass = "text-sm font-semibold text-[var(--color-ink-strong)]";
   const fieldErrorClass = "text-[0.82rem] text-[var(--color-danger)]";
 
   return (
-    <main className="grid min-h-screen place-items-start bg-gradient-to-br from-[var(--color-brand-primary-700)] to-[var(--color-brand-pink-500)] px-5 py-6 sm:px-6 sm:py-8 md:place-items-center md:py-10">
-      <section
-        className="relative grid min-h-[560px] w-full max-w-[920px] overflow-hidden rounded-[28px] bg-gradient-to-br from-[var(--color-brand-primary-600)] to-[var(--color-brand-pink-500)] shadow-[0_12px_24px_rgba(31,18,51,0.12),0_28px_56px_rgba(31,18,51,0.24),0_52px_104px_rgba(31,18,51,0.32)] md:grid-cols-[1.1fr_0.9fr]"
-      >
-        <div className="relative z-10 isolate grid content-start gap-7 overflow-hidden px-7 py-10 md:px-12 md:py-12">
-          <div
-            className="pointer-events-none absolute inset-0 -z-10 rounded-l-[28px] bg-white [clip-path:polygon(0_0,78%_0,100%_50%,78%_100%,0_100%)] max-[860px]:rounded-[28px] max-[860px]:[clip-path:none]"
-          />
+    <main className="grid min-h-screen place-items-start bg-[#f5f3ff] px-4 py-5 sm:px-6 sm:py-8 md:place-items-center md:py-10">
+      <section className="w-full max-w-[900px] overflow-hidden rounded-2xl bg-white shadow-[0_4px_24px_rgba(30,18,82,0.08),0_16px_48px_rgba(30,18,82,0.06)] md:grid md:grid-cols-[1.1fr_0.9fr] md:rounded-[24px]">
 
-          <header className="relative z-10">
-            <h1 className="pb-4 text-[clamp(2rem,3vw,2.75rem)] leading-[1.05] font-extrabold tracking-[-0.02em] text-[var(--color-ink-strong)]">
+        {/* Form Panel */}
+        <div className="grid content-start gap-6 px-5 py-8 sm:px-7 sm:py-10 md:px-12 md:py-12">
+          <header>
+            <h1 className="text-[clamp(1.75rem,3vw,2.5rem)] font-extrabold tracking-tight text-[var(--color-ink-strong)]">
               Log in
             </h1>
-            <p className="text-[0.95rem] text-[var(--color-text-muted)]">
+            <p className="mt-1.5 text-[0.95rem] text-[var(--color-text-muted)]">
               Welcome back. Sign in to continue.
             </p>
           </header>
 
-          <form className="relative z-10 grid w-full gap-3.5 md:pr-6" onSubmit={handleSubmit(onSubmit)}>
+          <form className="grid w-full gap-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-1.5">
               <label className={labelClass} htmlFor="email">
                 <span className="inline-flex items-center gap-1.5">
@@ -123,13 +120,13 @@ function LoginPage() {
               {errors.password && <p className={fieldErrorClass}>{errors.password.message}</p>}
             </div>
 
-            <div className="mt-0.5 flex items-center justify-between text-[0.9rem] text-[var(--color-text-muted)]">
+            <div className="flex items-center justify-between text-[0.88rem]">
               <Link to="/signup" className="font-semibold text-[var(--color-link)] hover:underline">
-                Create new account
+                Create account
               </Link>
               <button
                 type="button"
-                className="font-semibold text-[var(--color-link)] hover:underline"
+                className="font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-link)] hover:underline"
                 aria-label="Forgot password"
               >
                 Forgot password?
@@ -137,15 +134,15 @@ function LoginPage() {
             </div>
 
             <button
-              className="mt-3 flex h-[46px] w-full items-center justify-center rounded-full border border-[var(--color-ink-border-faint)] bg-white px-4 text-[0.98rem] font-bold tracking-[0.01em] text-[var(--color-ink-strong)] transition hover:bg-white hover:text-[var(--color-ink-strong)] disabled:cursor-not-allowed disabled:saturate-90"
+              className="mt-1 h-[46px] w-full rounded-full bg-[var(--color-brand-primary)] px-4 text-[0.95rem] font-bold text-white transition hover:bg-[var(--color-brand-primary-hover)] disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-accent)]"
               type="submit"
               disabled={isSubmitting}
             >
-              Log in
+              {isSubmitting ? "Signing in…" : "Log in"}
             </button>
           </form>
 
-          <p className="relative z-10 mt-1 text-[0.92rem] text-[var(--color-text-muted)]">
+          <p className="text-[0.9rem] text-[var(--color-text-muted)]">
             New to LocalLink?{" "}
             <Link to="/signup" className="font-bold text-[var(--color-link)] hover:underline">
               Create an account
@@ -153,10 +150,22 @@ function LoginPage() {
           </p>
         </div>
 
-        <aside className="relative hidden p-10 md:grid md:content-end md:justify-items-end">
-          <div className="absolute inset-[18%_10%_18%_18%] rotate-[-12deg] rounded-[28px] bg-white/12" />
-          <div className="absolute inset-[26%_16%_26%_26%] rotate-[10deg] rounded-[28px] bg-white/8" />
-          <div className="relative z-10 h-[140px] w-[140px] rounded-[26px] border border-white/18 bg-[radial-gradient(120px_120px_at_30%_25%,rgba(255,255,255,0.26),transparent_55%),linear-gradient(145deg,rgba(255,255,255,0.14),rgba(255,255,255,0.06))]" />
+        {/* Brand Panel */}
+        <aside className="hidden bg-[#1e1252] p-10 md:flex md:flex-col md:justify-end">
+          <div className="space-y-5">
+            <p className="text-2xl font-extrabold text-white">LocalLink</p>
+            <p className="text-sm leading-relaxed text-white/55">
+              Connect with trusted local helpers for everyday tasks in your community.
+            </p>
+            <div className="pt-2 space-y-2.5">
+              {FEATURES.map((f) => (
+                <div key={f} className="flex items-center gap-2.5 text-sm text-white/65">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--color-brand-accent)]" aria-hidden="true" />
+                  {f}
+                </div>
+              ))}
+            </div>
+          </div>
         </aside>
       </section>
     </main>

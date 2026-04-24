@@ -140,7 +140,7 @@ function Sidebar({ activeKey }: SidebarProps) {
 
     return (
         <>
-            <aside className="self-stretch min-h-[calc(100vh-3rem)] w-60 shrink-0 rounded-3xl bg-white/95 p-4 sm:p-5">
+            <aside className="w-56 shrink-0 rounded-2xl bg-white p-4">
                 <nav className="space-y-1">
                     {items.map((item) => {
                         const sharedClassName = `flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white ${activeKey === item.label

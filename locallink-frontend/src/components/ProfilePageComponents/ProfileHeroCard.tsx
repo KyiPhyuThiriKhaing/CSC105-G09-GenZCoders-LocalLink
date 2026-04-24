@@ -4,11 +4,7 @@ function ProfileHeroCard() {
             <div className="flex flex-col items-center gap-4">
                 <div className="relative">
                     <div
-                        className="grid h-28 w-28 place-items-center rounded-full text-3xl font-bold text-white shadow-md"
-                        style={{
-                            background:
-                                "linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-primary-600) 55%, var(--color-brand-pink-500) 100%)",
-                        }}
+                        className="grid h-28 w-28 place-items-center rounded-full bg-[var(--color-brand-primary)] text-3xl font-bold text-white shadow-md"
                     >
                         JD
                     </div>

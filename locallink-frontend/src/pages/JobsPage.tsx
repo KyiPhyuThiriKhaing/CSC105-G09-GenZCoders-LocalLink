@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { MagnifyingGlassIcon, PlusIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
 
-// Mock data (6-8 items)
 const MOCK_JOBS = [
   {
     id: "1",
@@ -68,89 +67,87 @@ export default function JobsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 pb-16">
-      {/* Top Section */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="min-h-screen bg-[#fafafa] pb-16">
+      <div className="border-b border-[var(--color-ink-border-soft)] bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          <div className="flex flex-col gap-4">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-xl font-bold tracking-tight text-[var(--color-ink-strong)] sm:text-2xl">
                 Mini Jobs
               </h1>
-              <p className="text-gray-500 mt-1">
+              <p className="mt-0.5 text-sm text-[var(--color-text-muted)]">
                 Find local chores and earn quickly
               </p>
             </div>
-            
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <div className="relative flex-1 md:w-80">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <MagnifyingGlassIcon className="h-4 w-4 text-[var(--color-text-muted)]" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search jobs..."
+                  placeholder="Search jobs…"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
+                  className="block w-full rounded-xl border border-[var(--color-ink-border-soft)] bg-white py-2.5 pl-9 pr-3 text-sm text-[var(--color-ink-strong)] placeholder:text-[var(--color-text-muted)] outline-none transition focus:border-[var(--color-brand-primary)] focus:ring-4 focus:ring-[var(--color-brand-focus-ring)]"
                 />
               </div>
-              <button className="flex items-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap shadow-sm">
-                <PlusIcon className="w-5 h-5" />
-                Create Job
+              <button className="flex items-center justify-center gap-1.5 rounded-xl bg-[var(--color-brand-primary)] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--color-brand-primary-hover)] focus-visible:outline-none sm:shrink-0">
+                <PlusIcon className="h-4 w-4" />
+                Post Job
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Grid Section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
         {filteredJobs.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">No jobs found matching "{searchQuery}"</p>
+          <div className="py-20 text-center">
+            <p className="text-[var(--color-text-muted)]">No jobs found matching &ldquo;{searchQuery}&rdquo;</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {filteredJobs.map((job) => (
-              <div 
-                key={job.id} 
-                className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-200 flex flex-col group"
+              <div
+                key={job.id}
+                className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--color-ink-border-soft)] bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <div className="h-44 relative overflow-hidden">
-                  <img 
-                    src={job.image} 
+                <div className="relative h-44 overflow-hidden">
+                  <img
+                    src={job.image}
                     alt={job.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                   />
-                  <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-md text-xs font-semibold text-gray-700 shadow-sm">
+                  <div className="absolute top-3 right-3 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-[var(--color-ink-strong)] shadow-sm">
                     {job.postedAt}
                   </div>
                 </div>
 
-                <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="font-semibold text-lg text-gray-900 leading-tight mb-2 line-clamp-2">
+                <div className="flex flex-grow flex-col p-5">
+                  <h3 className="mb-3 text-base font-bold leading-snug text-[var(--color-ink-strong)] line-clamp-2">
                     {job.title}
                   </h3>
-                  
-                  <div className="space-y-2 mt-auto mb-5">
-                    <div className="flex items-center text-sm text-gray-500 gap-1.5">
-                      <DrawingPinIcon className="w-4 h-4 text-purple-500" />
+
+                  <div className="mt-auto mb-4 space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
+                      <DrawingPinIcon className="h-3.5 w-3.5 shrink-0 text-[var(--color-brand-primary)]" />
                       <span className="truncate">{job.location}</span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-500 gap-1.5">
-                      <ClockIcon className="w-4 h-4 text-purple-500" />
+                    <div className="flex items-center gap-1.5 text-sm text-[var(--color-text-muted)]">
+                      <ClockIcon className="h-3.5 w-3.5 shrink-0 text-[var(--color-brand-primary)]" />
                       <span>{job.timeRange}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-gray-50 pt-4 mt-auto">
-                    <div className="font-bold text-gray-900">
+                  <div className="flex items-center justify-between border-t border-[var(--color-ink-border-faint)] pt-4">
+                    <span className="text-base font-bold text-[var(--color-ink-strong)]">
                       {job.feeRange}
-                    </div>
-                    <Link 
+                    </span>
+                    <Link
                       to={`/jobs/${job.id}`}
-                      className="text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 px-4 py-1.5 rounded-md transition-colors"
+                      className="rounded-lg bg-[var(--color-brand-soft)] px-4 py-1.5 text-sm font-semibold text-[var(--color-brand-primary)] transition hover:bg-[var(--color-brand-primary)] hover:text-white focus-visible:outline-none"
                     >
                       View Details
                     </Link>

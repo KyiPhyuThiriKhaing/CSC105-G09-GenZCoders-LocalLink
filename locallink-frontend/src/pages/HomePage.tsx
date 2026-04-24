@@ -4,7 +4,7 @@ import FeatureCardsSection from "../components/HomePageComponents/FeatureCardsSe
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-brand-soft text-(--color-ink-strong)">
-      <main className="mx-auto max-w-6xl px-4 pb-14 pt-6 sm:px-6 lg:px-8 lg:pt-8">
+      <main className="mx-auto max-w-6xl px-4 pb-12 pt-4 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8">
         <HeroSection />
         <FeatureCardsSection />
 

@@ -19,14 +19,15 @@ const jobsAccepted = [
 
 export default function HistoryPage() {
   return (
-    <div className="min-h-screen bg-brand-soft text-(--color-ink-strong)">
-      <div className="mx-auto flex max-w-6xl gap-6 px-4 pb-12 pt-6 sm:px-6 lg:px-8 lg:pt-8">
-
-        <div className="grid flex-1 grid-cols-1 gap-5 lg:grid-cols-3">
-          <HistoryColumn title="Jobs Applied" items={jobsApplied} />
-          <HistoryColumn title="Jobs Offered" items={jobsOffered} />
-          <HistoryColumn title="Jobs Accepted" items={jobsAccepted} />
-        </div>
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-lg font-bold text-[var(--color-ink-strong)]">Activity History</h1>
+        <p className="mt-0.5 text-sm text-[var(--color-text-muted)]">Track your applied, offered, and accepted jobs.</p>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <HistoryColumn title="Jobs Applied" items={jobsApplied} />
+        <HistoryColumn title="Jobs Offered" items={jobsOffered} />
+        <HistoryColumn title="Jobs Accepted" items={jobsAccepted} />
       </div>
     </div>
   );
