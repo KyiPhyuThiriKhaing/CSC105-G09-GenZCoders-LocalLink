@@ -12,10 +12,10 @@ import AdminDashboardQuickActions from "./components/AdminDashboardQuickActions"
 import { MOCK_DASHBOARD_STATS } from "../../../../../data/mockAdminData";
 
 const DASHBOARD_STATS = [
-  { ...MOCK_DASHBOARD_STATS[0], Icon: FileTextIcon },
-  { ...MOCK_DASHBOARD_STATS[1], Icon: ClockIcon },
-  { ...MOCK_DASHBOARD_STATS[2], Icon: CheckCircledIcon },
-  { ...MOCK_DASHBOARD_STATS[3], Icon: CrossCircledIcon },
+  { ...MOCK_DASHBOARD_STATS[0], Icon: FileTextIcon, color: "primary" },
+  { ...MOCK_DASHBOARD_STATS[1], Icon: ClockIcon, color: "warning" },
+  { ...MOCK_DASHBOARD_STATS[2], Icon: CheckCircledIcon, color: "success" },
+  { ...MOCK_DASHBOARD_STATS[3], Icon: CrossCircledIcon, color: "danger" },
 ] as const;
 
 function AdminDashboardPage() {

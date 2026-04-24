@@ -6,6 +6,7 @@ type StatItem = {
   label: string;
   value: number;
   Icon: ComponentType<{ className?: string }>;
+  color?: "primary" | "warning" | "success" | "danger" | string;
 };
 
 type AdminDashboardStatsGridProps = {
@@ -21,6 +22,7 @@ function AdminDashboardStatsGrid({ stats }: AdminDashboardStatsGridProps) {
           label={stat.label}
           value={stat.value}
           Icon={stat.Icon}
+          color={stat.color}
         />
       ))}
     </section>
