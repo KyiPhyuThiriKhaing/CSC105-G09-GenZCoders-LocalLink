@@ -5,7 +5,9 @@ import {
   MobileIcon,
   PersonIcon,
 } from "@radix-ui/react-icons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import ConfirmDialog from "../../../../../ConfirmDialog";
 import AdminUserDangerZone from "./AdminUserDangerZone";
 import type {
   AdminUser,
@@ -39,6 +41,8 @@ export default function AdminUserDetailsPanel({
   onClose,
   onUpdateStatus,
 }: AdminUserDetailsPanelProps) {
+  const [confirmAction, setConfirmAction] = useState<"suspend" | "activate" | null>(null);
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -171,15 +175,7 @@ export default function AdminUserDetailsPanel({
                   {user.status === "Active" ? (
                     <button
                       type="button"
-                      onClick={() => {
-                        const shouldSuspend = window.confirm(
-                          "Are you sure you want to suspend this user?",
-                        );
-                        if (!shouldSuspend) {
-                          return;
-                        }
-                        onUpdateStatus(user.id, "Suspended");
-                      }}
+                      onClick={() => setConfirmAction("suspend")}
                       className="inline-flex items-center rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
                     >
                       Suspend User
@@ -189,7 +185,7 @@ export default function AdminUserDetailsPanel({
                   {user.status === "Suspended" ? (
                     <button
                       type="button"
-                      onClick={() => onUpdateStatus(user.id, "Active")}
+                      onClick={() => setConfirmAction("activate")}
                       className="inline-flex items-center rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
                     >
                       Activate User
@@ -209,6 +205,37 @@ export default function AdminUserDetailsPanel({
           </div>
         ) : null}
       </aside>
+
+      <ConfirmDialog
+        isOpen={confirmAction === "suspend"}
+        onOpenChange={(open) => !open && setConfirmAction(null)}
+        title="Suspend User"
+        description={`Are you sure you want to suspend ${user?.name}? They will lose access to their account until reactivated.`}
+        confirmText="Suspend"
+        variant="danger"
+        onConfirm={() => {
+          if (user) {
+            onUpdateStatus(user.id, "Suspended");
+            toast.success(`${user.name}'s account has been suspended.`);
+          }
+          setConfirmAction(null);
+        }}
+      />
+      <ConfirmDialog
+        isOpen={confirmAction === "activate"}
+        onOpenChange={(open) => !open && setConfirmAction(null)}
+        title="Activate User"
+        description={`Are you sure you want to reactivate ${user?.name}'s account?`}
+        confirmText="Activate"
+        variant="success"
+        onConfirm={() => {
+          if (user) {
+            onUpdateStatus(user.id, "Active");
+            toast.success(`${user.name}'s account has been successfully reactivated.`);
+          }
+          setConfirmAction(null);
+        }}
+      />
     </div>
   );
 }

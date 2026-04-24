@@ -6,7 +6,9 @@ import {
   MobileIcon,
   PersonIcon,
 } from "@radix-ui/react-icons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import ConfirmDialog from "../../../../../ConfirmDialog";
 import type { Submission, SubmissionStatus } from "../types";
 
 type AdminSubmissionDetailsPanelProps = {
@@ -34,6 +36,8 @@ export default function AdminSubmissionDetailsPanel({
   isOpen,
   onClose,
 }: AdminSubmissionDetailsPanelProps) {
+  const [confirmAction, setConfirmAction] = useState<"approve" | "reject" | null>(null);
+
   useEffect(() => {
     if (!isOpen) {
       return;
@@ -197,34 +201,14 @@ export default function AdminSubmissionDetailsPanel({
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    const shouldApprove = window.confirm(
-                      "Are you sure you want to approve this submission?",
-                    );
-
-                    if (!shouldApprove) {
-                      return;
-                    }
-
-                    window.alert("Submission approved (UI placeholder).");
-                  }}
+                  onClick={() => setConfirmAction("approve")}
                   className="inline-flex items-center justify-center rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
                 >
                   Approve
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    const shouldReject = window.confirm(
-                      "Are you sure you want to reject this submission?",
-                    );
-
-                    if (!shouldReject) {
-                      return;
-                    }
-
-                    window.alert("Submission rejected (UI placeholder).");
-                  }}
+                  onClick={() => setConfirmAction("reject")}
                   className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
                 >
                   Reject
@@ -234,6 +218,31 @@ export default function AdminSubmissionDetailsPanel({
           </div>
         ) : null}
       </aside>
+
+      <ConfirmDialog
+        isOpen={confirmAction === "approve"}
+        onOpenChange={(open) => !open && setConfirmAction(null)}
+        title="Approve Submission"
+        description={`Are you sure you want to approve the submission from ${submission?.name}? They will be notified of the decision.`}
+        confirmText="Approve"
+        variant="success"
+        onConfirm={() => {
+          toast.success(`Submission from ${submission?.name} has been approved successfully.`);
+          setConfirmAction(null);
+        }}
+      />
+      <ConfirmDialog
+        isOpen={confirmAction === "reject"}
+        onOpenChange={(open) => !open && setConfirmAction(null)}
+        title="Reject Submission"
+        description={`Are you sure you want to reject the submission from ${submission?.name}? You may want to provide admin notes regarding why.`}
+        confirmText="Reject"
+        variant="danger"
+        onConfirm={() => {
+          toast.success(`Submission from ${submission?.name} has been rejected. Discarding documents.`);
+          setConfirmAction(null);
+        }}
+      />
     </div>
   );
 }
