@@ -7,12 +7,12 @@ LocalLink is a community-focused web platform where users can browse local jobs,
 
 ## Team
 
-| Name | Student ID | GitHub Username |
-|------|------------|-----------------|
-| Kyi Phyu Thiri Khaing | 68130500851 | KyiPhyuThiriKhaing |
-| Min Thuta | 68130500839 | YukinoTakkashi1998 |
-| Nan Thiri Htet Su | 68130500853 | laurahsu-loop |
-| Wunna Moe San | 68130500835 | wunnakueleon |
+| Profile | Name | GitHub | ID |
+|-------|------|--------|----|
+| [<img src="https://github.com/wunnakueleon.png?size=20" width="20" height="20" alt="Wunna" style="border-radius:50%; vertical-align:middle;" />](https://github.com/wunnakueleon) | [Wunna Moe San](https://github.com/wunnakueleon) | [wunnakueleon](https://github.com/wunnakueleon) | 68130500835 |
+| [<img src="https://github.com/YuukinoTakkashi1998.png?size=20" width="20" height="20" alt="Min" style="border-radius:50%; vertical-align:middle;" />](https://github.com/YuukinoTakkashi1998) | [Min Thuta](https://github.com/YuukinoTakkashi1998) | [YuukinoTakkashi1998](https://github.com/YuukinoTakkashi1998) | 68130500839 |
+| [<img src="https://github.com/KyiPhyuThiriKhaing.png?size=20" width="20" height="20" alt="Kyi" style="border-radius:50%; vertical-align:middle;" />](https://github.com/KyiPhyuThiriKhaing) | [Kyi Phyu Thiri Khaing](https://github.com/KyiPhyuThiriKhaing) | [KyiPhyuThiriKhaing](https://github.com/KyiPhyuThiriKhaing) | 68130500851 |
+| [<img src="https://github.com/laurahsu-loop.png?size=20" width="20" height="20" alt="Nan" style="border-radius:50%; vertical-align:middle;" />](https://github.com/laurahsu-loop) | [Nan Thiri Htet Su](https://github.com/laurahsu-loop) | [laurahsu-loop](https://github.com/laurahsu-loop) | 68130500853 |
 
 ## Repository Structure
 
@@ -23,30 +23,20 @@ LocalLink is a community-focused web platform where users can browse local jobs,
 └── README.md
 ```
 
+For detailed setup and folder-specific instructions, see:
+
+- `locallink-frontend/README.md`
+- `locallink-backend/README.md`
+
 ## Current Implementation Status
 
 ### Frontend
 
-Implemented and navigable:
-
-- Public pages: Home, Login, Sign Up, Jobs, Job Details
-- Profile area: My Profile, Verification, History, Settings, Chat
-- Admin area: Admin Login, Dashboard, Submissions, Users
-
-Currently mocked/not connected to backend:
-
-- Login and Sign Up submit handlers
-- Jobs listing/details data
-- Chat, history, verification, and settings updates
-- Admin dashboard stats, submissions list, and users list
+The frontend includes the main public pages, profile sections, and admin views. UI implementation is largely complete, while backend integration and data wiring are still in progress.
 
 ### Backend
 
-Backend is currently a scaffold:
-
-- Express server with `GET /` returning `Hello, World!`
-- Prisma initialized with SQLite datasource config
-- No implemented API routes/controllers/services yet
+The backend scaffold is set up with Express and Prisma. Core API routes, controllers, and services remain under development.
 
 ## Tech Stack
 
@@ -68,32 +58,6 @@ Backend is currently a scaffold:
 - Prisma ORM
 - SQLite datasource setup
 - Morgan + dotenv
-
-## Frontend Routes
-
-### Public
-
-- `/` - Home
-- `/login` - User login
-- `/signup` - User registration
-- `/jobs` - Job listings (mock)
-- `/jobs/:id` - Job details (mock)
-
-### Profile (nested)
-
-- `/profile` - Default to My Profile
-- `/profile/my-profile`
-- `/profile/verify`
-- `/profile/history`
-- `/profile/settings`
-- `/profile/chat`
-
-### Admin
-
-- `/admin` - Admin login UI
-- `/admin/dashboard`
-- `/admin/submissions`
-- `/admin/users`
 
 ## Quick Start
 
@@ -146,7 +110,7 @@ Default local URLs:
 
 | Student ID | GitHub Username | Week 6-8 (Assigned Feature) | Week 11 (Progress Report) | Week 12 (Progress Report) |
 |------------|-----------------|------------------------------|---------------------------|---------------------------|
-| 839 | YukinoTakkashi1998 | Admin Panel |  |  |
+| 839 | YuukinoTakkashi1998 | Admin Panel |  |  |
 |  |  |  |  |  |
 |  |  |  |  |  |
 |  |  |  |  |  |

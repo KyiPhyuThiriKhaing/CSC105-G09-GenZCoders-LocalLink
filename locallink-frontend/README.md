@@ -8,8 +8,9 @@ This is the React + TypeScript client for LocalLink.
 - TypeScript
 - Vite
 - React Router v7
-- Tailwind CSS v4 (`@tailwindcss/vite`)
-- Radix UI icons/dialog
+- Tailwind CSS v4 (`tailwindcss` + `@tailwindcss/vite`)
+- Radix UI (`@radix-ui/react-dialog`, `@radix-ui/react-icons`)
+- Sonner for toast notifications
 - React Hook Form + Zod
 
 ## Run Locally
@@ -46,6 +47,7 @@ npm run preview
 - `/login`
 - `/signup`
 - `/jobs`
+- `/jobs/post`
 - `/jobs/:id`
 
 ### Profile
@@ -66,11 +68,14 @@ npm run preview
 
 ## Current Status
 
-Implemented UI is extensive, but many pages currently use mock/static data and are not wired to backend APIs yet.
+The frontend layout and navigation are implemented, including the home page, job listings, job posting flow, profile sections, chat, and admin views.
+
+Many pages still rely on mock/static data and are not fully wired to backend APIs.
 
 Examples:
 
-- Login and Sign Up currently validate form input but do not send API requests.
-- Jobs, Job Details, Chat, History, Admin Dashboard, Submissions, and Users pages use in-file mock data.
+- Login and Sign Up validate form input but do not yet dispatch real authentication requests.
+- Job details, profile sections, chat, admin dashboard, submissions, and users pages use local mock data.
+- `/jobs/post` provides a UI for posting a job, but backend submission integration is pending.
 
 For full project overview and backend setup, see the root README at `../README.md`.
