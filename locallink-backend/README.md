@@ -13,6 +13,10 @@ Create a .env file:
 ```env
 PORT=3000
 DATABASE_URL="file:./dev.db"
+JWT_SECRET="replace-this-with-a-long-random-secret"
+JWT_EXPIRES_IN="1h"
+ADMIN_EMAIL="minthuta@gmail.com"
+ADMIN_PASSWORD="68130500839"
 ```
 
 Run migrations and generate Prisma client:
@@ -47,6 +51,25 @@ Note: Password hashes are placeholders in seed data. Auth is not wired yet.
 ## Admin API (for testing)
 
 Base URL: http://localhost:3000/api/admin
+
+Admin login:
+
+- POST /login
+
+Body:
+
+```json
+{
+  "email": "minthuta@gmail.com",
+  "password": "68130500839"
+}
+```
+
+Use the returned token for admin endpoints:
+
+```
+Authorization: Bearer <token>
+```
 
 - GET /dashboard/stats
 - GET /users?page=1&pageSize=10&search=&status=&sort=latest|oldest

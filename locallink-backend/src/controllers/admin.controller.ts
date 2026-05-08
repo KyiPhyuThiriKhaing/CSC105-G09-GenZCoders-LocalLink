@@ -1,5 +1,7 @@
 import type { RequestHandler } from "express";
+import { z } from "zod";
 import {
+  adminLogin,
   getDashboardStats,
   listAdminUsers,
   updateAdminUserStatus,
@@ -42,6 +44,33 @@ const parseVerificationStatus = (value: unknown): VerificationStatus | null => {
   return null;
 };
 
+const getAdminActorId = (req: Parameters<RequestHandler>[0]): string | undefined =>
+  (req as { adminUserId?: string }).adminUserId;
+
+const adminLoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+export const adminLoginHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const parsed = adminLoginSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: "Invalid login input", errors: parsed.error.flatten() });
+      return;
+    }
+    const { email, password } = parsed.data;
+    const data = await adminLogin(email, password);
+    if (!data) {
+      res.status(401).json({ message: "Invalid admin credentials" });
+      return;
+    }
+    res.status(200).json({ data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getDashboardStatsHandler: RequestHandler = async (_req, res, next) => {
   try {
     const data = await getDashboardStats();
@@ -73,7 +102,7 @@ export const updateAdminUserStatusHandler: RequestHandler = async (req, res, nex
       res.status(400).json({ message: "Invalid status" });
       return;
     }
-    const actorId = typeof req.body?.actorId === "string" ? req.body.actorId : undefined;
+    const actorId = getAdminActorId(req);
     const data = await updateAdminUserStatus(asId(req.params.id), status, actorId);
     if (!data) {
       res.status(404).json({ message: "User not found" });
@@ -87,7 +116,7 @@ export const updateAdminUserStatusHandler: RequestHandler = async (req, res, nex
 
 export const deleteAdminUserHandler: RequestHandler = async (req, res, next) => {
   try {
-    const actorId = typeof req.body?.actorId === "string" ? req.body.actorId : undefined;
+    const actorId = getAdminActorId(req);
     const deleted = await deleteAdminUser(asId(req.params.id), actorId);
     if (!deleted) {
       res.status(404).json({ message: "User not found" });
@@ -135,7 +164,7 @@ export const updateAdminSubmissionStatusHandler: RequestHandler = async (req, re
       return;
     }
 
-    const actorId = typeof req.body?.actorId === "string" ? req.body.actorId : undefined;
+    const actorId = getAdminActorId(req);
     const adminComment = typeof req.body?.adminComment === "string" ? req.body.adminComment : undefined;
     const notes = typeof req.body?.notes === "string" ? req.body.notes : undefined;
 

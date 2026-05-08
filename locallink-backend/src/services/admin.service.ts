@@ -1,7 +1,12 @@
+import bcrypt from "bcrypt";
 import { prisma } from "../lib/prisma";
+import { signAdminToken } from "../lib/jwt";
 
 export type AccountStatus = "ACTIVE" | "PENDING" | "SUSPENDED";
 export type VerificationStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "minthuta@gmail.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "68130500839";
 
 export interface DashboardStats {
   totalUsers: number;
@@ -9,6 +14,58 @@ export interface DashboardStats {
   totalSubmissions: number;
   pendingSubmissions: number;
 }
+
+const ensureAdminUser = async () => {
+  const existing = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+  const hashed = await bcrypt.hash(ADMIN_PASSWORD, 10);
+
+  if (!existing) {
+    return prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        passwordHash: hashed,
+        fullName: "Admin User",
+        role: "ADMIN",
+        status: "ACTIVE",
+      },
+    });
+  }
+
+  if (existing.role !== "ADMIN") {
+    await prisma.user.update({
+      where: { id: existing.id },
+      data: { role: "ADMIN" },
+    });
+  }
+
+  return existing;
+};
+
+export const adminLogin = async (email: string, password: string) => {
+  if (email !== ADMIN_EMAIL) {
+    return null;
+  }
+
+  const admin = await ensureAdminUser();
+
+  if (admin.role !== "ADMIN" || admin.status !== "ACTIVE") {
+    return null;
+  }
+
+  const matches = await bcrypt.compare(password, admin.passwordHash);
+  if (!matches) {
+    return null;
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: admin.id },
+    data: { lastLoginAt: new Date() },
+    select: { id: true, email: true, fullName: true },
+  });
+
+  const token = signAdminToken({ sub: updated.id, role: "ADMIN" });
+  return { token, admin: updated };
+};
 
 export interface AdminUsersQuery {
   page: number;
