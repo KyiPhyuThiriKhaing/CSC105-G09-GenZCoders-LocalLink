@@ -110,7 +110,7 @@ Default local URLs:
 
 | Student ID | GitHub Username | Week 6-8 (Assigned Feature) | Week 11 (Progress Report) | Week 12 (Progress Report) |
 |------------|-----------------|------------------------------|---------------------------|---------------------------|
-| 839 | YuukinoTakkashi1998 | Admin Panel |  |  |
+| 839 | YuukinoTakkashi1998 | Admin Panel | Frontend patching + bug fixes | Admin backend endpoints + Prisma wiring |
 |  |  |  |  |  |
 |  |  |  |  |  |
 |  |  |  |  |  |
