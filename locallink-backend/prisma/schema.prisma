@@ -11,3 +11,302 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+}
+
+enum JobStatus {
+  OPEN
+  ASSIGNED
+  COMPLETED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  CONTACTED
+  OFFERED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  COMPLETED
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PayoutType {
+  FIXED
+  HOURLY
+  RANGE
+}
+
+enum AdminActionType {
+  VERIFY_APPROVE
+  VERIFY_REJECT
+  USER_SUSPEND
+  USER_ACTIVATE
+  USER_DELETE
+}
+
+model User {
+  id              String        @id @default(cuid())
+  email           String        @unique
+  passwordHash    String
+  fullName        String
+  role            UserRole      @default(USER)
+  status          AccountStatus @default(PENDING)
+  phone           String?       @unique
+  avatarUrl       String?
+  location        String?
+  bio             String?
+  joinedAt        DateTime      @default(now())
+  emailVerifiedAt DateTime?
+  phoneVerifiedAt DateTime?
+  idVerifiedAt    DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  jobsPosted              Job[]                    @relation("JobPoster")
+  applications            JobApplication[]
+  bookmarks               JobBookmark[]
+  conversations           ConversationParticipant[]
+  messages                Message[]                @relation("MessageSender")
+  reviewsGiven            Review[]                 @relation("Reviewer")
+  reviewsReceived         Review[]                 @relation("Reviewee")
+  verificationSubmissions VerificationSubmission[]
+  reviewedSubmissions     VerificationSubmission[] @relation("VerificationReviewer")
+  skills                  UserSkill[]
+  sessions                Session[]
+  adminActions            AdminAction[]            @relation("AdminActor")
+  adminTargets            AdminAction[]            @relation("AdminTarget")
+}
+
+model Skill {
+  id        String      @id @default(cuid())
+  name      String      @unique
+  createdAt DateTime    @default(now())
+  users     UserSkill[]
+  jobs      JobSkill[]
+}
+
+model UserSkill {
+  userId  String
+  skillId String
+  level   String?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skillId])
+  @@index([skillId])
+}
+
+model Job {
+  id               String        @id @default(cuid())
+  title            String
+  description      String
+  location         String
+  imageUrl         String?
+  payoutMin        Decimal?
+  payoutMax        Decimal?
+  payoutCurrency   String        @default("THB")
+  payoutType       PayoutType?
+  payoutText       String?
+  durationText     String?
+  contactInfo      String?
+  requirementsText String?
+  status           JobStatus     @default(OPEN)
+  postedAt         DateTime      @default(now())
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  posterId String
+  poster   User @relation("JobPoster", fields: [posterId], references: [id], onDelete: Cascade)
+
+  applications JobApplication[]
+  bookmarks    JobBookmark[]
+  conversations Conversation[]
+  skills       JobSkill[]
+  reviews      Review[]
+
+  @@index([posterId])
+  @@index([status])
+  @@index([postedAt])
+}
+
+model JobSkill {
+  jobId   String
+  skillId String
+
+  job   Job   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([jobId, skillId])
+  @@index([skillId])
+}
+
+model JobApplication {
+  id          String            @id @default(cuid())
+  jobId       String
+  applicantId String
+  status      ApplicationStatus @default(APPLIED)
+  message     String?
+  offeredAt   DateTime?
+  acceptedAt  DateTime?
+  completedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  job       Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicant User @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, applicantId])
+  @@index([applicantId])
+  @@index([jobId, status])
+}
+
+model JobBookmark {
+  userId String
+  jobId  String
+  savedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@id([userId, jobId])
+  @@index([jobId])
+}
+
+model Conversation {
+  id        String     @id @default(cuid())
+  jobId     String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  job          Job?                      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@index([jobId])
+}
+
+model ConversationParticipant {
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String
+  sentAt         DateTime @default(now())
+  readAt         DateTime?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, sentAt])
+  @@index([senderId])
+}
+
+model VerificationSubmission {
+  id           String             @id @default(cuid())
+  userId       String
+  status       VerificationStatus @default(PENDING)
+  submittedAt  DateTime           @default(now())
+  reviewedAt   DateTime?
+  reviewedById String?
+  notes        String?
+  adminComment String?
+
+  user        User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy  User? @relation("VerificationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  documents   VerificationDocument[]
+  adminActions AdminAction[]
+
+  @@index([userId, status])
+  @@index([reviewedById])
+}
+
+model VerificationDocument {
+  id           String   @id @default(cuid())
+  submissionId String
+  fileName     String
+  fileUrl      String
+  mimeType     String?
+  fileSize     Int?
+  createdAt    DateTime @default(now())
+
+  submission VerificationSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  jobId      String
+  reviewerId String
+  revieweeId String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  reviewer User @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewee User @relation("Reviewee", fields: [revieweeId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, reviewerId])
+  @@index([revieweeId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AdminAction {
+  id             String           @id @default(cuid())
+  action         AdminActionType
+  actorId        String
+  targetUserId   String?
+  submissionId   String?
+  details        String?
+  createdAt      DateTime         @default(now())
+
+  actor      User  @relation("AdminActor", fields: [actorId], references: [id], onDelete: Cascade)
+  targetUser User? @relation("AdminTarget", fields: [targetUserId], references: [id], onDelete: SetNull)
+  submission VerificationSubmission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([targetUserId])
+  @@index([submissionId])
+}
