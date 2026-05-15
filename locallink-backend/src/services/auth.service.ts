@@ -270,3 +270,18 @@ export const removeUserSkill = async (
   }
   return listUserSkills(userId);
 };
+export const getUserHistory = async (userId: string) => {
+  const applications = await prisma.jobApplication.findMany({
+    where: { applicantId: userId },
+    include: { job: { include: { poster: true } } },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  const postedJobs = await prisma.job.findMany({
+    where: { posterId: userId },
+    include: { _count: { select: { applications: true } }, applications: { include: { applicant: true } } },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  return { applications, postedJobs };
+};

@@ -11,8 +11,8 @@ import {
     updateMe,
     updatePassword,
     verifyAccount,
+    getMyHistory,
 } from "../controllers/auth.controller";
-import { requireUser } from "../middleware/user-auth.middleware";
 
 export const authRouter = Router();
 
@@ -21,6 +21,7 @@ authRouter.post("/login", login);
 authRouter.post("/verify", verifyAccount);
 authRouter.post("/logout", logout);
 authRouter.get("/me", requireUser, me);
+authRouter.get("/me/history", requireUser, getMyHistory);
 authRouter.patch("/me", requireUser, updateMe);
 authRouter.patch("/me/password", requireUser, updatePassword);
 authRouter.get("/me/skills", requireUser, getMySkills);

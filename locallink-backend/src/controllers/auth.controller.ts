@@ -18,6 +18,7 @@ import {
   updateUserPassword,
   updateUserProfile,
   verifyUserAccount,
+  getUserHistory,
 } from "../services/auth.service";
 
 const NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
@@ -250,6 +251,20 @@ export const removeMySkill: RequestHandler = async (req, res, next) => {
       return;
     }
     const data = await removeUserSkill(userId, skillName);
+    res.status(200).json({ data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyHistory: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = getUserId(req);
+    if (!userId) {
+      res.status(401).json({ message: 'Missing auth token' });
+      return;
+    }
+    const data = await getUserHistory(userId);
     res.status(200).json({ data });
   } catch (error) {
     next(error);
