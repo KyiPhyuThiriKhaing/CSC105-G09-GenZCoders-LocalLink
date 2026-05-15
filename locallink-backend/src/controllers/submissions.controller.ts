@@ -5,8 +5,10 @@ import {
   createSubmission,
   deleteSubmission,
   getSubmissionById,
+  getSubmissionByUserId,
   getSubmissionDocumentById,
   listSubmissions,
+  upsertSubmissionForUser,
   updateSubmissionStatus,
 } from "../services/submissions.service";
 import { uploadsDir } from "../lib/uploads";
@@ -73,7 +75,7 @@ export const uploadSubmissionDocumentHandler: RequestHandler = (req, res) => {
     file?: { originalname: string; filename: string; mimetype: string; size: number };
   }).file;
   if (!file) {
-    res.status(400).json({ message: "PDF file is required" });
+    res.status(400).json({ message: "File is required" });
     return;
   }
 
@@ -88,6 +90,65 @@ export const uploadSubmissionDocumentHandler: RequestHandler = (req, res) => {
       fileSize: file.size,
     },
   });
+};
+
+export const getMySubmissionHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const userId =
+      (req as { userId?: string }).userId ??
+      (typeof req.query.userId === "string" ? req.query.userId : "");
+    if (!userId) {
+      res.status(400).json({ message: "userId is required" });
+      return;
+    }
+
+    const data = await getSubmissionByUserId(userId);
+    if (!data) {
+      res.status(200).json({ data: null });
+      return;
+    }
+
+    res.status(200).json({ data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const upsertMySubmissionHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const userId =
+      (req as { userId?: string }).userId ??
+      (typeof req.body?.userId === "string" ? req.body.userId : "");
+    if (!userId) {
+      res.status(400).json({ message: "userId is required" });
+      return;
+    }
+
+    const documents = Array.isArray(req.body?.documents) ? req.body.documents : [];
+    if (documents.length === 0) {
+      res.status(400).json({ message: "At least one document is required" });
+      return;
+    }
+
+    const data = await upsertSubmissionForUser({
+      userId,
+      documents,
+      notes: typeof req.body?.notes === "string" ? req.body.notes : undefined,
+    });
+
+    if (!data) {
+      res.status(404).json({ message: "Submission not found" });
+      return;
+    }
+
+    res.status(200).json({ data });
+  } catch (error) {
+    if (error instanceof Error && error.message === "Submission already approved") {
+      res.status(409).json({ message: error.message });
+      return;
+    }
+    next(error);
+  }
 };
 
 export const downloadSubmissionDocumentHandler: RequestHandler = async (req, res, next) => {

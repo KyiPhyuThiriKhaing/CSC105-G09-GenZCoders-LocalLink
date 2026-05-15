@@ -18,6 +18,7 @@ export type AuthUser = {
   joinedAt: string;
   emailVerifiedAt?: string | null;
   emailVerificationRequestedAt?: string | null;
+  idVerifiedAt?: string | null;
 };
 
 export type AuthResponse = {

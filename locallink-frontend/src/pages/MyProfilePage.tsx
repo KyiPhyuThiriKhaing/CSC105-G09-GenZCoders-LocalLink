@@ -252,12 +252,21 @@ export default function MyProfilePage() {
                   <span className="text-sm font-bold">Email not verified</span>
                 </div>
               )}
-              <div className="flex items-center gap-2 text-orange-500">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100">
-                  <ExclamationTriangleIcon />
-                </span>
-                <span className="text-sm font-bold">Document unverified</span>
-              </div>
+              {user.idVerifiedAt ? (
+                <div className="flex items-center gap-2 text-emerald-600">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
+                    <CheckCircledIcon />
+                  </span>
+                  <span className="text-sm font-bold">Document verified</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-orange-500">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100">
+                    <ExclamationTriangleIcon />
+                  </span>
+                  <span className="text-sm font-bold">Document unverified</span>
+                </div>
+              )}
             </div>
           </section>
         </div>

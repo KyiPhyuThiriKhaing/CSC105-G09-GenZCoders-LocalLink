@@ -38,7 +38,6 @@ export default function AdminSubmissionDetailsPanel({
   onClose,
   onUpdateStatus,
 }: AdminSubmissionDetailsPanelProps) {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
   const [confirmAction, setConfirmAction] = useState<"approve" | "reject" | null>(null);
   const [adminComment, setAdminComment] = useState("");
   const isApproved = submission?.status === "Approved";
@@ -194,8 +193,9 @@ export default function AdminSubmissionDetailsPanel({
                     >
                       <FileTextIcon className="text-brand-primary" />
                       <a
-                        href={`${apiBaseUrl}/submissions/documents/${document.id}/download`}
-                        download
+                        href={document.fileUrl}
+                        target="_blank"
+                        rel="noreferrer"
                         className="break-all underline-offset-2 hover:underline"
                       >
                         {document.fileName}

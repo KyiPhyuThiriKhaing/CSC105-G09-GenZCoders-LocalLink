@@ -37,6 +37,13 @@ export const getSubmissionById = async (id: string): Promise<Submission | null> 
     select: selectSubmission,
   });
 
+export const getSubmissionByUserId = async (userId: string): Promise<Submission | null> =>
+  prisma.verificationSubmission.findFirst({
+    where: { userId },
+    orderBy: { submittedAt: "desc" },
+    select: selectSubmission,
+  });
+
 export const createSubmission = async (payload: CreateSubmissionInput): Promise<Submission> => {
   const documents = payload.documents.map((doc) => ({
     fileName: doc.fileName,
@@ -54,6 +61,64 @@ export const createSubmission = async (payload: CreateSubmissionInput): Promise<
       },
     },
     select: selectSubmission,
+  });
+};
+
+export const upsertSubmissionForUser = async (
+  payload: CreateSubmissionInput,
+): Promise<Submission | null> => {
+  const documents = payload.documents.map((doc) => ({
+    fileName: doc.fileName,
+    fileUrl: doc.fileUrl,
+    mimeType: doc.mimeType ?? null,
+    fileSize: doc.fileSize ?? null,
+  }));
+
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.verificationSubmission.findFirst({
+      where: { userId: payload.userId },
+      select: { id: true, status: true },
+      orderBy: { submittedAt: "desc" },
+    });
+
+    if (!existing) {
+      return tx.verificationSubmission.create({
+        data: {
+          userId: payload.userId,
+          notes: payload.notes ?? null,
+          status: "PENDING",
+          submittedAt: new Date(),
+          documents: {
+            create: documents,
+          },
+        },
+        select: selectSubmission,
+      });
+    }
+
+    if (existing.status === "APPROVED") {
+      throw new Error("Submission already approved");
+    }
+
+    await tx.verificationDocument.deleteMany({
+      where: { submissionId: existing.id },
+    });
+
+    return tx.verificationSubmission.update({
+      where: { id: existing.id },
+      data: {
+        notes: payload.notes ?? null,
+        status: "PENDING",
+        submittedAt: new Date(),
+        reviewedAt: null,
+        reviewedById: null,
+        adminComment: null,
+        documents: {
+          create: documents,
+        },
+      },
+      select: selectSubmission,
+    });
   });
 };
 

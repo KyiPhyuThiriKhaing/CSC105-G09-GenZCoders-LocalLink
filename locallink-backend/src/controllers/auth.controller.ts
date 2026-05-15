@@ -98,6 +98,7 @@ export const me: RequestHandler = async (req, res, next) => {
         joinedAt: true,
         emailVerifiedAt: true,
         emailVerificationRequestedAt: true,
+        idVerifiedAt: true,
       },
     });
 

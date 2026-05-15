@@ -25,6 +25,7 @@ const userSelect = {
   joinedAt: true,
   emailVerifiedAt: true,
   emailVerificationRequestedAt: true,
+  idVerifiedAt: true,
 } as const;
 
 export const registerUser = async (payload: RegisterInput): Promise<AuthResponse> => {

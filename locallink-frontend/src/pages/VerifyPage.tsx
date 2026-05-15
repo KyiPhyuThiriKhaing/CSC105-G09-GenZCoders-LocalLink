@@ -4,33 +4,77 @@ import {
   FileTextIcon,
   EnvelopeClosedIcon,
   CheckCircledIcon,
+  Cross2Icon,
 } from "@radix-ui/react-icons";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "../lib/useCurrentUser";
 import { requestEmailVerification } from "../lib/authApi";
-
-type UploadedDocument = {
-  fileName: string;
-  fileUrl: string;
-  mimeType?: string;
-  fileSize?: number;
-};
+import {
+  fetchMySubmission,
+  uploadVerificationDocument,
+  upsertMySubmission,
+  type VerificationDocument,
+  type VerificationSubmission,
+} from "../lib/verificationApi";
 
 export default function VerifyPage() {
   const { user } = useCurrentUser();
-  const [uploadedDocuments, setUploadedDocuments] = useState<UploadedDocument[]>([]);
+  const [submission, setSubmission] = useState<VerificationSubmission | null>(null);
+  const [isLoadingSubmission, setIsLoadingSubmission] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
+  const [uploadedDocuments, setUploadedDocuments] = useState<VerificationDocument[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+  const [notes, setNotes] = useState("");
   const [isRequestingEmail, setIsRequestingEmail] = useState(false);
   const [emailRequestError, setEmailRequestError] = useState("");
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
+
+  const submissionStatus = submission?.status ?? "DRAFT";
+  const isDocumentVerified = submissionStatus === "APPROVED";
+  const isPending = submissionStatus === "PENDING";
+  const isRejected = submissionStatus === "REJECTED";
+  const isReadOnly = isDocumentVerified;
 
   const isEmailVerified = Boolean(user?.emailVerifiedAt);
   const isEmailRequestPending = Boolean(user?.emailVerificationRequestedAt);
   const isEmailButtonDisabled =
     isEmailVerified || isEmailRequestPending || isRequestingEmail;
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let isMounted = true;
+    setIsLoadingSubmission(true);
+    setSubmissionError("");
+    fetchMySubmission(user?.id)
+      .then((data) => {
+        if (!isMounted) return;
+        setSubmission(data);
+        setUploadedDocuments(data?.documents ?? []);
+        setNotes(data?.notes ?? "");
+      })
+      .catch((error) => {
+        if (!isMounted) return;
+        setSubmissionError(
+          error instanceof Error ? error.message : "Unable to load submission.",
+        );
+      })
+      .finally(() => {
+        if (!isMounted) return;
+        setIsLoadingSubmission(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
+
+  const statusLabel = useMemo(() => {
+    if (submissionStatus === "APPROVED") return "Verified";
+    if (submissionStatus === "REJECTED") return "Rejected";
+    if (submissionStatus === "PENDING") return "Pending Review";
+    return "Not submitted";
+  }, [submissionStatus]);
 
   const handleRequestEmailVerification = async () => {
     if (isEmailButtonDisabled) return;
@@ -47,39 +91,21 @@ export default function VerifyPage() {
     }
   };
 
-  const uploadDocument = async (file: File): Promise<UploadedDocument> => {
-    if (file.type !== "application/pdf") {
-      throw new Error("Only PDF files are allowed.");
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await fetch(`${apiBaseUrl}/submissions/upload`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Upload failed. Please try again.");
-    }
-
-    const payload = (await response.json()) as { data: UploadedDocument };
-    return payload.data;
-  };
-
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) {
       return;
     }
 
+    if (isReadOnly) return;
     setUploadError("");
     setSubmitMessage("");
     setIsUploading(true);
 
     try {
-      const uploads = await Promise.all(Array.from(files).map(uploadDocument));
+      const uploads = await Promise.all(
+        Array.from(files).map((file) => uploadVerificationDocument(file)),
+      );
       setUploadedDocuments((prev) => [...prev, ...uploads]);
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Upload failed.");
@@ -87,6 +113,11 @@ export default function VerifyPage() {
       setIsUploading(false);
       event.target.value = "";
     }
+  };
+
+  const handleRemoveDocument = (index: number) => {
+    if (isReadOnly) return;
+    setUploadedDocuments((prev) => prev.filter((_, idx) => idx !== index));
   };
 
   const handleSubmit = async () => {
@@ -99,27 +130,19 @@ export default function VerifyPage() {
     }
 
     if (uploadedDocuments.length === 0) {
-      setUploadError("Please upload at least one PDF before submitting.");
+      setUploadError("Please upload at least one document before submitting.");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/submissions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user?.id,
-          documents: uploadedDocuments,
-        }),
+      const updated = await upsertMySubmission({
+        userId: user?.id,
+        documents: uploadedDocuments,
+        notes: notes.trim() || undefined,
       });
-
-      if (!response.ok) {
-        throw new Error("Submission failed. Please try again.");
-      }
-
-      setUploadedDocuments([]);
+      setSubmission(updated);
       setSubmitMessage("Submitted for review successfully.");
     } catch (error) {
       setSubmitMessage(
@@ -234,7 +257,11 @@ export default function VerifyPage() {
           </label>
           <label
             htmlFor="verification-upload"
-            className="group flex min-h-64 w-full cursor-pointer flex-col items-center justify-center rounded-4xl border-2 border-dashed border-slate-200 bg-white px-6 text-center transition-all hover:border-(--color-brand-primary) hover:bg-(--color-brand-soft)/50"
+            className={`group flex min-h-64 w-full flex-col items-center justify-center rounded-4xl border-2 border-dashed border-slate-200 bg-white px-6 text-center transition-all ${
+              isReadOnly
+                ? "cursor-not-allowed opacity-60"
+                : "cursor-pointer hover:border-(--color-brand-primary) hover:bg-(--color-brand-soft)/50"
+            }`}
           >
             <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-colors group-hover:bg-(--color-brand-soft) group-hover:text-(--color-brand-primary)">
               <UploadIcon className="h-6 w-6" />
@@ -257,6 +284,7 @@ export default function VerifyPage() {
               accept=".pdf"
               multiple
               onChange={handleFileChange}
+              disabled={isReadOnly}
             />
           </label>
           {isUploading ? (
@@ -265,36 +293,121 @@ export default function VerifyPage() {
           {uploadError ? (
             <p className="mt-3 text-sm font-semibold text-red-600">{uploadError}</p>
           ) : null}
-          {uploadedDocuments.length > 0 ? (
-            <ul className="mt-4 space-y-2">
-              {uploadedDocuments.map((doc) => (
-                <li
-                  key={doc.fileUrl}
-                  className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700"
-                >
-                  <span className="break-all">{doc.fileName}</span>
-                  <span className="text-xs text-slate-400">Ready</span>
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </div>
 
-        <div className="flex items-center gap-4 border-t border-slate-200 pt-8">
+        <section className="rounded-3xl border border-slate-200 bg-white p-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">
+                Document Verification
+              </h2>
+              <p className="text-sm text-slate-500">
+                Upload and submit your verification documents for review.
+              </p>
+            </div>
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-bold ${
+                isDocumentVerified
+                  ? "bg-emerald-100 text-emerald-700"
+                  : isRejected
+                    ? "bg-red-100 text-red-600"
+                    : isPending
+                      ? "bg-orange-100 text-orange-600"
+                      : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              {statusLabel}
+            </span>
+          </div>
+
+          {submissionError ? (
+            <p className="mb-4 text-sm font-semibold text-red-600">
+              {submissionError}
+            </p>
+          ) : null}
+
+          {submission?.adminComment && isRejected ? (
+            <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <span className="font-bold">Admin note:</span> {submission.adminComment}
+            </div>
+          ) : null}
+
+          <div className="mb-4">
+            <label className="mb-2 block text-sm font-bold text-slate-900">
+              Submission note
+            </label>
+            <textarea
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              rows={3}
+              disabled={isReadOnly}
+              placeholder="Add a note for the admin reviewing your documents."
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring) disabled:bg-slate-50 disabled:text-slate-400"
+            />
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-sm font-bold text-slate-900">
+              Uploaded files
+            </h3>
+            {isLoadingSubmission ? (
+              <p className="text-sm text-slate-500">Loading documents...</p>
+            ) : uploadedDocuments.length === 0 ? (
+              <p className="text-sm text-slate-500">No documents uploaded yet.</p>
+            ) : (
+              <ul className="space-y-2">
+                {uploadedDocuments.map((doc, index) => (
+                  <li
+                    key={`${doc.fileUrl}-${index}`}
+                    className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+                  >
+                    <a
+                      href={doc.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 break-all underline-offset-2 hover:underline"
+                    >
+                      <FileTextIcon /> {doc.fileName}
+                    </a>
+                    {!isReadOnly ? (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDocument(index)}
+                        className="rounded-full p-1 text-slate-400 transition hover:bg-red-100 hover:text-red-600"
+                        aria-label={`Remove ${doc.fileName}`}
+                      >
+                        <Cross2Icon className="h-3.5 w-3.5" />
+                      </button>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           <button
+            type="button"
             onClick={handleSubmit}
-            disabled={isSubmitting || isUploading}
-            className="flex items-center gap-2 rounded-xl bg-slate-900 px-8 py-3.5 text-sm font-bold text-white transition-all hover:bg-slate-800 hover:scale-105 hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={isSubmitting || isUploading || isReadOnly}
+            className={`mt-5 w-full rounded-xl px-5 py-3 text-sm font-bold transition-all ${
+              isReadOnly
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-[1.01]"
+            }`}
           >
-            Submit for Review
+            {isSubmitting
+              ? "Submitting..."
+              : isPending
+                ? "Resubmit for Review"
+                : "Submit for Review"}
           </button>
-          <span className="text-sm font-medium text-slate-500">
-            Usually verified within 24 hours
-          </span>
-        </div>
-        {submitMessage ? (
-          <p className="text-sm font-semibold text-slate-600">{submitMessage}</p>
-        ) : null}
+
+          {submitMessage ? (
+            <p className="mt-3 text-sm font-semibold text-slate-600">
+              {submitMessage}
+            </p>
+          ) : null}
+        </section>
       </div>
     </div>
   );
