@@ -21,6 +21,7 @@ import UsersPage from "./pages/UsersPage.tsx";
 import MyProfilePage from "./pages/MyProfilePage.tsx";
 import PostJobPage from "./pages/PostJobPage.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
+import SuspendedPage from "./pages/SuspendedPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <LoginPage />,
+      },
+      {
+        path: "suspended",
+        element: <SuspendedPage />,
       },
       {
         path: "signup",

@@ -96,6 +96,10 @@ export const loginUser = async (payload: LoginInput): Promise<AuthResponse> => {
     throw new Error("Invalid email or password");
   }
 
+  if (user.status === "SUSPENDED") {
+    throw new Error("Account suspended");
+  }
+
   const isPasswordValid = await bcrypt.compare(payload.password, user.passwordHash);
 
   if (!isPasswordValid) {

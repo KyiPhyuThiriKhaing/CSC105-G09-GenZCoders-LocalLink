@@ -67,6 +67,10 @@ export const login: RequestHandler = async (req, res, next) => {
       res.status(401).json({ message: error.message });
       return;
     }
+    if (error instanceof Error && error.message === "Account suspended") {
+      res.status(403).json({ message: error.message });
+      return;
+    }
     next(error);
   }
 };

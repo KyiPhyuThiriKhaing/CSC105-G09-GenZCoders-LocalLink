@@ -17,8 +17,13 @@ export const requireUser: RequestHandler = async (req, res, next) => {
             select: { id: true, status: true, role: true },
         });
 
-        if (!user || user.status === "SUSPENDED") {
-            res.status(403).json({ message: "Access denied" });
+        if (!user) {
+            res.status(401).json({ message: "Invalid token" });
+            return;
+        }
+
+        if (user.status === "SUSPENDED") {
+            res.status(403).json({ message: "Account suspended" });
             return;
         }
 
