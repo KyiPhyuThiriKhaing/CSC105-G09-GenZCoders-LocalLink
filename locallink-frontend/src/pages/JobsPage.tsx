@@ -7,7 +7,20 @@ import type { Job } from "../data/mockJobs";
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   useEffect(() => {
-    apiClient.get<{ data: Job[] }>("/jobs").then(({ data }) => setJobs(data.data));
+    apiClient.get<{ data: Record<string, unknown>[] }>("/jobs").then(({ data }) => {
+      const mapped: Job[] = data.data.map((j) => ({
+        id: String(j.id),
+        title: String(j.title),
+        description: String(j.description),
+        location: String(j.location),
+        image: j.imageUrl ? String(j.imageUrl) : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        feeRange: j.payoutText ? String(j.payoutText) : "฿—",
+        timeRange: j.durationText ? String(j.durationText) : "—",
+        postedAt: new Date(String(j.postedAt)).toLocaleDateString(),
+        poster: { name: "LocalLink User", avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${String(j.posterId)}` },
+      }));
+      setJobs(mapped);
+    });
   }, []);
   const [searchQuery, setSearchQuery] = useState("");
 

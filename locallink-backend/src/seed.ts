@@ -60,36 +60,40 @@ const seedUsers = async () => {
   return { admin, maya, liam };
 };
 
-const ensureJob = async (posterId: string, title: string) => {
-  const existing = await prisma.job.findFirst({
-    where: { posterId, title },
-  });
-
-  if (existing) {
-    return existing;
-  }
-
-  return prisma.job.create({
-    data: {
-      title,
-      description: "Help needed for a local task.",
-      location: "Sukhumvit, Bangkok",
-      payoutText: "฿300 - ฿450",
-      payoutCurrency: "THB",
-      durationText: "1-2 hours",
-      status: "OPEN",
-      posterId,
-    },
-  });
+const ensureJob = async (posterId: string, data: {
+  title: string;
+  description: string;
+  location: string;
+  payoutText: string;
+  durationText: string;
+  contactInfo?: string;
+  imageUrl?: string;
+}) => {
+  const existing = await prisma.job.findFirst({ where: { posterId, title: data.title } });
+  if (existing) return existing;
+  return prisma.job.create({ data: { ...data, payoutCurrency: "THB", status: "OPEN", posterId } });
 };
 
 const seedJobs = async (posterId: string) => {
-  const jobs = await Promise.all([
-    ensureJob(posterId, "Help move small furniture"),
-    ensureJob(posterId, "Dog walking (2 dogs)"),
-  ]);
-
-  const extras = [
+  const jobs = [
+    {
+      title: "Help move small furniture",
+      description: "Need someone strong to help move a sofa and two bookshelves from the 3rd floor to a truck outside. Building has no elevator.",
+      location: "Sukhumvit, Bangkok",
+      payoutText: "฿300 - ฿450",
+      durationText: "1-2 hours",
+      contactInfo: "Line: maya_bkk",
+      imageUrl: "https://images.unsplash.com/photo-1614359835514-92f8ba196357?auto=format&fit=crop&w=900&q=80",
+    },
+    {
+      title: "Dog walking (2 dogs)",
+      description: "Two friendly golden retrievers need a 45-minute walk around Benjakitti Park. Morning slot preferred, 7-9am. Dogs are well trained and leash-ready.",
+      location: "Sukhumvit, Bangkok",
+      payoutText: "฿200 - ฿300",
+      durationText: "45 minutes",
+      contactInfo: "Line: maya_bkk",
+      imageUrl: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=900&q=80",
+    },
     {
       title: "Grocery run to Lotus's",
       description: "Need someone to pick up groceries from Lotus's Ekkamai and deliver to my condo on Sukhumvit 42. Shopping list will be provided. Must have a bike or car.",
@@ -115,7 +119,7 @@ const seedJobs = async (posterId: string) => {
       payoutText: "฿300 - ฿400",
       durationText: "2-3 hours",
       contactInfo: "Line: techsetup_help",
-      imageUrl: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?auto=format&fit=crop&w=900&q=80",
+      imageUrl: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&w=900&q=80",
     },
     {
       title: "Plant watering while on holiday",
@@ -124,7 +128,7 @@ const seedJobs = async (posterId: string) => {
       payoutText: "฿200 flat",
       durationText: "5 days (every other day)",
       contactInfo: "Email: plants@example.com",
-      imageUrl: "https://images.unsplash.com/photo-1463936575829-25148e1db1b8?auto=format&fit=crop&w=900&q=80",
+      imageUrl: "https://images.unsplash.com/photo-1592150621744-aca64f48394a?auto=format&fit=crop&w=900&q=80",
     },
     {
       title: "Help with Thai paperwork translation",
@@ -133,18 +137,15 @@ const seedJobs = async (posterId: string) => {
       payoutText: "฿250 - ฿350",
       durationText: "1-2 hours",
       contactInfo: "Line: paperwork_help",
-      imageUrl: "https://images.unsplash.com/photo-1568667256549-094345857637?auto=format&fit=crop&w=900&q=80",
+      imageUrl: "https://images.unsplash.com/photo-1603796846097-bee99e4a601f?auto=format&fit=crop&w=900&q=80",
     },
   ];
 
-  for (const job of extras) {
-    const existing = await prisma.job.findFirst({ where: { posterId, title: job.title } });
-    if (!existing) {
-      await prisma.job.create({ data: { ...job, payoutCurrency: "THB", status: "OPEN", posterId } });
-    }
+  const results = [];
+  for (const job of jobs) {
+    results.push(await ensureJob(posterId, job));
   }
-
-  return jobs;
+  return results;
 };
 
 const ensureSubmission = async (userId: string, status: "PENDING" | "APPROVED") => {
