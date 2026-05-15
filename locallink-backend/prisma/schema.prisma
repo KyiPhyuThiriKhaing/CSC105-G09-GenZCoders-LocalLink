@@ -72,9 +72,10 @@ model User {
   location        String?
   bio             String?
   joinedAt        DateTime      @default(now())
-  emailVerifiedAt DateTime?
-  phoneVerifiedAt DateTime?
-  idVerifiedAt    DateTime?
+  emailVerifiedAt            DateTime?
+  emailVerificationRequestedAt DateTime?
+  phoneVerifiedAt            DateTime?
+  idVerifiedAt               DateTime?
   lastLoginAt     DateTime?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

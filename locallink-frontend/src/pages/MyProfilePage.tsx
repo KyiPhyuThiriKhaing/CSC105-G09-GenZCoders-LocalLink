@@ -6,6 +6,7 @@ import {
   MobileIcon,
   CalendarIcon,
   ExclamationTriangleIcon,
+  CheckCircledIcon,
   Cross2Icon,
 } from "@radix-ui/react-icons";
 import { useNavigate } from "react-router-dom";
@@ -227,12 +228,30 @@ export default function MyProfilePage() {
               Verifications
             </h2>
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-orange-500">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100">
-                  <ExclamationTriangleIcon />
-                </span>
-                <span className="text-sm font-bold">Email verification pending</span>
-              </div>
+              {user.emailVerifiedAt ? (
+                <div className="flex items-center gap-2 text-emerald-600">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
+                    <CheckCircledIcon />
+                  </span>
+                  <span className="text-sm font-bold">Email verified</span>
+                </div>
+              ) : user.emailVerificationRequestedAt ? (
+                <div className="flex items-center gap-2 text-orange-500">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100">
+                    <ExclamationTriangleIcon />
+                  </span>
+                  <span className="text-sm font-bold">
+                    Email verification pending review
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-slate-500">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100">
+                    <ExclamationTriangleIcon />
+                  </span>
+                  <span className="text-sm font-bold">Email not verified</span>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-orange-500">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-100">
                   <ExclamationTriangleIcon />

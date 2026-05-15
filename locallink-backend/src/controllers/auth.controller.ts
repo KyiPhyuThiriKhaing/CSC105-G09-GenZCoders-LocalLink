@@ -14,6 +14,7 @@ import {
   loginUser,
   registerUser,
   removeUserSkill,
+  requestEmailVerification,
   updateUserPassword,
   updateUserProfile,
   verifyUserAccount,
@@ -94,6 +95,8 @@ export const me: RequestHandler = async (req, res, next) => {
         location: true,
         bio: true,
         joinedAt: true,
+        emailVerifiedAt: true,
+        emailVerificationRequestedAt: true,
       },
     });
 
@@ -203,6 +206,28 @@ export const addMySkill: RequestHandler = async (req, res, next) => {
   } catch (error) {
     if (error instanceof ZodError) {
       res.status(400).json({ message: error.issues[0]?.message ?? "Invalid input" });
+      return;
+    }
+    next(error);
+  }
+};
+
+export const requestMyEmailVerification: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = getUserId(req);
+    if (!userId) {
+      res.status(401).json({ message: "Missing auth token" });
+      return;
+    }
+    const data = await requestEmailVerification(userId);
+    res.status(200).json({ data });
+  } catch (error) {
+    if (error instanceof Error && error.message === "Email is already verified") {
+      res.status(409).json({ message: error.message });
+      return;
+    }
+    if (error instanceof Error && error.message === "Email verification already requested") {
+      res.status(409).json({ message: error.message });
       return;
     }
     next(error);

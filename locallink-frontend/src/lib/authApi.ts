@@ -16,6 +16,8 @@ export type AuthUser = {
   location?: string | null;
   bio?: string | null;
   joinedAt: string;
+  emailVerifiedAt?: string | null;
+  emailVerificationRequestedAt?: string | null;
 };
 
 export type AuthResponse = {
@@ -164,6 +166,19 @@ export const addSkill = async (name: string): Promise<string[]> => {
     return result.data.data;
   } catch (error) {
     throw parseApiError(error, "Unable to add skill.");
+  }
+};
+
+export const requestEmailVerification = async (): Promise<AuthUser> => {
+  try {
+    const result = await apiClient.post<{ data: AuthUser }>(
+      "/auth/me/request-email-verification",
+    );
+    localStorage.setItem(AUTH_PROFILE_KEY, JSON.stringify(result.data.data));
+    window.dispatchEvent(new Event("auth:changed"));
+    return result.data.data;
+  } catch (error) {
+    throw parseApiError(error, "Unable to request email verification.");
   }
 };
 

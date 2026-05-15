@@ -7,6 +7,7 @@ import {
     me,
     register,
     removeMySkill,
+    requestMyEmailVerification,
     updateMe,
     updatePassword,
     verifyAccount,
@@ -25,3 +26,4 @@ authRouter.patch("/me/password", requireUser, updatePassword);
 authRouter.get("/me/skills", requireUser, getMySkills);
 authRouter.post("/me/skills", requireUser, addMySkill);
 authRouter.delete("/me/skills/:name", requireUser, removeMySkill);
+authRouter.post("/me/request-email-verification", requireUser, requestMyEmailVerification);

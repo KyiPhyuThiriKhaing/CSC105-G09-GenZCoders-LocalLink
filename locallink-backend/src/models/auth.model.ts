@@ -81,6 +81,8 @@ export interface AuthUser {
   location?: string | null;
   bio?: string | null;
   joinedAt: Date;
+  emailVerifiedAt?: Date | null;
+  emailVerificationRequestedAt?: Date | null;
 }
 
 export interface AuthResponse {

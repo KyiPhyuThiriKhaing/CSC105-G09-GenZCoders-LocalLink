@@ -23,6 +23,8 @@ const userSelect = {
   location: true,
   bio: true,
   joinedAt: true,
+  emailVerifiedAt: true,
+  emailVerificationRequestedAt: true,
 } as const;
 
 export const registerUser = async (payload: RegisterInput): Promise<AuthResponse> => {
@@ -221,6 +223,36 @@ export const addUserSkill = async (
   });
 
   return listUserSkills(userId);
+};
+
+export const requestEmailVerification = async (
+  userId: string,
+): Promise<AuthUser> => {
+  const existing = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      emailVerifiedAt: true,
+      emailVerificationRequestedAt: true,
+    },
+  });
+
+  if (!existing) {
+    throw new Error("User not found");
+  }
+  if (existing.emailVerifiedAt) {
+    throw new Error("Email is already verified");
+  }
+  if (existing.emailVerificationRequestedAt) {
+    throw new Error("Email verification already requested");
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { emailVerificationRequestedAt: new Date() },
+    select: userSelect,
+  });
+
+  return updated as AuthUser;
 };
 
 export const removeUserSkill = async (

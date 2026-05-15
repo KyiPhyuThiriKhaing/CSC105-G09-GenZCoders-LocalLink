@@ -3,9 +3,11 @@ import {
   UploadIcon,
   FileTextIcon,
   EnvelopeClosedIcon,
+  CheckCircledIcon,
 } from "@radix-ui/react-icons";
 import { useState } from "react";
 import { useCurrentUser } from "../lib/useCurrentUser";
+import { requestEmailVerification } from "../lib/authApi";
 
 type UploadedDocument = {
   fileName: string;
@@ -21,7 +23,29 @@ export default function VerifyPage() {
   const [uploadError, setUploadError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
+  const [isRequestingEmail, setIsRequestingEmail] = useState(false);
+  const [emailRequestError, setEmailRequestError] = useState("");
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
+
+  const isEmailVerified = Boolean(user?.emailVerifiedAt);
+  const isEmailRequestPending = Boolean(user?.emailVerificationRequestedAt);
+  const isEmailButtonDisabled =
+    isEmailVerified || isEmailRequestPending || isRequestingEmail;
+
+  const handleRequestEmailVerification = async () => {
+    if (isEmailButtonDisabled) return;
+    setEmailRequestError("");
+    setIsRequestingEmail(true);
+    try {
+      await requestEmailVerification();
+    } catch (error) {
+      setEmailRequestError(
+        error instanceof Error ? error.message : "Unable to request email verification.",
+      );
+    } finally {
+      setIsRequestingEmail(false);
+    }
+  };
 
   const uploadDocument = async (file: File): Promise<UploadedDocument> => {
     if (file.type !== "application/pdf") {
@@ -130,21 +154,62 @@ export default function VerifyPage() {
                 Email Verification
               </h2>
             </div>
-            <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-600">
-              Pending
-            </span>
+            {isEmailVerified ? (
+              <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+                <CheckCircledIcon className="h-3.5 w-3.5" />
+                Verified
+              </span>
+            ) : isEmailRequestPending ? (
+              <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-600">
+                Pending
+              </span>
+            ) : (
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                Not requested
+              </span>
+            )}
           </div>
-          <p className="text-sm text-slate-500">
-            Verify your email address to unlock job offers and messaging.
-            We'll wire this up later — coming soon.
-          </p>
+
+          {isEmailVerified ? (
+            <p className="text-sm font-semibold text-emerald-700">
+              Your email address has been verified.
+            </p>
+          ) : isEmailRequestPending ? (
+            <p className="text-sm font-semibold text-orange-600">
+              Email verification request submitted. We'll review it shortly —
+              you'll only need to do this once.
+            </p>
+          ) : (
+            <p className="text-sm text-slate-500">
+              Verify your email address ({user?.email ?? "your account"}) to
+              unlock job offers and messaging. You can only request this once.
+            </p>
+          )}
+
           <button
             type="button"
-            disabled
-            className="mt-4 rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-400 cursor-not-allowed"
+            onClick={handleRequestEmailVerification}
+            disabled={isEmailButtonDisabled}
+            className={`mt-4 rounded-xl px-5 py-2.5 text-sm font-bold transition-all ${
+              isEmailButtonDisabled
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-105 hover:shadow-lg"
+            }`}
           >
-            Send Verification Email
+            {isRequestingEmail
+              ? "Sending…"
+              : isEmailVerified
+                ? "Email Verified"
+                : isEmailRequestPending
+                  ? "Request Pending"
+                  : "Send Verification Email"}
           </button>
+
+          {emailRequestError ? (
+            <p className="mt-3 text-sm font-semibold text-red-600">
+              {emailRequestError}
+            </p>
+          ) : null}
         </section>
 
         <div className="rounded-2xl bg-emerald-50 p-6 border border-emerald-100 flex items-start gap-4">
