@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
-import { saveJob, type Job, type JobPostFormValues, jobPostSchema } from "../data/mockJobs";
+import { type JobPostFormValues, jobPostSchema } from "../data/mockJobs";
+import { apiClient } from "../lib/apiClient";
 
 export default function PostJobPage() {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<JobPostFormValues>({
     resolver: zodResolver(jobPostSchema),
     mode: "onTouched",
@@ -30,27 +32,31 @@ export default function PostJobPage() {
     window.scrollTo(0, 0);
   }, []);
 
-  const onSubmit = (values: JobPostFormValues) => {
-    const newJob: Job = {
-      id: Date.now().toString(),
-      title: values.title,
-      location: values.location,
-      feeRange: values.feeRange,
-      timeRange: values.timeRange,
-      postedAt: "Just now",
-      description: values.description,
-      image: values.image ||
-        "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
-      poster: {
-        name: "You",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=You&backgroundColor=e2e8f0",
-      },
-    };
+  const onSubmit = async (values: JobPostFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await apiClient.post("/jobs", {
+        title: values.title,
+        location: values.location,
+        feeRange: values.feeRange,
+        timeRange: values.timeRange,
+        description: values.description,
+        payoutText: values.feeRange,
+        durationText: values.timeRange,
+        imageUrl: values.image || "",
+        contactInfo: values.contact,
+        requirementsText: values.requirements,
+      });
 
-    saveJob(newJob);
-    toast.success("Job created successfully.");
-    reset();
-    navigate("/jobs");
+      toast.success("Job created successfully.");
+      reset();
+      navigate("/jobs");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to create job.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -223,9 +229,10 @@ export default function PostJobPage() {
                 </Link>
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center rounded-2xl bg-(--color-brand-primary) px-6 py-3 text-sm font-semibold text-white transition hover:bg-(--color-brand-primary-hover)"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center justify-center rounded-2xl bg-(--color-brand-primary) px-6 py-3 text-sm font-semibold text-white transition hover:bg-(--color-brand-primary-hover) disabled:opacity-50"
                 >
-                  Publish job
+                  {isSubmitting ? "Publishing..." : "Publish job"}
                 </button>
               </div>
             </section>

@@ -7,12 +7,35 @@ export const listJobs = async (): Promise<Job[]> => {
   return prisma.job.findMany({ orderBy: { postedAt: "desc" } });
 };
 
-export const getJobById = async (_id: string): Promise<Job | null> => {
-  throw new Error(NOT_IMPLEMENTED);
+export const getJobById = async (id: string): Promise<Job | null> => {
+  return prisma.job.findUnique({ 
+    where: { id },
+    include: { poster: true }
+  });
 };
 
-export const createJob = async (_payload: CreateJobInput): Promise<Job> => {
-  throw new Error(NOT_IMPLEMENTED);
+export const createJob = async (payload: CreateJobInput): Promise<Job> => {
+  let posterId = payload.posterId;
+  if (!posterId) {
+    const firstUser = await prisma.user.findFirst();
+    posterId = firstUser?.id || "";
+  }
+  
+  return prisma.job.create({
+    data: {
+      title: payload.title,
+      description: payload.description,
+      location: payload.location,
+      imageUrl: payload.imageUrl,
+      payoutText: payload.payoutText,
+      durationText: payload.durationText,
+      contactInfo: payload.contactInfo,
+      requirementsText: payload.requirementsText,
+      poster: { connect: { id: posterId } },
+      payoutCurrency: "THB",
+      status: "OPEN"
+    }
+  });
 };
 
 export const updateJob = async (_id: string, _payload: UpdateJobInput): Promise<Job | null> => {

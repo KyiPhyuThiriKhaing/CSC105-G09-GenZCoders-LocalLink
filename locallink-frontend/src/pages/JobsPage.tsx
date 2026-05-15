@@ -2,7 +2,20 @@ import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
 import { apiClient } from "../lib/apiClient";
-import type { Job } from "../data/mockJobs";
+export interface Job {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  image: string;
+  feeRange: string;
+  timeRange: string;
+  postedAt: string;
+  poster: {
+    avatar: string;
+    name: string;
+  };
+}
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -13,7 +26,7 @@ export default function JobsPage() {
         title: String(j.title),
         description: String(j.description),
         location: String(j.location),
-        image: j.imageUrl ? String(j.imageUrl) : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80",
+        image: j.imageUrl ? String(j.imageUrl) : "", // Blank if no image provided
         feeRange: j.payoutText ? String(j.payoutText) : "฿—",
         timeRange: j.durationText ? String(j.durationText) : "—",
         postedAt: new Date(String(j.postedAt)).toLocaleDateString(),
@@ -94,14 +107,20 @@ export default function JobsPage() {
                 to={`/jobs/${job.id}`}
                 className="group flex flex-col overflow-hidden rounded-[1.5rem] bg-white border border-slate-200 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.18)] transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-18px_rgba(15,23,42,0.18)] focus-visible:ring-4 focus-visible:ring-(--color-brand-focus-ring)"
               >
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative h-44 overflow-hidden bg-slate-100 flex items-center justify-center">
                   <div className="absolute inset-0 bg-slate-100" />
-                  <img
-                    src={job.image}
-                    alt={job.title}
-                    className="relative z-10 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
+                  {job.image ? (
+                    <img
+                      src={job.image}
+                      alt={job.title}
+                      className="relative z-10 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="relative z-10 flex h-full w-full items-center justify-center bg-slate-200 text-slate-400">
+                      <span className="text-sm font-medium">No Image</span>
+                    </div>
+                  )}
                   <div className="absolute top-3 right-3 z-20 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold text-slate-900 shadow-sm">
                     {job.postedAt}
                   </div>

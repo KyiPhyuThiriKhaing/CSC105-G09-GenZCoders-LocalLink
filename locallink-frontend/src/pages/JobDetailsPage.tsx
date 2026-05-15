@@ -1,15 +1,62 @@
+import { useEffect, useState } from "react";
 import {
   ArrowLeftIcon,
   DrawingPinIcon,
   ClockIcon,
 } from "@radix-ui/react-icons";
 import { Link, useParams } from "react-router-dom";
-import { getJobs } from "../data/mockJobs";
+import { apiClient } from "../lib/apiClient";
+import type { Job } from "../pages/JobsPage";
 
 export default function JobDetailsPage() {
   const { id } = useParams();
-  const jobs = getJobs();
-  const job = jobs.find((j) => j.id === id) || jobs[0];
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    apiClient.get<{ data: Record<string, unknown> }>(`/jobs/${id}`)
+      .then(({ data }) => {
+        const j = data.data as any; // Using any specifically to access nested relationships for the mock UI right now
+        const posterName = j.poster?.fullName || "LocalLink User";
+        const posterAvatar = j.poster?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${String(j.posterId)}`;
+
+        setJob({
+          id: String(j.id),
+          title: String(j.title),
+          description: String(j.description),
+          location: String(j.location),
+          image: j.imageUrl ? String(j.imageUrl) : "", // Blank if no image provided
+          feeRange: j.payoutText ? String(j.payoutText) : "฿—",
+          timeRange: j.durationText ? String(j.durationText) : "—",
+          postedAt: new Date(String(j.postedAt)).toLocaleDateString(),
+          poster: { 
+            name: posterName, 
+            avatar: posterAvatar 
+          },
+        });
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <p className="text-lg font-medium text-slate-500 animate-pulse">Loading job details...</p>
+      </div>
+    );
+  }
+
+  if (!job) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-50">
+        <p className="text-lg font-medium text-slate-500">Job not found.</p>
+        <Link to="/jobs" className="text-(--color-brand-primary) font-bold hover:underline">Return to Jobs</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-24 lg:pb-20">
@@ -26,12 +73,16 @@ export default function JobDetailsPage() {
           {/* Main Content */}
           <div className="lg:col-span-7 xl:col-span-8">
             <div className="mb-8 overflow-hidden rounded-4xl bg-slate-100">
-              <div className="relative aspect-4/3 w-full lg:aspect-video">
-                <img
-                  src={job.image}
-                  alt={job.title}
-                  className="h-full w-full object-cover"
-                />
+              <div className="relative aspect-4/3 w-full lg:aspect-video flex items-center justify-center bg-slate-200">
+                {job.image ? (
+                  <img
+                    src={job.image}
+                    alt={job.title}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-lg font-medium text-slate-400">No Image</span>
+                )}
                 <div className="absolute top-4 right-4 inline-flex h-8 items-center rounded-full bg-white/90 backdrop-blur-md px-3 text-xs font-bold tracking-wide text-slate-900 shadow-sm">
                   {job.postedAt}
                 </div>
