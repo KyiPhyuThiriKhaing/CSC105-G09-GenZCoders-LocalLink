@@ -46,7 +46,14 @@ export const getJobByIdHandler: RequestHandler = async (req, res, next) => {
 
 export const createJobHandler: RequestHandler = async (req, res, next) => {
   try {
-    const data = await createJob(req.body);
+    const userId = (req as { userId?: string }).userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const payload = { ...req.body, posterId: userId };
+    const data = await createJob(payload);
     res.status(201).json({ data });
   } catch (error) {
     if (error instanceof Error && error.message === NOT_IMPLEMENTED) {

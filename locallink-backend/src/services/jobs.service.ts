@@ -15,10 +15,8 @@ export const getJobById = async (id: string): Promise<Job | null> => {
 };
 
 export const createJob = async (payload: CreateJobInput): Promise<Job> => {
-  let posterId = payload.posterId;
-  if (!posterId) {
-    const firstUser = await prisma.user.findFirst();
-    posterId = firstUser?.id || "";
+  if (!payload.posterId) {
+    throw new Error("posterId is required to create a job");
   }
   
   return prisma.job.create({
@@ -31,7 +29,7 @@ export const createJob = async (payload: CreateJobInput): Promise<Job> => {
       durationText: payload.durationText,
       contactInfo: payload.contactInfo,
       requirementsText: payload.requirementsText,
-      poster: { connect: { id: posterId } },
+      poster: { connect: { id: payload.posterId } },
       payoutCurrency: "THB",
       status: "OPEN"
     }
