@@ -1,9 +1,10 @@
 import type { CreateJobInput, Job, UpdateJobInput } from "../models/job.model";
+import { prisma } from "../lib/prisma";
 
 const NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
 
 export const listJobs = async (): Promise<Job[]> => {
-  throw new Error(NOT_IMPLEMENTED);
+  return prisma.job.findMany({ orderBy: { postedAt: "desc" } });
 };
 
 export const getJobById = async (_id: string): Promise<Job | null> => {

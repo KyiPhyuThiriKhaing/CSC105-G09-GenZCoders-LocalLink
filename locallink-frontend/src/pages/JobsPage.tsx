@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
-import { getJobs } from "../data/mockJobs";
+import { apiClient } from "../lib/apiClient";
+import type { Job } from "../data/mockJobs";
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState(() => getJobs());
+  const [jobs, setJobs] = useState<Job[]>([]);
   useEffect(() => {
-    setJobs(getJobs());
+    apiClient.get<{ data: Job[] }>("/jobs").then(({ data }) => setJobs(data.data));
   }, []);
   const [searchQuery, setSearchQuery] = useState("");
 
