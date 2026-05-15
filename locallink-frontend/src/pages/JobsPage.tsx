@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { MagnifyingGlassIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiClient } from "../lib/apiClient";
+import { getAuthToken } from "../lib/authApi";
 export interface Job {
   id: string;
   title: string;
@@ -19,6 +20,14 @@ export interface Job {
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const navigate = useNavigate();
+
+  const handlePostJobClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!getAuthToken()) {
+      event.preventDefault();
+      navigate("/login");
+    }
+  };
   useEffect(() => {
     apiClient.get<{ data: Record<string, unknown>[] }>("/jobs").then(({ data }) => {
       const mapped: Job[] = data.data.map((j) => ({
@@ -70,6 +79,7 @@ export default function JobsPage() {
             </div>
             <Link
               to="/jobs/post"
+              onClick={handlePostJobClick}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-(--color-brand-primary) px-8 py-4 text-sm font-bold text-white shadow-lg shadow-(--color-brand-primary)/25 transition-all hover:bg-(--color-brand-primary-hover) hover:scale-[1.02]"
             >
               Post a Job
