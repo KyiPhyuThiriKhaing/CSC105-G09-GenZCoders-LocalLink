@@ -169,6 +169,45 @@ export const addSkill = async (name: string): Promise<string[]> => {
   }
 };
 
+export type HistoryApplication = {
+  id: string;
+  status: "APPLIED" | "CONTACTED" | "OFFERED" | "ACCEPTED" | "REJECTED" | "WITHDRAWN" | "COMPLETED";
+  message: string | null;
+  createdAt: string;
+  job: {
+    id: string;
+    title: string;
+    location: string;
+    payoutText: string | null;
+    status: string;
+    poster: { id: string; fullName: string };
+  };
+};
+
+export type HistoryPostedJob = {
+  id: string;
+  title: string;
+  location: string;
+  payoutText: string | null;
+  status: string;
+  postedAt: string;
+  _count: { applications: number };
+};
+
+export type HistoryResponse = {
+  applications: HistoryApplication[];
+  postedJobs: HistoryPostedJob[];
+};
+
+export const fetchHistory = async (): Promise<HistoryResponse> => {
+  try {
+    const result = await apiClient.get<{ data: HistoryResponse }>("/auth/me/history");
+    return result.data.data;
+  } catch (error) {
+    throw parseApiError(error, "Unable to load history.");
+  }
+};
+
 export const requestEmailVerification = async (): Promise<AuthUser> => {
   try {
     const result = await apiClient.post<{ data: AuthUser }>(

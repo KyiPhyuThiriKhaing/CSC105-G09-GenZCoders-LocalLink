@@ -13,6 +13,7 @@ import {
     verifyAccount,
     getMyHistory,
 } from "../controllers/auth.controller";
+import { requireUser } from "../middleware/user-auth.middleware";
 
 export const authRouter = Router();
 

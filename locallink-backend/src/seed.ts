@@ -204,10 +204,60 @@ const seedSubmissions = async (mayaId: string, liamId: string) => {
   return { pending, approved };
 };
 
+type ApplicationSeed = {
+  jobTitle: string;
+  status: "APPLIED" | "CONTACTED" | "OFFERED" | "ACCEPTED" | "REJECTED" | "WITHDRAWN" | "COMPLETED";
+  message?: string;
+};
+
+const seedApplications = async (
+  applicantId: string,
+  jobs: { id: string; title: string }[],
+  entries: ApplicationSeed[],
+) => {
+  const created = [];
+  for (const entry of entries) {
+    const job = jobs.find((j) => j.title === entry.jobTitle);
+    if (!job) continue;
+
+    const data = {
+      status: entry.status,
+      message: entry.message ?? "Interested, available this week.",
+      offeredAt:
+        entry.status === "OFFERED" || entry.status === "ACCEPTED" || entry.status === "COMPLETED"
+          ? new Date()
+          : null,
+      acceptedAt:
+        entry.status === "ACCEPTED" || entry.status === "COMPLETED" ? new Date() : null,
+      completedAt: entry.status === "COMPLETED" ? new Date() : null,
+    };
+
+    const application = await prisma.jobApplication.upsert({
+      where: { jobId_applicantId: { jobId: job.id, applicantId } },
+      update: data,
+      create: { ...data, jobId: job.id, applicantId },
+    });
+    created.push(application);
+  }
+  return created;
+};
+
 const main = async () => {
   const { admin, maya, liam } = await seedUsers();
   const jobs = await seedJobs(maya.id);
   const submissions = await seedSubmissions(maya.id, liam.id);
+
+  const liamApplications = await seedApplications(liam.id, jobs, [
+    { jobTitle: "Help move small furniture", status: "APPLIED", message: "Strong, can lift heavy items." },
+    { jobTitle: "Dog walking (2 dogs)", status: "CONTACTED", message: "Love dogs, free in the mornings." },
+    { jobTitle: "Grocery run to Lotus's", status: "ACCEPTED", message: "Have a motorbike, can deliver fast." },
+    { jobTitle: "IKEA furniture assembly", status: "COMPLETED", message: "Built loads of KALLAX shelves." },
+    { jobTitle: "Plant watering while on holiday", status: "REJECTED", message: "Reliable, available daily." },
+  ]);
+
+  const adminApplications = await seedApplications(admin.id, jobs, [
+    { jobTitle: "Help move small furniture", status: "APPLIED", message: "Available weekends." },
+  ]);
 
   console.log("Seed complete:");
   console.log({
@@ -216,6 +266,7 @@ const main = async () => {
     liamId: liam.id,
     jobIds: jobs.map((j) => j.id),
     submissionIds: [submissions.pending.id, submissions.approved.id],
+    applicationIds: [...liamApplications, ...adminApplications].map((a) => a.id),
   });
 };
 
