@@ -139,6 +139,18 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
   };
 };
 
+const adminUserSelect = {
+  id: true,
+  fullName: true,
+  email: true,
+  phone: true,
+  status: true,
+  joinedAt: true,
+  role: true,
+  emailVerifiedAt: true,
+  emailVerificationRequestedAt: true,
+} as const;
+
 export const listAdminUsers = async (query: AdminUsersQuery) => {
   const { page, pageSize, status, search, sort } = query;
   const skip = (page - 1) * pageSize;
@@ -164,15 +176,7 @@ export const listAdminUsers = async (query: AdminUsersQuery) => {
       orderBy,
       skip,
       take: pageSize,
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        phone: true,
-        status: true,
-        joinedAt: true,
-        role: true,
-      },
+      select: adminUserSelect,
     }),
   ]);
 
@@ -195,21 +199,59 @@ export const updateAdminUserStatus = async (
     const updated = await tx.user.update({
       where: { id: userId },
       data: { status },
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        phone: true,
-        status: true,
-        joinedAt: true,
-        role: true,
-      },
+      select: adminUserSelect,
     });
 
     if (actorId) {
       await tx.adminAction.create({
         data: {
           action: status === "SUSPENDED" ? "USER_SUSPEND" : "USER_ACTIVATE",
+          actorId,
+          targetUserId: userId,
+        },
+      });
+    }
+
+    return updated;
+  }).catch(() => null);
+};
+
+export const verifyAdminUserEmail = async (userId: string, actorId?: string) => {
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        emailVerifiedAt: true,
+        emailVerificationRequestedAt: true,
+      },
+    });
+
+    if (!existing) {
+      return null;
+    }
+
+    if (existing.emailVerifiedAt) {
+      return tx.user.findUnique({
+        where: { id: userId },
+        select: adminUserSelect,
+      });
+    }
+
+    const updated = await tx.user.update({
+      where: { id: userId },
+      data: {
+        emailVerifiedAt: new Date(),
+        emailVerificationRequestedAt: null,
+        status: "ACTIVE",
+      },
+      select: adminUserSelect,
+    });
+
+    if (actorId) {
+      await tx.adminAction.create({
+        data: {
+          action: "USER_ACTIVATE",
           actorId,
           targetUserId: userId,
         },

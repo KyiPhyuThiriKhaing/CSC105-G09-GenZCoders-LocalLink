@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     fetchCurrentUser,
     getAuthToken,
@@ -19,6 +19,11 @@ export const useCurrentUser = (): CurrentUserState => {
         error: null,
     });
 
+    const refreshState = useRef({
+        inFlight: false,
+        lastRefreshMs: 0,
+    });
+
     useEffect(() => {
         const sync = async () => {
             const token = getAuthToken();
@@ -30,6 +35,22 @@ export const useCurrentUser = (): CurrentUserState => {
             const cached = getStoredUser();
             if (cached) {
                 setState({ user: cached, isLoading: false, error: null });
+                const now = Date.now();
+                if (!refreshState.current.inFlight && now - refreshState.current.lastRefreshMs > 5000) {
+                    refreshState.current.inFlight = true;
+                    refreshState.current.lastRefreshMs = now;
+                    try {
+                        const user = await fetchCurrentUser();
+                        setState({ user, isLoading: false, error: null });
+                    } catch (error) {
+                        setState((prev) => ({
+                            ...prev,
+                            error: error instanceof Error ? error.message : "Unable to load user.",
+                        }));
+                    } finally {
+                        refreshState.current.inFlight = false;
+                    }
+                }
                 return;
             }
 

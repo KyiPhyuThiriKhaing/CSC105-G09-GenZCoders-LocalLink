@@ -42,6 +42,8 @@ export type AdminUser = {
   status: AdminStatus;
   joinedAt: string;
   role: "ADMIN" | "USER";
+  emailVerifiedAt?: string | null;
+  emailVerificationRequestedAt?: string | null;
 };
 
 export type AdminSubmission = {
@@ -182,6 +184,11 @@ export const updateAdminUserStatus = async (userId: string, status: AdminStatus)
   adminFetch<{ data: AdminUser }>(`/admin/users/${userId}/status`, {
     method: "PATCH",
     body: JSON.stringify({ status }),
+  });
+
+export const verifyAdminUserEmail = async (userId: string) =>
+  adminFetch<{ data: AdminUser }>(`/admin/users/${userId}/verify-email`, {
+    method: "PATCH",
   });
 
 export const deleteAdminUser = async (userId: string) =>

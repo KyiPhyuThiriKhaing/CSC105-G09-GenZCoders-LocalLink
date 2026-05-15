@@ -11,6 +11,7 @@ import {
   listAdminUsers,
   updateAdminAccountStatus,
   updateAdminUserStatus,
+  verifyAdminUserEmail,
   deleteAdminUser,
   listAdminSubmissions,
   getAdminSubmissionById,
@@ -288,6 +289,20 @@ export const deleteAdminUserHandler: RequestHandler = async (req, res, next) => 
       return;
     }
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyAdminUserEmailHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const actorId = getAdminActorId(req);
+    const data = await verifyAdminUserEmail(asId(req.params.id), actorId);
+    if (!data) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.status(200).json({ data });
   } catch (error) {
     next(error);
   }

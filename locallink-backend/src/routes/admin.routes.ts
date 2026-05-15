@@ -4,6 +4,7 @@ import {
   changeAdminPasswordHandler,
   createAdminHandler,
 	deleteAdminUserHandler,
+	verifyAdminUserEmailHandler,
 	getAdminProfileHandler,
 	getAdminSubmissionByIdHandler,
 	getDashboardStatsHandler,
@@ -34,6 +35,7 @@ adminRouter.get("/actions", listAdminActionsHandler);
 
 adminRouter.get("/users", listAdminUsersHandler);
 adminRouter.patch("/users/:id/status", updateAdminUserStatusHandler);
+adminRouter.patch("/users/:id/verify-email", verifyAdminUserEmailHandler);
 adminRouter.delete("/users/:id", deleteAdminUserHandler);
 
 adminRouter.get("/submissions", listAdminSubmissionsHandler);

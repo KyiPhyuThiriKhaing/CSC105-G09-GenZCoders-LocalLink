@@ -17,6 +17,7 @@ export interface AdminUserDetailsPanelProps {
   onClose: () => void;
   onUpdateStatus: (userId: string, status: AdminUser["status"]) => void;
   onDeleteUser: (userId: string) => void;
+  onVerifyEmail: (userId: string) => void;
 }
 
 const STATUS_STYLES: Record<AdminStatus, string> = {
@@ -39,6 +40,7 @@ export default function AdminUserDetailsPanel({
   onClose,
   onUpdateStatus,
   onDeleteUser,
+  onVerifyEmail,
 }: AdminUserDetailsPanelProps) {
   const [confirmAction, setConfirmAction] = useState<"suspend" | "activate" | null>(null);
 
@@ -195,6 +197,37 @@ export default function AdminUserDetailsPanel({
                     <span className="inline-flex items-center rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs font-semibold text-yellow-700">
                       Pending email verification
                     </span>
+                  ) : null}
+                </div>
+              </section>
+
+              <section className="rounded-xl border border-(--color-ink-border-faint) bg-white p-4">
+                <h3 className="text-sm font-bold text-(--color-ink-strong)">
+                  Email Verification
+                </h3>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  {user.emailVerifiedAt ? (
+                    <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                      Verified
+                    </span>
+                  ) : user.emailVerificationRequestedAt ? (
+                    <span className="inline-flex items-center rounded-full border border-yellow-200 bg-yellow-50 px-3 py-1 text-xs font-semibold text-yellow-700">
+                      Request pending
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
+                      Not requested
+                    </span>
+                  )}
+
+                  {!user.emailVerifiedAt && user.emailVerificationRequestedAt ? (
+                    <button
+                      type="button"
+                      onClick={() => onVerifyEmail(user.id)}
+                      className="inline-flex items-center rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                    >
+                      Verify Email
+                    </button>
                   ) : null}
                 </div>
               </section>

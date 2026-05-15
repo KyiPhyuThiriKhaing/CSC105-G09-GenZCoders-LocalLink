@@ -8,6 +8,7 @@ import {
   deleteAdminUser,
   listAdminUsers,
   updateAdminUserStatus,
+  verifyAdminUserEmail,
 } from "../../../../../lib/adminApi";
 
 const ITEMS_PER_PAGE = 8;
@@ -28,6 +29,18 @@ export default function AdminUsersPage() {
     PENDING: 0,
     SUSPENDED: 0,
   });
+
+  const updateStatusCounts = (list: AdminUser[]) => {
+    const active = list.filter((user) => user.status === "ACTIVE").length;
+    const pending = list.filter((user) => user.status === "PENDING").length;
+    const suspended = list.filter((user) => user.status === "SUSPENDED").length;
+
+    setStatusCounts({
+      ACTIVE: active,
+      PENDING: pending,
+      SUSPENDED: suspended,
+    });
+  };
 
   const filteredUsers = useMemo(() => {
     const tokens = searchTerm
@@ -78,16 +91,7 @@ export default function AdminUsersPage() {
 
       setUsers(response.data);
       setTotalUsers(response.meta.total);
-
-      const active = response.data.filter((user) => user.status === "ACTIVE").length;
-      const pending = response.data.filter((user) => user.status === "PENDING").length;
-      const suspended = response.data.filter((user) => user.status === "SUSPENDED").length;
-
-      setStatusCounts({
-        ACTIVE: active,
-        PENDING: pending,
-        SUSPENDED: suspended,
-      });
+      updateStatusCounts(response.data);
     };
 
     loadUsers().catch((error) => {
@@ -114,13 +118,17 @@ export default function AdminUsersPage() {
 
   const handleStatusChange = async (userId: string, nextStatus: AdminStatus) => {
     try {
-      await updateAdminUserStatus(userId, nextStatus);
-      setUsers((prevUsers) =>
-        prevUsers.map((user) => (user.id === userId ? { ...user, status: nextStatus } : user)),
-      );
+      const result = await updateAdminUserStatus(userId, nextStatus);
+      setUsers((prevUsers) => {
+        const nextUsers = prevUsers.map((user) =>
+          user.id === userId ? { ...user, ...result.data } : user,
+        );
+        updateStatusCounts(nextUsers);
+        return nextUsers;
+      });
       setSelectedUser((prevSelected) =>
         prevSelected && prevSelected.id === userId
-          ? { ...prevSelected, status: nextStatus }
+          ? { ...prevSelected, ...result.data }
           : prevSelected,
       );
     } catch (error) {
@@ -129,10 +137,36 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleVerifyEmail = async (userId: string) => {
+    try {
+      const result = await verifyAdminUserEmail(userId);
+      setUsers((prevUsers) => {
+        const nextUsers = prevUsers.map((user) =>
+          user.id === userId ? { ...user, ...result.data } : user,
+        );
+        updateStatusCounts(nextUsers);
+        return nextUsers;
+      });
+      setSelectedUser((prevSelected) =>
+        prevSelected && prevSelected.id === userId
+          ? { ...prevSelected, ...result.data }
+          : prevSelected,
+      );
+      toast.success("Email verified successfully.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to verify email";
+      toast.error(message);
+    }
+  };
+
   const handleDeleteUser = async (userId: string) => {
     try {
       await deleteAdminUser(userId);
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      setUsers((prevUsers) => {
+        const nextUsers = prevUsers.filter((user) => user.id !== userId);
+        updateStatusCounts(nextUsers);
+        return nextUsers;
+      });
       setSelectedUser((prevSelected) =>
         prevSelected && prevSelected.id === userId ? null : prevSelected,
       );
@@ -265,6 +299,7 @@ export default function AdminUsersPage() {
         onClose={() => setIsPanelOpen(false)}
         onUpdateStatus={handleStatusChange}
         onDeleteUser={handleDeleteUser}
+        onVerifyEmail={handleVerifyEmail}
       />
     </div>
   );
