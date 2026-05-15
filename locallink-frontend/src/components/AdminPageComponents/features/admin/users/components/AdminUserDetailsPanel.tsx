@@ -9,22 +9,20 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ConfirmDialog from "../../../../../ConfirmDialog";
 import AdminUserDangerZone from "./AdminUserDangerZone";
-import type {
-  AdminUser,
-  UserStatus,
-} from "../../../../../../data/mockAdminData";
+import type { AdminUser, AdminStatus } from "../../../../../../lib/adminApi";
 
 export interface AdminUserDetailsPanelProps {
   user: AdminUser | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdateStatus: (userId: number, status: AdminUser["status"]) => void;
+  onUpdateStatus: (userId: string, status: AdminUser["status"]) => void;
+  onDeleteUser: (userId: string) => void;
 }
 
-const STATUS_STYLES: Record<UserStatus, string> = {
-  Active: "bg-green-100 text-green-800 border-green-200",
-  Suspended: "bg-red-100 text-red-800 border-red-200",
-  Pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+const STATUS_STYLES: Record<AdminStatus, string> = {
+  ACTIVE: "bg-green-100 text-green-800 border-green-200",
+  SUSPENDED: "bg-red-100 text-red-800 border-red-200",
+  PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
 };
 
 const getInitials = (name: string) =>
@@ -40,6 +38,7 @@ export default function AdminUserDetailsPanel({
   isOpen,
   onClose,
   onUpdateStatus,
+  onDeleteUser,
 }: AdminUserDetailsPanelProps) {
   const [confirmAction, setConfirmAction] = useState<"suspend" | "activate" | null>(null);
 
@@ -102,10 +101,10 @@ export default function AdminUserDetailsPanel({
               <section className="rounded-xl border border-(--color-ink-border-faint) bg-white p-4">
                 <div className="flex flex-col items-center text-center">
                   <div className="grid h-20 w-20 place-items-center rounded-2xl bg-(--color-brand-primary) text-3xl font-extrabold text-white">
-                    {getInitials(user.name)}
+                    {getInitials(user.fullName)}
                   </div>
                   <h3 className="mt-3 text-xl font-extrabold text-(--color-ink-strong)">
-                    {user.name}
+                    {user.fullName}
                   </h3>
                   <p className="mt-1 text-sm text-(--color-text-muted)">
                     {user.email}
@@ -125,7 +124,7 @@ export default function AdminUserDetailsPanel({
                         Full Name
                       </dt>
                       <dd className="mt-0.5 font-medium text-(--color-ink-strong)">
-                        {user.name}
+                        {user.fullName}
                       </dd>
                     </div>
                   </div>
@@ -154,7 +153,7 @@ export default function AdminUserDetailsPanel({
                         Joined
                       </dt>
                       <dd className="mt-0.5 font-medium text-(--color-ink-strong)">
-                        {user.joinedAt}
+                        {new Date(user.joinedAt).toLocaleDateString()}
                       </dd>
                     </div>
                   </div>
@@ -172,7 +171,7 @@ export default function AdminUserDetailsPanel({
                     {user.status}
                   </span>
 
-                  {user.status === "Active" ? (
+                  {user.status === "ACTIVE" ? (
                     <button
                       type="button"
                       onClick={() => setConfirmAction("suspend")}
@@ -182,7 +181,7 @@ export default function AdminUserDetailsPanel({
                     </button>
                   ) : null}
 
-                  {user.status === "Suspended" ? (
+                  {user.status === "SUSPENDED" ? (
                     <button
                       type="button"
                       onClick={() => setConfirmAction("activate")}
@@ -192,15 +191,18 @@ export default function AdminUserDetailsPanel({
                     </button>
                   ) : null}
 
-                  {user.status === "Pending" ? (
+                  {user.status === "PENDING" ? (
                     <span className="inline-flex items-center rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs font-semibold text-yellow-700">
-                      Pending verification
+                      Pending email verification
                     </span>
                   ) : null}
                 </div>
               </section>
 
-              <AdminUserDangerZone userName={user.name} />
+              <AdminUserDangerZone
+                userName={user.fullName}
+                onDelete={() => onDeleteUser(user.id)}
+              />
             </div>
           </div>
         ) : null}
@@ -215,8 +217,8 @@ export default function AdminUserDetailsPanel({
         variant="danger"
         onConfirm={() => {
           if (user) {
-            onUpdateStatus(user.id, "Suspended");
-            toast.success(`${user.name}'s account has been suspended.`);
+            onUpdateStatus(user.id, "SUSPENDED");
+            toast.success(`${user.fullName}'s account has been suspended.`);
           }
           setConfirmAction(null);
         }}
@@ -230,8 +232,8 @@ export default function AdminUserDetailsPanel({
         variant="success"
         onConfirm={() => {
           if (user) {
-            onUpdateStatus(user.id, "Active");
-            toast.success(`${user.name}'s account has been successfully reactivated.`);
+            onUpdateStatus(user.id, "ACTIVE");
+            toast.success(`${user.fullName}'s account has been successfully reactivated.`);
           }
           setConfirmAction(null);
         }}

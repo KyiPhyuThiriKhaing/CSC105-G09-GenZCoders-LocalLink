@@ -20,11 +20,13 @@ import SubmissionsPage from "./pages/SubmissionsPage.tsx";
 import UsersPage from "./pages/UsersPage.tsx";
 import MyProfilePage from "./pages/MyProfilePage.tsx";
 import PostJobPage from "./pages/PostJobPage.tsx";
+import ErrorPage from "./pages/ErrorPage.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "",
@@ -86,24 +88,28 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: <AdminPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/admin/dashboard",
     element: <AdminDashboardPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/admin/submissions",
     element: <SubmissionsPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/admin/users",
     element: <UsersPage />,
+    errorElement: <ErrorPage />,
   },
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Toaster position="top-center" richColors />
+    <Toaster position="top-center" richColors visibleToasts={1} />
     <RouterProvider router={router} />
   </StrictMode>,
 );

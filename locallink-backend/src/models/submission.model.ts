@@ -1,21 +1,36 @@
-export type SubmissionStatus = "pending" | "reviewed" | "accepted" | "rejected";
+export type SubmissionStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface SubmissionDocumentInput {
+  fileName: string;
+  fileUrl: string;
+  mimeType?: string;
+  fileSize?: number;
+}
+
+export interface SubmissionDocument extends SubmissionDocumentInput {
+  id: string;
+}
 
 export interface Submission {
   id: string;
-  jobId: string;
-  applicantUserId: string;
-  coverLetter: string;
+  userId: string;
   status: SubmissionStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  submittedAt: Date;
+  reviewedAt?: Date | null;
+  notes?: string | null;
+  adminComment?: string | null;
+  documents: SubmissionDocument[];
 }
 
 export interface CreateSubmissionInput {
-  jobId: string;
-  applicantUserId: string;
-  coverLetter: string;
+  userId: string;
+  documents: SubmissionDocumentInput[];
+  notes?: string;
 }
 
 export interface UpdateSubmissionStatusInput {
   status: SubmissionStatus;
+  adminComment?: string;
+  notes?: string;
+  reviewedById?: string;
 }

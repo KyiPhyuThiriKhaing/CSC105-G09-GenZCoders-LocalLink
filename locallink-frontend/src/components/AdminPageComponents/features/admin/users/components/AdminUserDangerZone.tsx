@@ -4,10 +4,12 @@ import ConfirmDialog from "../../../../../ConfirmDialog";
 
 type AdminUserDangerZoneProps = {
   userName: string;
+  onDelete: () => void;
 };
 
 export default function AdminUserDangerZone({
   userName,
+  onDelete,
 }: AdminUserDangerZoneProps) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   return (
@@ -41,6 +43,7 @@ export default function AdminUserDangerZone({
         confirmText="Delete Account"
         variant="danger"
         onConfirm={() => {
+          onDelete();
           toast.success(`${userName}'s account has been successfully deleted.`);
           setIsConfirmOpen(false);
         }}

@@ -4,22 +4,89 @@ import {
   CrossCircledIcon,
   FileTextIcon,
 } from "@radix-ui/react-icons";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashboardPage.module.css";
 import AdminDashboardHeader from "./components/AdminDashboardHeader";
 import AdminDashboardStatsGrid from "./components/AdminDashboardStatsGrid";
 import AdminDashboardQuickActions from "./components/AdminDashboardQuickActions";
-import { MOCK_DASHBOARD_STATS } from "../../../../../data/mockAdminData";
-
-const DASHBOARD_STATS = [
-  { ...MOCK_DASHBOARD_STATS[0], Icon: FileTextIcon, color: "primary" },
-  { ...MOCK_DASHBOARD_STATS[1], Icon: ClockIcon, color: "warning" },
-  { ...MOCK_DASHBOARD_STATS[2], Icon: CheckCircledIcon, color: "success" },
-  { ...MOCK_DASHBOARD_STATS[3], Icon: CrossCircledIcon, color: "danger" },
-] as const;
+import { getDashboardStats, getSubmissionCount } from "../../../../../lib/adminApi";
 
 function AdminDashboardPage() {
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    totalSubmissions: 0,
+    pendingSubmissions: 0,
+    approvedSubmissions: 0,
+    rejectedSubmissions: 0,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadStats = async () => {
+      const [dashboard, approved, rejected] = await Promise.all([
+        getDashboardStats(),
+        getSubmissionCount("APPROVED"),
+        getSubmissionCount("REJECTED"),
+      ]);
+
+      if (!isMounted) return;
+
+      setStats({
+        totalSubmissions: dashboard.totalSubmissions,
+        pendingSubmissions: dashboard.pendingSubmissions,
+        approvedSubmissions: approved,
+        rejectedSubmissions: rejected,
+      });
+    };
+
+    loadStats().catch(() => {
+      if (isMounted) {
+        setStats({
+          totalSubmissions: 0,
+          pendingSubmissions: 0,
+          approvedSubmissions: 0,
+          rejectedSubmissions: 0,
+        });
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const dashboardStats = useMemo(
+    () =>
+      [
+        {
+          label: "Total Submissions",
+          value: stats.totalSubmissions,
+          Icon: FileTextIcon,
+          color: "primary",
+        },
+        {
+          label: "Pending Review",
+          value: stats.pendingSubmissions,
+          Icon: ClockIcon,
+          color: "warning",
+        },
+        {
+          label: "Approved",
+          value: stats.approvedSubmissions,
+          Icon: CheckCircledIcon,
+          color: "success",
+        },
+        {
+          label: "Rejected",
+          value: stats.rejectedSubmissions,
+          Icon: CrossCircledIcon,
+          color: "danger",
+        },
+      ] as const,
+    [stats],
+  );
 
   const quickActions = [
     {
@@ -40,7 +107,7 @@ function AdminDashboardPage() {
         title="Dashboard Overview"
         subtitle="Monitor and manage account validation submissions"
       />
-      <AdminDashboardStatsGrid stats={[...DASHBOARD_STATS]} />
+      <AdminDashboardStatsGrid stats={[...dashboardStats]} />
       <AdminDashboardQuickActions actions={[...quickActions]} />
     </div>
   );

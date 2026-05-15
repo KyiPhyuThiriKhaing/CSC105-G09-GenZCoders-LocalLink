@@ -1,7 +1,13 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { adminLogin } from "../lib/adminApi";
 
 export default function AdminPage() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <div className="grid min-h-screen place-items-center bg-(--color-ink-strong) px-4 py-8">
@@ -15,9 +21,23 @@ export default function AdminPage() {
 
         <form
           className="mt-7 space-y-5"
-          onSubmit={(event) => {
+          onSubmit={async (event) => {
             event.preventDefault();
-            navigate("/admin/dashboard");
+            if (!email || !password) {
+              toast.error("Enter email and password");
+              return;
+            }
+            try {
+              setIsSubmitting(true);
+              await adminLogin(email, password);
+              toast.success("Welcome back, admin!");
+              navigate("/admin/dashboard");
+            } catch (error) {
+              const message = error instanceof Error ? error.message : "Login failed";
+              toast.error(message);
+            } finally {
+              setIsSubmitting(false);
+            }
           }}
         >
           <div>
@@ -31,6 +51,8 @@ export default function AdminPage() {
               id="admin-email"
               type="email"
               placeholder="admin@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               className="h-11 w-full rounded-xl border border-(--color-ink-border-soft) bg-(--color-brand-soft) px-3 text-sm text-(--color-ink-strong) outline-none transition placeholder:text-(--color-text-muted) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring)"
             />
           </div>
@@ -46,15 +68,18 @@ export default function AdminPage() {
               id="admin-password"
               type="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
               className="h-11 w-full rounded-xl border border-(--color-ink-border-soft) bg-(--color-brand-soft) px-3 text-sm text-(--color-ink-strong) outline-none transition placeholder:text-(--color-text-muted) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring)"
             />
           </div>
 
           <button
             type="submit"
-            className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl bg-brand-primary px-4 text-sm font-semibold text-white transition hover:bg-brand-primary-hover"
+            className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl bg-brand-primary px-4 text-sm font-semibold text-white transition hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-70"
+            disabled={isSubmitting}
           >
-            Enter Admin Portal
+            {isSubmitting ? "Signing in..." : "Enter Admin Portal"}
           </button>
         </form>
       </section>

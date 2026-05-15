@@ -56,10 +56,10 @@ export default function AdminSubmissionCard({
         </span>
         {submission.documents.slice(0, 3).map((doc) => (
           <span
-            key={doc}
+            key={doc.id}
             className="rounded-full border border-(--color-ink-border-faint) px-2.5 py-1"
           >
-            {doc}
+            {doc.fileName}
           </span>
         ))}
         {submission.documents.length > 3 ? (

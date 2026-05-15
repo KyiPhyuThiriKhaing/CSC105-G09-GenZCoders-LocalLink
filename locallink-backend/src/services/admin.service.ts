@@ -4,6 +4,12 @@ import { signAdminToken } from "../lib/jwt";
 
 export type AccountStatus = "ACTIVE" | "PENDING" | "SUSPENDED";
 export type VerificationStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type AdminActionType =
+  | "VERIFY_APPROVE"
+  | "VERIFY_REJECT"
+  | "USER_SUSPEND"
+  | "USER_ACTIVATE"
+  | "USER_DELETE";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "minthuta@gmail.com";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "68130500839";
@@ -42,11 +48,14 @@ const ensureAdminUser = async () => {
 };
 
 export const adminLogin = async (email: string, password: string) => {
-  if (email !== ADMIN_EMAIL) {
-    return null;
+  if (email === ADMIN_EMAIL) {
+    await ensureAdminUser();
   }
 
-  const admin = await ensureAdminUser();
+  const admin = await prisma.user.findUnique({ where: { email } });
+  if (!admin) {
+    return null;
+  }
 
   if (admin.role !== "ADMIN" || admin.status !== "ACTIVE") {
     return null;
@@ -67,6 +76,20 @@ export const adminLogin = async (email: string, password: string) => {
   return { token, admin: updated };
 };
 
+export const getAdminProfile = async (adminId: string) =>
+  prisma.user.findUnique({
+    where: { id: adminId },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      role: true,
+      status: true,
+      joinedAt: true,
+      lastLoginAt: true,
+    },
+  });
+
 export interface AdminUsersQuery {
   page: number;
   pageSize: number;
@@ -81,6 +104,22 @@ export interface AdminSubmissionsQuery {
   status: VerificationStatus | null;
   search: string;
   sort: string;
+}
+
+export interface AdminsQuery {
+  page: number;
+  pageSize: number;
+  status: AccountStatus | null;
+  search: string;
+  sort: string;
+}
+
+export interface AdminActionsQuery {
+  page: number;
+  pageSize: number;
+  action: AdminActionType | null;
+  actorId: string | null;
+  targetUserId: string | null;
 }
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
@@ -110,9 +149,9 @@ export const listAdminUsers = async (query: AdminUsersQuery) => {
     ...(search
       ? {
           OR: [
-            { fullName: { contains: search, mode: "insensitive" as const } },
-            { email: { contains: search, mode: "insensitive" as const } },
-            { phone: { contains: search, mode: "insensitive" as const } },
+            { fullName: { contains: search } },
+            { email: { contains: search } },
+            { phone: { contains: search } },
           ],
         }
       : {}),
@@ -188,8 +227,6 @@ export const deleteAdminUser = async (userId: string, actorId?: string) => {
       return null;
     }
 
-    await tx.user.delete({ where: { id: userId } });
-
     if (actorId) {
       await tx.adminAction.create({
         data: {
@@ -200,6 +237,7 @@ export const deleteAdminUser = async (userId: string, actorId?: string) => {
       });
     }
 
+    await tx.user.delete({ where: { id: userId } });
     return existing;
   });
 };
@@ -214,10 +252,10 @@ export const listAdminSubmissions = async (query: AdminSubmissionsQuery) => {
     ...(search
       ? {
           OR: [
-            { user: { fullName: { contains: search, mode: "insensitive" as const } } },
-            { user: { email: { contains: search, mode: "insensitive" as const } } },
-            { user: { phone: { contains: search, mode: "insensitive" as const } } },
-            { documents: { some: { fileName: { contains: search, mode: "insensitive" as const } } } },
+            { user: { fullName: { contains: search } } },
+            { user: { email: { contains: search } } },
+            { user: { phone: { contains: search } } },
+            { documents: { some: { fileName: { contains: search } } } },
           ],
         }
       : {}),
@@ -379,4 +417,161 @@ export const updateAdminSubmissionStatus = async (
 
     return updated;
   });
+};
+
+export const listAdmins = async (query: AdminsQuery) => {
+  const { page, pageSize, status, search, sort } = query;
+  const skip = (page - 1) * pageSize;
+  const orderBy = sort === "oldest" ? { joinedAt: "asc" as const } : { joinedAt: "desc" as const };
+
+  const where = {
+    role: "ADMIN" as const,
+    ...(status ? { status } : {}),
+    ...(search
+      ? {
+          OR: [
+            { fullName: { contains: search, mode: "insensitive" as const } },
+            { email: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+  };
+
+  const [total, admins] = await prisma.$transaction([
+    prisma.user.count({ where }),
+    prisma.user.findMany({
+      where,
+      orderBy,
+      skip,
+      take: pageSize,
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        status: true,
+        joinedAt: true,
+        lastLoginAt: true,
+      },
+    }),
+  ]);
+
+  return {
+    data: admins,
+    meta: {
+      page,
+      pageSize,
+      total,
+    },
+  };
+};
+
+export const createAdmin = async (payload: { fullName: string; email: string; password: string }) => {
+  const existing = await prisma.user.findUnique({ where: { email: payload.email } });
+  if (existing) {
+    return null;
+  }
+
+  const passwordHash = await bcrypt.hash(payload.password, 10);
+
+  return prisma.user.create({
+    data: {
+      email: payload.email,
+      fullName: payload.fullName,
+      passwordHash,
+      role: "ADMIN",
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      status: true,
+      joinedAt: true,
+    },
+  });
+};
+
+export const updateAdminAccountStatus = async (adminId: string, status: AccountStatus) => {
+  const existing = await prisma.user.findUnique({ where: { id: adminId } });
+  if (!existing || existing.role !== "ADMIN") {
+    return null;
+  }
+
+  return prisma.user.update({
+    where: { id: adminId },
+    data: { status },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      status: true,
+      joinedAt: true,
+      lastLoginAt: true,
+    },
+  });
+};
+
+export const changeAdminPassword = async (adminId: string, currentPassword: string, newPassword: string) => {
+  const admin = await prisma.user.findUnique({ where: { id: adminId } });
+  if (!admin || admin.role !== "ADMIN") {
+    return null;
+  }
+
+  const matches = await bcrypt.compare(currentPassword, admin.passwordHash);
+  if (!matches) {
+    return false;
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: { id: adminId },
+    data: { passwordHash },
+  });
+
+  return true;
+};
+
+export const listAdminActions = async (query: AdminActionsQuery) => {
+  const { page, pageSize, action, actorId, targetUserId } = query;
+  const skip = (page - 1) * pageSize;
+
+  const where = {
+    ...(action ? { action } : {}),
+    ...(actorId ? { actorId } : {}),
+    ...(targetUserId ? { targetUserId } : {}),
+  };
+
+  const [total, actions] = await prisma.$transaction([
+    prisma.adminAction.count({ where }),
+    prisma.adminAction.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: pageSize,
+      select: {
+        id: true,
+        action: true,
+        details: true,
+        createdAt: true,
+        actor: {
+          select: { id: true, fullName: true, email: true },
+        },
+        targetUser: {
+          select: { id: true, fullName: true, email: true },
+        },
+        submission: {
+          select: { id: true, status: true },
+        },
+      },
+    }),
+  ]);
+
+  return {
+    data: actions,
+    meta: {
+      page,
+      pageSize,
+      total,
+    },
+  };
 };

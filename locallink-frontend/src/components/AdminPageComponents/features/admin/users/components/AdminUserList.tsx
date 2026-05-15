@@ -1,5 +1,5 @@
 import AdminUserCard from "./AdminUserCard";
-import type { AdminUser } from "../../../../../../data/mockAdminData";
+import type { AdminUser } from "../../../../../../lib/adminApi";
 
 export interface AdminUserListProps {
   users: AdminUser[];

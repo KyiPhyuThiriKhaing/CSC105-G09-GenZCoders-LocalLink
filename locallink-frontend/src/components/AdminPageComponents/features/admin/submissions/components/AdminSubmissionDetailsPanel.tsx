@@ -15,6 +15,7 @@ type AdminSubmissionDetailsPanelProps = {
   submission: Submission | null;
   isOpen: boolean;
   onClose: () => void;
+  onUpdateStatus: (submissionId: string, status: SubmissionStatus, comment: string) => void;
 };
 
 const STATUS_STYLES: Record<SubmissionStatus, string> = {
@@ -35,8 +36,12 @@ export default function AdminSubmissionDetailsPanel({
   submission,
   isOpen,
   onClose,
+  onUpdateStatus,
 }: AdminSubmissionDetailsPanelProps) {
   const [confirmAction, setConfirmAction] = useState<"approve" | "reject" | null>(null);
+  const [adminComment, setAdminComment] = useState("");
+  const isApproved = submission?.status === "Approved";
+  const isRejected = submission?.status === "Rejected";
 
   useEffect(() => {
     if (!isOpen) {
@@ -53,6 +58,12 @@ export default function AdminSubmissionDetailsPanel({
       document.body.style.overflow = previousBodyOverflow;
       document.documentElement.style.overflow = previousHtmlOverflow;
     };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setAdminComment("");
+    }
   }, [isOpen]);
 
   return (
@@ -144,7 +155,7 @@ export default function AdminSubmissionDetailsPanel({
                     <div>
                       <dt className="text-xs uppercase tracking-wide">Phone</dt>
                       <dd className="mt-0.5 font-medium text-(--color-ink-strong)">
-                        {submission.phone}
+                        {submission.phone ?? "No phone"}
                       </dd>
                     </div>
                   </div>
@@ -176,13 +187,19 @@ export default function AdminSubmissionDetailsPanel({
                   Uploaded Documents
                 </h3>
                 <ul className="mt-2 space-y-2">
-                  {submission.documents.map((documentName) => (
+                  {submission.documents.map((document) => (
                     <li
-                      key={documentName}
+                      key={document.id}
                       className="flex items-center gap-2 rounded-xl border border-(--color-ink-border-faint) bg-white px-3 py-2 text-sm text-(--color-ink-strong)"
                     >
                       <FileTextIcon className="text-brand-primary" />
-                      <span className="break-all">{documentName}</span>
+                      <a
+                        href={document.fileUrl}
+                        download
+                        className="break-all underline-offset-2 hover:underline"
+                      >
+                        {document.fileName}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -196,20 +213,24 @@ export default function AdminSubmissionDetailsPanel({
               <textarea
                 placeholder="Add optional admin comment..."
                 rows={3}
+                value={adminComment}
+                onChange={(event) => setAdminComment(event.target.value)}
                 className="mt-3 w-full rounded-xl border border-(--color-ink-border-soft) bg-white px-3 py-2 text-sm text-(--color-ink-strong) outline-none transition placeholder:text-(--color-text-muted) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring)"
               />
               <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
                   onClick={() => setConfirmAction("approve")}
-                  className="inline-flex items-center justify-center rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
+                  disabled={isApproved}
+                  className="inline-flex items-center justify-center rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-200 disabled:text-green-600"
                 >
                   Approve
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmAction("reject")}
-                  className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+                  disabled={isRejected}
+                  className="inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-200 disabled:text-red-600"
                 >
                   Reject
                 </button>
@@ -227,7 +248,10 @@ export default function AdminSubmissionDetailsPanel({
         confirmText="Approve"
         variant="success"
         onConfirm={() => {
-          toast.success(`Submission from ${submission?.name} has been approved successfully.`);
+          if (submission) {
+            onUpdateStatus(submission.id, "Approved", adminComment);
+            toast.success(`Submission from ${submission.name} has been approved successfully.`);
+          }
           setConfirmAction(null);
         }}
       />
@@ -239,7 +263,10 @@ export default function AdminSubmissionDetailsPanel({
         confirmText="Reject"
         variant="danger"
         onConfirm={() => {
-          toast.success(`Submission from ${submission?.name} has been rejected. Discarding documents.`);
+          if (submission) {
+            onUpdateStatus(submission.id, "Rejected", adminComment);
+            toast.success(`Submission from ${submission.name} has been rejected.`);
+          }
           setConfirmAction(null);
         }}
       />

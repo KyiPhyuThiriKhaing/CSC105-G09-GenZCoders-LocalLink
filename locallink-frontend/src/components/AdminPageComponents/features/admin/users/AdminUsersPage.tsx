@@ -1,73 +1,104 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import AdminPagination from "../submissions/components/AdminPagination";
 import AdminUserDetailsPanel from "./components/AdminUserDetailsPanel";
 import AdminUserList from "./components/AdminUserList";
-import type { AdminUser, UserStatus } from "../../../../../data/mockAdminData";
-import { MOCK_ADMIN_USERS } from "../../../../../data/mockAdminData";
+import type { AdminStatus, AdminUser } from "../../../../../lib/adminApi";
+import {
+  deleteAdminUser,
+  listAdminUsers,
+  updateAdminUserStatus,
+} from "../../../../../lib/adminApi";
 
 const ITEMS_PER_PAGE = 8;
-type StatusFilter = "All" | UserStatus;
+type StatusFilter = "All" | AdminStatus;
 type SortOrder = "latest-to-oldest" | "oldest-to-latest";
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<AdminUser[]>(MOCK_ADMIN_USERS);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
   const [sortOrder, setSortOrder] = useState<SortOrder>("latest-to-oldest");
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [statusCounts, setStatusCounts] = useState({
+    ACTIVE: 0,
+    PENDING: 0,
+    SUSPENDED: 0,
+  });
 
   const filteredUsers = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const tokens = searchTerm
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
 
     return users.filter((user) => {
-      const matchesStatus =
-        statusFilter === "All" ? true : user.status === statusFilter;
-      const matchesSearch =
-        normalizedSearch.length === 0
-          ? true
-          : user.name.toLowerCase().includes(normalizedSearch) ||
-            user.email.toLowerCase().includes(normalizedSearch) ||
-            user.phone.toLowerCase().includes(normalizedSearch);
+      const matchesStatus = statusFilter === "All" ? true : user.status === statusFilter;
+      if (!matchesStatus) return false;
+      if (tokens.length === 0) return true;
 
-      return matchesStatus && matchesSearch;
+      const haystack = [user.fullName, user.email, user.phone ?? ""].map((value) =>
+        value.toLowerCase(),
+      );
+
+      return tokens.every((token) => haystack.some((value) => value.includes(token)));
     });
-  }, [users, searchTerm, statusFilter]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredUsers.length / ITEMS_PER_PAGE),
-  );
+  }, [searchTerm, statusFilter, users]);
 
   const sortedUsers = useMemo(() => {
-    const usersToSort = [...filteredUsers];
-
-    usersToSort.sort((a, b) => {
+    const next = [...filteredUsers];
+    next.sort((a, b) => {
       const aTime = new Date(a.joinedAt).getTime();
       const bTime = new Date(b.joinedAt).getTime();
-
-      if (sortOrder === "oldest-to-latest") {
-        return aTime - bTime;
-      }
-
-      return bTime - aTime;
+      return sortOrder === "oldest-to-latest" ? aTime - bTime : bTime - aTime;
     });
-
-    return usersToSort;
+    return next;
   }, [filteredUsers, sortOrder]);
 
+  const totalPages = Math.max(1, Math.ceil(sortedUsers.length / ITEMS_PER_PAGE));
   const pagedUsers = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return sortedUsers.slice(start, start + ITEMS_PER_PAGE);
   }, [currentPage, sortedUsers]);
 
-  const totalUsers = users.length;
-  const activeUsers = users.filter((user) => user.status === "Active").length;
-  const pendingUsers = users.filter((user) => user.status === "Pending").length;
-  const suspendedUsers = users.filter(
-    (user) => user.status === "Suspended",
-  ).length;
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUsers = async () => {
+      const response = await listAdminUsers({
+        page: 1,
+        pageSize: 1000,
+      });
+
+      if (!isMounted) return;
+
+      setUsers(response.data);
+      setTotalUsers(response.meta.total);
+
+      const active = response.data.filter((user) => user.status === "ACTIVE").length;
+      const pending = response.data.filter((user) => user.status === "PENDING").length;
+      const suspended = response.data.filter((user) => user.status === "SUSPENDED").length;
+
+      setStatusCounts({
+        ACTIVE: active,
+        PENDING: pending,
+        SUSPENDED: suspended,
+      });
+    };
+
+    loadUsers().catch((error) => {
+      const message = error instanceof Error ? error.message : "Failed to load users";
+      toast.error(message);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) {
@@ -81,22 +112,35 @@ export default function AdminUsersPage() {
     setIsPanelOpen(true);
   };
 
-  const handleStatusChange = (userId: number, nextStatus: UserStatus) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => {
-        if (user.id !== userId) {
-          return user;
-        }
-        return { ...user, status: nextStatus };
-      }),
-    );
+  const handleStatusChange = async (userId: string, nextStatus: AdminStatus) => {
+    try {
+      await updateAdminUserStatus(userId, nextStatus);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === userId ? { ...user, status: nextStatus } : user)),
+      );
+      setSelectedUser((prevSelected) =>
+        prevSelected && prevSelected.id === userId
+          ? { ...prevSelected, status: nextStatus }
+          : prevSelected,
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update status";
+      toast.error(message);
+    }
+  };
 
-    setSelectedUser((prevSelected) => {
-      if (!prevSelected || prevSelected.id !== userId) {
-        return prevSelected;
-      }
-      return { ...prevSelected, status: nextStatus };
-    });
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      await deleteAdminUser(userId);
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+      setSelectedUser((prevSelected) =>
+        prevSelected && prevSelected.id === userId ? null : prevSelected,
+      );
+      setTotalUsers((prev) => Math.max(prev - 1, 0));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to delete user";
+      toast.error(message);
+    }
   };
 
   const handleFilterChange = (value: StatusFilter) => {
@@ -108,6 +152,10 @@ export default function AdminUsersPage() {
     setSearchTerm(value);
     setCurrentPage(1);
   };
+
+  const activeUsers = statusCounts.ACTIVE;
+  const pendingUsers = statusCounts.PENDING;
+  const suspendedUsers = statusCounts.SUSPENDED;
 
   return (
     <div className="relative w-full">
@@ -180,9 +228,9 @@ export default function AdminUsersPage() {
           className="h-11 w-full rounded-xl border border-(--color-ink-border-soft) bg-white px-3 text-sm font-medium text-(--color-ink-strong) outline-none transition focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring) sm:w-56"
         >
           <option value="All">All statuses</option>
-          <option value="Active">Active</option>
-          <option value="Suspended">Suspended</option>
-          <option value="Pending">Pending</option>
+          <option value="ACTIVE">Active</option>
+          <option value="SUSPENDED">Suspended</option>
+          <option value="PENDING">Pending</option>
         </select>
 
         <label className="sr-only" htmlFor="admin-users-sort-order">
@@ -216,6 +264,7 @@ export default function AdminUsersPage() {
         isOpen={isPanelOpen}
         onClose={() => setIsPanelOpen(false)}
         onUpdateStatus={handleStatusChange}
+        onDeleteUser={handleDeleteUser}
       />
     </div>
   );

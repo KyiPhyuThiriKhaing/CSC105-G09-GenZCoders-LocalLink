@@ -1,11 +1,17 @@
 import { Router } from "express";
 import {
   adminLoginHandler,
+  changeAdminPasswordHandler,
+  createAdminHandler,
 	deleteAdminUserHandler,
+	getAdminProfileHandler,
 	getAdminSubmissionByIdHandler,
 	getDashboardStatsHandler,
+	listAdminActionsHandler,
+	listAdminsHandler,
 	listAdminSubmissionsHandler,
 	listAdminUsersHandler,
+	updateAdminAccountStatusHandler,
 	updateAdminSubmissionStatusHandler,
 	updateAdminUserStatusHandler,
 } from "../controllers/admin.controller";
@@ -17,7 +23,15 @@ adminRouter.post("/login", adminLoginHandler);
 
 adminRouter.use(requireAdmin);
 
+adminRouter.get("/me", getAdminProfileHandler);
 adminRouter.get("/dashboard/stats", getDashboardStatsHandler);
+
+adminRouter.get("/admins", listAdminsHandler);
+adminRouter.post("/admins", createAdminHandler);
+adminRouter.patch("/admins/:id/status", updateAdminAccountStatusHandler);
+adminRouter.patch("/password", changeAdminPasswordHandler);
+adminRouter.get("/actions", listAdminActionsHandler);
+
 adminRouter.get("/users", listAdminUsersHandler);
 adminRouter.patch("/users/:id/status", updateAdminUserStatusHandler);
 adminRouter.delete("/users/:id", deleteAdminUserHandler);

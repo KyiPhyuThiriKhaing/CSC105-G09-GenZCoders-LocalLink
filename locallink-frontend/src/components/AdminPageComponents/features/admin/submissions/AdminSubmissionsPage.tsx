@@ -1,57 +1,128 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import AdminPagination from "./components/AdminPagination";
 import AdminSubmissionDetailsPanel from "./components/AdminSubmissionDetailsPanel";
 import AdminSubmissionList from "./components/AdminSubmissionList";
-import { MOCK_ADMIN_SUBMISSIONS } from "../../../../../data/mockAdminData";
-import type { Submission } from "../../../../../data/mockAdminData";
+import type { Submission, SubmissionStatus } from "./types";
+import {
+  listAdminSubmissions,
+  updateAdminSubmissionStatus,
+  type AdminSubmission,
+  type VerificationStatus,
+} from "../../../../../lib/adminApi";
 
 const ITEMS_PER_PAGE = 6;
-type StatusFilter = "All" | Submission["status"];
+type StatusFilter = "All" | SubmissionStatus;
 type SortOrder = "latest-to-oldest" | "oldest-to-latest";
 
+const statusToApi = (status: SubmissionStatus): VerificationStatus => {
+  switch (status) {
+    case "Approved":
+      return "APPROVED";
+    case "Rejected":
+      return "REJECTED";
+    default:
+      return "PENDING";
+  }
+};
+
+const statusFromApi = (status: VerificationStatus): SubmissionStatus => {
+  switch (status) {
+    case "APPROVED":
+      return "Approved";
+    case "REJECTED":
+      return "Rejected";
+    default:
+      return "Pending";
+  }
+};
+
+const mapSubmission = (submission: AdminSubmission): Submission => ({
+  id: submission.id,
+  name: submission.user.fullName,
+  email: submission.user.email,
+  phone: submission.user.phone,
+  date: new Date(submission.submittedAt).toLocaleDateString(),
+  status: statusFromApi(submission.status),
+  documents: submission.documents.map((doc) => ({
+    id: doc.id,
+    fileName: doc.fileName,
+    fileUrl: doc.fileUrl,
+  })),
+  notes: submission.notes ?? "No notes provided",
+});
+
 export default function AdminSubmissionsPage() {
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
   const [sortOrder, setSortOrder] = useState<SortOrder>("latest-to-oldest");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedSubmission, setSelectedSubmission] =
     useState<Submission | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const filteredSubmissions = useMemo(() => {
-    if (statusFilter === "All") {
-      return MOCK_ADMIN_SUBMISSIONS;
-    }
-    return MOCK_ADMIN_SUBMISSIONS.filter(
-      (submission) => submission.status === statusFilter,
-    );
-  }, [statusFilter]);
+    const tokens = searchTerm
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredSubmissions.length / ITEMS_PER_PAGE),
-  );
+    return submissions.filter((submission) => {
+      const matchesStatus = statusFilter === "All" ? true : submission.status === statusFilter;
+      if (!matchesStatus) return false;
+      if (tokens.length === 0) return true;
+
+      const docNames = submission.documents.map((doc) => doc.fileName);
+      const haystack = [submission.name, submission.email, submission.phone ?? "", ...docNames]
+        .map((value) => value.toLowerCase());
+
+      return tokens.every((token) => haystack.some((value) => value.includes(token)));
+    });
+  }, [searchTerm, statusFilter, submissions]);
 
   const sortedSubmissions = useMemo(() => {
-    const submissionsToSort = [...filteredSubmissions];
-
-    submissionsToSort.sort((a, b) => {
+    const next = [...filteredSubmissions];
+    next.sort((a, b) => {
       const aTime = new Date(a.date).getTime();
       const bTime = new Date(b.date).getTime();
-
-      if (sortOrder === "oldest-to-latest") {
-        return aTime - bTime;
-      }
-
-      return bTime - aTime;
+      return sortOrder === "oldest-to-latest" ? aTime - bTime : bTime - aTime;
     });
-
-    return submissionsToSort;
+    return next;
   }, [filteredSubmissions, sortOrder]);
 
+  const totalPages = Math.max(1, Math.ceil(sortedSubmissions.length / ITEMS_PER_PAGE));
   const pagedSubmissions = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return sortedSubmissions.slice(start, start + ITEMS_PER_PAGE);
   }, [currentPage, sortedSubmissions]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadSubmissions = async () => {
+      const response = await listAdminSubmissions({
+        page: 1,
+        pageSize: 1000,
+      });
+
+      if (!isMounted) return;
+
+      setSubmissions(response.data.map(mapSubmission));
+      setTotalSubmissions(response.meta.total);
+    };
+
+    loadSubmissions().catch((error) => {
+      const message = error instanceof Error ? error.message : "Failed to load submissions";
+      toast.error(message);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) {
@@ -67,6 +138,26 @@ export default function AdminSubmissionsPage() {
 
   const handleCloseDetails = () => {
     setIsDetailsOpen(false);
+  };
+
+  const handleUpdateStatus = async (
+    submissionId: string,
+    status: SubmissionStatus,
+    adminComment: string,
+  ) => {
+    try {
+      const result = await updateAdminSubmissionStatus(submissionId, {
+        status: statusToApi(status),
+        adminComment: adminComment || undefined,
+      });
+
+      const updated = mapSubmission(result.data);
+      setSubmissions((prev) => prev.map((item) => (item.id === submissionId ? updated : item)));
+      setSelectedSubmission(updated);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update submission";
+      toast.error(message);
+    }
   };
 
   return (
@@ -87,6 +178,11 @@ export default function AdminSubmissionsPage() {
         <input
           id="admin-submissions-search"
           type="text"
+          value={searchTerm}
+          onChange={(event) => {
+            setSearchTerm(event.target.value);
+            setCurrentPage(1);
+          }}
           placeholder="Search submissions by name, email, or document"
           className="h-11 w-full rounded-xl border border-(--color-ink-border-soft) bg-white px-3 text-sm text-(--color-ink-strong) outline-none transition placeholder:text-(--color-text-muted) focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring)"
         />
@@ -142,6 +238,7 @@ export default function AdminSubmissionsPage() {
         submission={selectedSubmission}
         isOpen={isDetailsOpen}
         onClose={handleCloseDetails}
+        onUpdateStatus={handleUpdateStatus}
       />
     </div>
   );
