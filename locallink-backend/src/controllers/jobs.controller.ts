@@ -1,5 +1,13 @@
 import type { RequestHandler, Response } from "express";
-import { createJob, deleteJob, getJobById, listJobs, updateJob } from "../services/jobs.service";
+import {
+  applyToJob,
+  createJob,
+  deleteJob,
+  getApplicationForUser,
+  getJobById,
+  listJobs,
+  updateJob,
+} from "../services/jobs.service";
 
 const NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
 
@@ -90,6 +98,51 @@ export const deleteJobHandler: RequestHandler = async (req, res, next) => {
       sendNotImplemented(res, "delete job");
       return;
     }
+    next(error);
+  }
+};
+
+export const applyToJobHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = (req as { userId?: string }).userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const jobId = asId(req.params.id);
+    const message = typeof req.body?.message === "string" ? req.body.message : undefined;
+    const data = await applyToJob(jobId, userId, message);
+    res.status(201).json({ data });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "Job not found") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (
+        error.message === "You cannot apply to your own job" ||
+        error.message === "This job is no longer accepting applications" ||
+        error.message === "You have already applied to this job"
+      ) {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+    }
+    next(error);
+  }
+};
+
+export const getMyApplicationHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = (req as { userId?: string }).userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+    const data = await getApplicationForUser(asId(req.params.id), userId);
+    res.status(200).json({ data });
+  } catch (error) {
     next(error);
   }
 };

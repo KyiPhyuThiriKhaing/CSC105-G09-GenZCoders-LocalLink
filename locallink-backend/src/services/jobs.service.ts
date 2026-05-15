@@ -43,3 +43,47 @@ export const updateJob = async (_id: string, _payload: UpdateJobInput): Promise<
 export const deleteJob = async (_id: string): Promise<void> => {
   throw new Error(NOT_IMPLEMENTED);
 };
+
+export const applyToJob = async (
+  jobId: string,
+  applicantId: string,
+  message?: string,
+) => {
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: { id: true, posterId: true, status: true },
+  });
+
+  if (!job) {
+    throw new Error("Job not found");
+  }
+  if (job.posterId === applicantId) {
+    throw new Error("You cannot apply to your own job");
+  }
+  if (job.status !== "OPEN") {
+    throw new Error("This job is no longer accepting applications");
+  }
+
+  const existing = await prisma.jobApplication.findUnique({
+    where: { jobId_applicantId: { jobId, applicantId } },
+  });
+  if (existing) {
+    throw new Error("You have already applied to this job");
+  }
+
+  return prisma.jobApplication.create({
+    data: {
+      jobId,
+      applicantId,
+      status: "APPLIED",
+      message: message?.trim() || null,
+    },
+  });
+};
+
+export const getApplicationForUser = async (jobId: string, applicantId: string) => {
+  return prisma.jobApplication.findUnique({
+    where: { jobId_applicantId: { jobId, applicantId } },
+    select: { id: true, status: true, createdAt: true },
+  });
+};

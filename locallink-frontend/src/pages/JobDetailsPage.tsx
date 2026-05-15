@@ -4,24 +4,53 @@ import {
   DrawingPinIcon,
   ClockIcon,
 } from "@radix-ui/react-icons";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { apiClient } from "../lib/apiClient";
+import { getAuthToken } from "../lib/authApi";
+import { useCurrentUser } from "../lib/useCurrentUser";
+import {
+  applyToJob,
+  fetchMyApplication,
+  type ApplicationStatus,
+} from "../lib/jobsApi";
 import type { Job } from "../pages/JobsPage";
+
+const APPLIED_LABEL: Record<ApplicationStatus, string> = {
+  APPLIED: "Applied",
+  CONTACTED: "Contacted",
+  OFFERED: "Offered",
+  ACCEPTED: "Accepted",
+  REJECTED: "Application rejected",
+  WITHDRAWN: "Application withdrawn",
+  COMPLETED: "Completed",
+};
 
 export default function JobDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useCurrentUser();
   const [job, setJob] = useState<Job | null>(null);
+  const [posterId, setPosterId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [applicationStatus, setApplicationStatus] =
+    useState<ApplicationStatus | null>(null);
+  const [isApplying, setIsApplying] = useState(false);
+  const [applyError, setApplyError] = useState<string | null>(null);
+
+  const isAuthed = Boolean(getAuthToken());
+  const isOwnJob = Boolean(user?.id && posterId && user.id === posterId);
+  const hasApplied = applicationStatus !== null;
 
   useEffect(() => {
     if (!id) return;
-    
+
     apiClient.get<{ data: Record<string, unknown> }>(`/jobs/${id}`)
       .then(({ data }) => {
         const j = data.data as any; // Using any specifically to access nested relationships for the mock UI right now
         const posterName = j.poster?.fullName || "LocalLink User";
         const posterAvatar = j.poster?.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${String(j.posterId)}`;
 
+        setPosterId(j.posterId ? String(j.posterId) : null);
         setJob({
           id: String(j.id),
           title: String(j.title),
@@ -31,15 +60,64 @@ export default function JobDetailsPage() {
           feeRange: j.payoutText ? String(j.payoutText) : "฿—",
           timeRange: j.durationText ? String(j.durationText) : "—",
           postedAt: new Date(String(j.postedAt)).toLocaleDateString(),
-          poster: { 
-            name: posterName, 
-            avatar: posterAvatar 
+          poster: {
+            name: posterName,
+            avatar: posterAvatar
           },
         });
       })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (!id || !isAuthed) {
+      setApplicationStatus(null);
+      return;
+    }
+    let cancelled = false;
+    fetchMyApplication(id)
+      .then((existing) => {
+        if (!cancelled) setApplicationStatus(existing?.status ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setApplicationStatus(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isAuthed]);
+
+  const handleApply = async () => {
+    if (!id) return;
+    if (!isAuthed) {
+      navigate("/login");
+      return;
+    }
+    if (isOwnJob || hasApplied || isApplying) return;
+
+    setIsApplying(true);
+    setApplyError(null);
+    try {
+      const created = await applyToJob(id);
+      setApplicationStatus(created.status);
+    } catch (err) {
+      setApplyError(err instanceof Error ? err.message : "Unable to apply.");
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
+  const applyDisabled = isOwnJob || hasApplied || isApplying;
+  const applyLabel = !isAuthed
+    ? "Log in to Apply"
+    : isOwnJob
+      ? "Your Job"
+      : isApplying
+        ? "Applying…"
+        : hasApplied
+          ? APPLIED_LABEL[applicationStatus!] ?? "Applied"
+          : "Apply Now";
 
   if (loading) {
     return (
@@ -168,13 +246,37 @@ export default function JobDetailsPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <button className="w-full rounded-2xl bg-(--color-brand-primary) py-4 text-base font-bold text-white shadow-md shadow-(--color-brand-primary)/20 transition-transform active:scale-[0.98] hover:bg-(--color-brand-primary-hover)">
-                  Apply Now
+                <button
+                  type="button"
+                  onClick={handleApply}
+                  disabled={applyDisabled}
+                  className={`w-full rounded-2xl py-4 text-base font-bold transition-transform active:scale-[0.98] ${
+                    applyDisabled
+                      ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                      : "bg-(--color-brand-primary) text-white shadow-md shadow-(--color-brand-primary)/20 hover:bg-(--color-brand-primary-hover)"
+                  }`}
+                >
+                  {applyLabel}
                 </button>
                 <button className="w-full rounded-2xl bg-slate-100 py-4 text-base font-bold text-slate-900 transition-colors hover:bg-slate-200">
                   Save for Later
                 </button>
               </div>
+              {applyError ? (
+                <p className="mt-3 text-sm font-semibold text-red-600">{applyError}</p>
+              ) : null}
+              {hasApplied && !applyError ? (
+                <p className="mt-3 text-sm font-semibold text-emerald-600">
+                  Application sent. Check your{" "}
+                  <Link
+                    to="/profile/history"
+                    className="underline hover:text-emerald-700"
+                  >
+                    history
+                  </Link>{" "}
+                  for status.
+                </p>
+              ) : null}
 
               <div className="my-6 border-t border-slate-200"></div>
 
@@ -212,8 +314,17 @@ export default function JobDetailsPage() {
               {job.feeRange}
             </p>
           </div>
-          <button className="flex-1 rounded-2xl bg-(--color-brand-primary) py-3.5 text-sm font-bold text-white shadow-lg shadow-(--color-brand-primary)/20 active:scale-95">
-            Apply Now
+          <button
+            type="button"
+            onClick={handleApply}
+            disabled={applyDisabled}
+            className={`flex-1 rounded-2xl py-3.5 text-sm font-bold transition-transform active:scale-95 ${
+              applyDisabled
+                ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                : "bg-(--color-brand-primary) text-white shadow-lg shadow-(--color-brand-primary)/20"
+            }`}
+          >
+            {applyLabel}
           </button>
         </div>
       </div>
