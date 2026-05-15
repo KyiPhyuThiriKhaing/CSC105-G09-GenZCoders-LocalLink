@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   PersonIcon,
   CheckCircledIcon,
@@ -8,6 +8,7 @@ import {
   ChatBubbleIcon,
   ExitIcon,
 } from "@radix-ui/react-icons";
+import { logoutUser } from "../lib/authApi";
 
 type NavItem = {
   label: string;
@@ -19,29 +20,29 @@ const items: NavItem[] = [
   {
     label: "My Profile",
     href: "/profile/my-profile",
-    icon: <PersonIcon className="h-5 w-5" />,
+    icon: <PersonIcon className="h-6 w-6" />,
   },
   {
     label: "Verification",
     href: "/profile/verify",
-    icon: <CheckCircledIcon className="h-5 w-5" />,
+    icon: <CheckCircledIcon className="h-6 w-6" />,
   },
   {
     label: "History",
     href: "/profile/history",
-    icon: <ClockIcon className="h-5 w-5" />,
+    icon: <ClockIcon className="h-6 w-6" />,
   },
   {
     label: "Settings",
     href: "/profile/settings",
-    icon: <GearIcon className="h-5 w-5" />,
+    icon: <GearIcon className="h-6 w-6" />,
   },
   {
     label: "Chat",
     href: "/profile/chat",
-    icon: <ChatBubbleIcon className="h-5 w-5" />,
+    icon: <ChatBubbleIcon className="h-6 w-6" />,
   },
-  { label: "Log Out", href: "/logout", icon: <ExitIcon className="h-5 w-5" /> },
+  { label: "Log Out", href: "/logout", icon: <ExitIcon className="h-6 w-6" /> },
 ];
 
 type SidebarProps = {
@@ -50,27 +51,30 @@ type SidebarProps = {
 
 function Sidebar({ activeKey }: SidebarProps) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const openLogoutModal = () => setIsLogoutModalOpen(true);
   const closeLogoutModal = () => setIsLogoutModalOpen(false);
-  const handleLogoutConfirm = () => closeLogoutModal();
+  const handleLogoutConfirm = async () => {
+    await logoutUser();
+    closeLogoutModal();
+    navigate("/login");
+  };
 
   return (
     <>
       <aside className="sticky top-32">
-        <nav className="flex flex-col gap-1.5">
+        <nav className="flex flex-col gap-2">
           {items.map((item) => {
-            const sharedClassName = `group flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-brand-focus-ring) ${
-              activeKey === item.label
+            const sharedClassName = `group flex w-full items-center gap-4 rounded-2xl px-5 py-4 text-left text-base font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-brand-focus-ring) ${activeKey === item.label
                 ? "bg-(--color-brand-primary) text-white shadow-md shadow-(--color-brand-primary)/20"
                 : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900"
-            }`;
+              }`;
 
-            const iconClassName = `transition-transform group-hover:scale-110 ${
-              activeKey === item.label
+            const iconClassName = `transition-transform group-hover:scale-110 ${activeKey === item.label
                 ? "text-white"
                 : "text-slate-400 group-hover:text-(--color-brand-primary)"
-            }`;
+              }`;
 
             if (item.label === "Log Out") {
               return (
@@ -78,7 +82,7 @@ function Sidebar({ activeKey }: SidebarProps) {
                   key={item.label}
                   type="button"
                   onClick={openLogoutModal}
-                  className="group mt-4 flex w-full items-center gap-4 rounded-2xl px-4 py-3 text-left text-sm font-bold text-red-600 transition-all hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-100"
+                  className="group mt-4 flex w-full items-center gap-4 rounded-2xl px-5 py-4 text-left text-base font-bold text-red-600 transition-all hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-100"
                 >
                   <span className="text-red-400 transition-transform group-hover:scale-110 group-hover:text-red-600">
                     {item.icon}

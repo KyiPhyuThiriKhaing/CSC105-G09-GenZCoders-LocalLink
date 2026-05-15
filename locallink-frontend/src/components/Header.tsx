@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { currentUser } from "../data/mockUsers";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { getAuthToken, logoutUser } from "../lib/authApi";
+import { useCurrentUser } from "../lib/useCurrentUser";
 
 type ProfileMenuItem = {
   label: string;
@@ -20,8 +21,11 @@ function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(getAuthToken()));
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useCurrentUser();
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -52,6 +56,17 @@ function Header() {
     };
   }, [isProfileMenuOpen]);
 
+  useEffect(() => {
+    const syncAuth = () => setIsAuthenticated(Boolean(getAuthToken()));
+    syncAuth();
+    window.addEventListener("storage", syncAuth);
+    window.addEventListener("auth:changed", syncAuth);
+    return () => {
+      window.removeEventListener("storage", syncAuth);
+      window.removeEventListener("auth:changed", syncAuth);
+    };
+  }, []);
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -70,13 +85,16 @@ function Header() {
     setIsLogoutModalOpen(true);
   };
   const closeLogoutModal = () => setIsLogoutModalOpen(false);
-  const handleLogoutConfirm = () => setIsLogoutModalOpen(false);
+  const handleLogoutConfirm = async () => {
+    await logoutUser();
+    setIsLogoutModalOpen(false);
+    navigate("/login");
+  };
 
   const linkClassName = ({ isActive }: { isActive: boolean }) =>
-    `relative text-sm font-bold transition-all duration-200 ${
-      isActive
-        ? "text-(--color-brand-primary) after:absolute after:left-0 after:-bottom-1.5 after:h-[2px] after:w-full after:bg-(--color-brand-primary) after:rounded-t-full"
-        : "text-slate-500 hover:text-slate-900"
+    `relative text-sm font-bold transition-all duration-200 ${isActive
+      ? "text-(--color-brand-primary) after:absolute after:left-0 after:-bottom-1.5 after:h-[2px] after:w-full after:bg-(--color-brand-primary) after:rounded-t-full"
+      : "text-slate-500 hover:text-slate-900"
     }`;
 
   return (
@@ -112,53 +130,73 @@ function Header() {
               </NavLink>
             </div>
 
-            <div className="relative" ref={profileMenuRef}>
-              <button
-                type="button"
-                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-200 ${isProfileMenuOpen ? "border-(--color-brand-primary) bg-(--color-brand-soft) shadow-sm scale-105" : "border-slate-100 bg-slate-50 hover:border-slate-200 hover:bg-slate-100"}`}
-                onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              >
-                <img
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(currentUser.name)}&backgroundColor=f8fafc`}
-                  alt="Profile"
-                  className="h-full w-full rounded-full object-cover"
-                />
-              </button>
+            {isAuthenticated ? (
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  type="button"
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-200 ${isProfileMenuOpen ? "border-(--color-brand-primary) bg-(--color-brand-soft) shadow-sm scale-105" : "border-slate-100 bg-slate-50 hover:border-slate-200 hover:bg-slate-100"}`}
+                  onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                  aria-label="Open profile menu"
+                >
+                  <img
+                    src={
+                      user?.avatarUrl ??
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.fullName ?? "User")}&backgroundColor=f8fafc`
+                    }
+                    alt={user?.fullName ?? "Profile"}
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                </button>
 
-              {isProfileMenuOpen && (
-                <div className="absolute right-0 top-17 z-50 w-60 overflow-hidden rounded-3xl border border-white/50 bg-white/95 p-2 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-in fade-in slide-in-from-top-2">
-                  <div className="px-4 py-3 mb-1 border-b border-slate-100">
-                    <p className="text-sm font-bold text-slate-900">
-                      {currentUser.name}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {currentUser.name.split(" ").join(".").toLowerCase()}
-                      @example.com
-                    </p>
-                  </div>
-                  {profileMenuItems.map((item) => (
-                    <NavLink
-                      key={item.label}
-                      to={item.to}
-                      onClick={() => setIsProfileMenuOpen(false)}
-                      className={({ isActive }) =>
-                        `block rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`
-                      }
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 top-17 z-50 w-60 overflow-hidden rounded-3xl border border-white/50 bg-white/95 p-2 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] backdrop-blur-xl animate-in fade-in slide-in-from-top-2">
+                    <div className="px-4 py-3 mb-1 border-b border-slate-100">
+                      <p className="text-sm font-bold text-slate-900">
+                        {user?.fullName ?? "User"}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {user?.email ?? "user@example.com"}
+                      </p>
+                    </div>
+                    {profileMenuItems.map((item) => (
+                      <NavLink
+                        key={item.label}
+                        to={item.to}
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className={({ isActive }) =>
+                          `block rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`
+                        }
+                      >
+                        {item.label}
+                      </NavLink>
+                    ))}
+                    <div className="my-1 h-px bg-slate-100" />
+                    <button
+                      type="button"
+                      onClick={handleOpenLogoutModal}
+                      className="block w-full rounded-xl px-4 py-2.5 text-left text-sm font-bold text-red-600 transition-colors hover:bg-red-50"
                     >
-                      {item.label}
-                    </NavLink>
-                  ))}
-                  <div className="my-1 h-px bg-slate-100" />
-                  <button
-                    type="button"
-                    onClick={handleOpenLogoutModal}
-                    className="block w-full rounded-xl px-4 py-2.5 text-left text-sm font-bold text-red-600 transition-colors hover:bg-red-50"
-                  >
-                    Log Out
-                  </button>
-                </div>
-              )}
-            </div>
+                      Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="hidden items-center gap-3 sm:flex">
+                <NavLink
+                  to="/login"
+                  className="rounded-full px-4 py-2 text-sm font-semibold text-slate-700 transition hover:text-slate-900"
+                >
+                  Log in
+                </NavLink>
+                <NavLink
+                  to="/signup"
+                  className="rounded-full bg-(--color-brand-primary) px-4 py-2 text-sm font-semibold text-white transition hover:bg-(--color-brand-primary-hover)"
+                >
+                  Sign up
+                </NavLink>
+              </div>
+            )}
 
             {/* Mobile Menu Toggle */}
             <button
@@ -237,8 +275,7 @@ function Header() {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                  isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
+                `rounded-2xl px-4 py-3 text-sm font-semibold transition ${isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
                 }`
               }
             >
@@ -247,38 +284,59 @@ function Header() {
             <NavLink
               to="/jobs"
               className={({ isActive }) =>
-                `rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                  isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
+                `rounded-2xl px-4 py-3 text-sm font-semibold transition ${isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
                 }`
               }
             >
               Jobs
             </NavLink>
             <div className="my-3 h-px bg-slate-100" />
-            {profileMenuItems.map((item) => (
-              <NavLink
-                key={item.label}
-                to={item.to}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  `rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                    isActive ? "bg-(--color-brand-soft) text-(--color-brand-primary)" : "text-slate-700 hover:bg-slate-100"
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {isAuthenticated ? (
+              profileMenuItems.map((item) => (
+                <NavLink
+                  key={item.label}
+                  to={item.to}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `rounded-2xl px-4 py-3 text-sm font-semibold transition ${isActive
+                      ? "bg-(--color-brand-soft) text-(--color-brand-primary)"
+                      : "text-slate-700 hover:bg-slate-100"
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))
+            ) : (
+              <>
+                <NavLink
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                >
+                  Log in
+                </NavLink>
+                <NavLink
+                  to="/signup"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="rounded-2xl bg-(--color-brand-primary) px-4 py-3 text-sm font-semibold text-white transition hover:bg-(--color-brand-primary-hover)"
+                >
+                  Sign up
+                </NavLink>
+              </>
+            )}
           </nav>
 
-          <div className="mt-auto border-t border-slate-200 px-4 py-5">
-            <button
-              onClick={handleOpenLogoutModal}
-              className="w-full rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100"
-            >
-              Sign out
-            </button>
-          </div>
+          {isAuthenticated ? (
+            <div className="mt-auto border-t border-slate-200 px-4 py-5">
+              <button
+                onClick={handleOpenLogoutModal}
+                className="w-full rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : null}
         </div>
       )}
 

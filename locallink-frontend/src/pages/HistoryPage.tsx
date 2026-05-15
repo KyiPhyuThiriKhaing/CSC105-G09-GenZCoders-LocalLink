@@ -1,19 +1,29 @@
 import { ClockIcon, CheckCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
-import {
-  MOCK_HISTORY_APPLIED,
-  MOCK_HISTORY_OFFERED,
-  MOCK_HISTORY_ACCEPTED,
-} from "../data/mockJobs";
 
 export default function HistoryPage() {
-  const jobsApplied = MOCK_HISTORY_APPLIED;
-  const jobsOffered = MOCK_HISTORY_OFFERED;
-  const jobsAccepted = MOCK_HISTORY_ACCEPTED;
+  const jobsApplied: Array<{
+    title: string;
+    location: string;
+    price: string;
+    status: string;
+  }> = [];
+  const jobsOffered: Array<{
+    title: string;
+    date: string;
+    price: string;
+    applicants: number;
+  }> = [];
+  const jobsAccepted: Array<{
+    title: string;
+    user: string;
+    price: string;
+    active: boolean;
+  }> = [];
 
   return (
-    <div className="max-w-4xl">
+    <div className="mx-auto w-full max-w-4xl">
       <div className="mb-12">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">
           Activity History
         </h1>
         <p className="mt-2 text-base text-slate-500">
@@ -36,36 +46,42 @@ export default function HistoryPage() {
             </span>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {jobsApplied.map((job) => (
-              <div
-                key={job.title}
-                className="group rounded-3xl bg-white p-6 shadow-sm border border-slate-200 transition-all hover:shadow-lg hover:border-(--color-brand-primary)/50"
-              >
-                <div className="mb-4 flex items-center justify-between">
-                  <span
-                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${job.status === "Contacted" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"}`}
-                  >
-                    {job.status}
-                  </span>
-                  <span className="text-sm font-bold text-slate-900">
-                    {job.price}
-                  </span>
+          {jobsApplied.length === 0 ? (
+            <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-white p-10 text-center text-sm font-semibold text-slate-500">
+              You haven't applied to any jobs yet.
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {jobsApplied.map((job) => (
+                <div
+                  key={job.title}
+                  className="group rounded-3xl bg-white p-6 shadow-sm border border-slate-200 transition-all hover:shadow-lg hover:border-(--color-brand-primary)/50"
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${job.status === "Contacted" ? "bg-emerald-50 text-emerald-700" : "bg-orange-50 text-orange-700"}`}
+                    >
+                      {job.status}
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">
+                      {job.price}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-(--color-brand-primary) transition-colors">
+                    {job.title}
+                  </h3>
+                  <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
+                    <ClockIcon className="text-slate-400" /> {job.location}
+                  </p>
+                  <div className="mt-6">
+                    <button className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-bold text-slate-900 transition-all hover:bg-slate-100">
+                      View Status
+                    </button>
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-(--color-brand-primary) transition-colors">
-                  {job.title}
-                </h3>
-                <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-                  <ClockIcon className="text-slate-400" /> {job.location}
-                </p>
-                <div className="mt-6">
-                  <button className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-bold text-slate-900 transition-all hover:bg-slate-100">
-                    View Status
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section>
@@ -81,38 +97,44 @@ export default function HistoryPage() {
             </span>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {jobsOffered.map((job) => (
-              <div
-                key={job.title}
-                className="relative overflow-hidden rounded-3xl bg-white p-6 shadow-sm border border-slate-200 transition-all hover:shadow-lg hover:border-blue-400/50"
-              >
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500 rounded-l-3xl" />
-                <div className="pl-4">
-                  <div className="mb-4 flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                      {job.applicants} Applicants
-                    </span>
-                    <span className="text-sm font-bold text-slate-900">
-                      {job.price}
-                    </span>
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-1">
-                    {job.title}
-                  </h3>
-                  <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
-                    <ClockIcon className="text-slate-400" /> Posted {job.date}
-                  </p>
-                  <div className="mt-6 flex gap-2">
-                    <button className="flex-1 rounded-xl bg-blue-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-blue-700">
-                      Review
-                    </button>
+          {jobsOffered.length === 0 ? (
+            <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-white p-10 text-center text-sm font-semibold text-slate-500">
+              You haven't posted any jobs yet.
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {jobsOffered.map((job) => (
+                <div
+                  key={job.title}
+                  className="relative overflow-hidden rounded-3xl bg-white p-6 shadow-sm border border-slate-200 transition-all hover:shadow-lg hover:border-blue-400/50"
+                >
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500 rounded-l-3xl" />
+                  <div className="pl-4">
+                    <div className="mb-4 flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
+                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                        {job.applicants} Applicants
+                      </span>
+                      <span className="text-sm font-bold text-slate-900">
+                        {job.price}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900 mb-1">
+                      {job.title}
+                    </h3>
+                    <p className="text-sm font-medium text-slate-500 flex items-center gap-1.5">
+                      <ClockIcon className="text-slate-400" /> Posted {job.date}
+                    </p>
+                    <div className="mt-6 flex gap-2">
+                      <button className="flex-1 rounded-xl bg-blue-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-blue-700">
+                        Review
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section>
@@ -128,42 +150,48 @@ export default function HistoryPage() {
             </span>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {jobsAccepted.map((job) => (
-              <div
-                key={job.title}
-                className={`rounded-3xl bg-white p-6 shadow-sm border transition-all hover:shadow-lg ${job.active ? "border-emerald-200" : "border-slate-200"}`}
-              >
-                <div className="mb-4 flex items-center justify-between">
-                  <span
-                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${job.active ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-slate-100 text-slate-600"}`}
-                  >
-                    {job.active ? "Active" : "Completed"}
-                  </span>
-                  <span className="text-sm font-bold text-slate-900">
-                    {job.price}
-                  </span>
+          {jobsAccepted.length === 0 ? (
+            <div className="rounded-3xl border-2 border-dashed border-slate-200 bg-white p-10 text-center text-sm font-semibold text-slate-500">
+              No active or completed jobs yet.
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {jobsAccepted.map((job) => (
+                <div
+                  key={job.title}
+                  className={`rounded-3xl bg-white p-6 shadow-sm border transition-all hover:shadow-lg ${job.active ? "border-emerald-200" : "border-slate-200"}`}
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${job.active ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-slate-100 text-slate-600"}`}
+                    >
+                      {job.active ? "Active" : "Completed"}
+                    </span>
+                    <span className="text-sm font-bold text-slate-900">
+                      {job.price}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900 mb-1">
+                    {job.title}
+                  </h3>
+                  <p className="text-sm font-medium text-slate-500">
+                    With {job.user}
+                  </p>
+                  <div className="mt-6">
+                    {job.active ? (
+                      <button className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-emerald-700">
+                        Message
+                      </button>
+                    ) : (
+                      <button className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-bold text-slate-900 transition-all hover:bg-slate-100">
+                        Leave Review
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-slate-900 mb-1">
-                  {job.title}
-                </h3>
-                <p className="text-sm font-medium text-slate-500">
-                  With {job.user}
-                </p>
-                <div className="mt-6">
-                  {job.active ? (
-                    <button className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-emerald-700">
-                      Message
-                    </button>
-                  ) : (
-                    <button className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-bold text-slate-900 transition-all hover:bg-slate-100">
-                      Leave Review
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </div>

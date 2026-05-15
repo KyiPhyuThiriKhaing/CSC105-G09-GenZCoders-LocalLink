@@ -2,13 +2,15 @@ import { z } from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   EnvelopeClosedIcon,
   EyeNoneIcon,
   EyeOpenIcon,
   LockClosedIcon,
 } from "@radix-ui/react-icons";
+import { toast } from "sonner";
+import { loginUser } from "../lib/authApi";
 
 const userSchema = z.object({
   email: z.email("Please enter a valid email address"),
@@ -45,6 +47,8 @@ const FEATURES = [
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
 
   const {
     register,
@@ -59,8 +63,16 @@ function LoginPage() {
   });
 
   const onSubmit = async (data: UserFormData) => {
-    void data;
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    setFormError("");
+    try {
+      await loginUser(data);
+      toast.success("Welcome back!");
+      navigate("/jobs");
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : "Unable to log in.",
+      );
+    }
   };
 
   const inputClass =
@@ -145,6 +157,12 @@ function LoginPage() {
                 Forgot password?
               </button>
             </div>
+
+            {formError ? (
+              <p className="text-[0.9rem] font-semibold text-(--color-danger)">
+                {formError}
+              </p>
+            ) : null}
 
             <button
               className="mt-1 h-[46px] w-full rounded-full bg-(--color-brand-primary) px-4 text-[0.95rem] font-bold text-white transition hover:bg-(--color-brand-primary-hover) disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-brand-accent)"

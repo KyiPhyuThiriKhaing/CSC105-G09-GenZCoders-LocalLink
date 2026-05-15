@@ -51,17 +51,19 @@ export default function ProfilePage() {
         ))}
       </nav>
 
-      {/* Layout: sidebar (desktop) + content */}
-      <div className="mx-auto max-w-6xl px-4 pt-6 pb-20 sm:px-6 lg:flex lg:gap-10 lg:px-8 lg:pt-14 lg:pb-24">
-        {/* Sidebar — desktop only */}
-        <div className="hidden lg:block w-64 shrink-0">
+      {/* Layout: sidebar pinned to left edge + centered content in remaining space */}
+      <div className="px-4 pt-6 pb-20 sm:px-6 lg:flex lg:items-start lg:gap-8 lg:px-0 lg:pt-14 lg:pb-24">
+        {/* Sidebar — desktop only, pinned to left edge */}
+        <aside className="hidden lg:block lg:w-72 lg:shrink-0 lg:pl-6 xl:pl-10">
           <Sidebar activeKey={activeKey} />
-        </div>
+        </aside>
 
-        {/* Page content */}
-        <div className="min-w-0 flex-1">
-          <Outlet />
-        </div>
+        {/* Page content — centered in remaining space, bigger */}
+        <main className="min-w-0 flex-1 lg:px-8">
+          <div className="mx-auto w-full max-w-4xl">
+            <Outlet />
+          </div>
+        </main>
       </div>
     </div>
   );

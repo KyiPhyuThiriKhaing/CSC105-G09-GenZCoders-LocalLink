@@ -2,9 +2,10 @@ import {
   ExclamationTriangleIcon,
   UploadIcon,
   FileTextIcon,
+  EnvelopeClosedIcon,
 } from "@radix-ui/react-icons";
 import { useState } from "react";
-import { currentUser } from "../data/mockUsers";
+import { useCurrentUser } from "../lib/useCurrentUser";
 
 type UploadedDocument = {
   fileName: string;
@@ -14,6 +15,7 @@ type UploadedDocument = {
 };
 
 export default function VerifyPage() {
+  const { user } = useCurrentUser();
   const [uploadedDocuments, setUploadedDocuments] = useState<UploadedDocument[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
@@ -67,6 +69,11 @@ export default function VerifyPage() {
     setUploadError("");
     setSubmitMessage("");
 
+    if (!user?.id) {
+      setUploadError("Please log in before submitting verification.");
+      return;
+    }
+
     if (uploadedDocuments.length === 0) {
       setUploadError("Please upload at least one PDF before submitting.");
       return;
@@ -79,7 +86,7 @@ export default function VerifyPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: currentUser.id,
+          userId: user?.id,
           documents: uploadedDocuments,
         }),
       });
@@ -100,10 +107,10 @@ export default function VerifyPage() {
   };
 
   return (
-    <div className="max-w-2xl">
+    <div className="mx-auto w-full max-w-3xl">
       <div className="mb-10">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-          Identity Verification
+        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
+          Document Verification
           <ExclamationTriangleIcon className="h-8 w-8 text-emerald-500" />
         </h1>
         <p className="mt-3 text-base text-slate-500 max-w-lg">
@@ -113,6 +120,33 @@ export default function VerifyPage() {
       </div>
 
       <div className="space-y-8">
+        <section className="rounded-3xl border border-slate-200 bg-white p-6">
+          <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-(--color-brand-soft) text-(--color-brand-primary)">
+                <EnvelopeClosedIcon className="h-5 w-5" />
+              </div>
+              <h2 className="text-lg font-bold text-slate-900">
+                Email Verification
+              </h2>
+            </div>
+            <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-600">
+              Pending
+            </span>
+          </div>
+          <p className="text-sm text-slate-500">
+            Verify your email address to unlock job offers and messaging.
+            We'll wire this up later — coming soon.
+          </p>
+          <button
+            type="button"
+            disabled
+            className="mt-4 rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-400 cursor-not-allowed"
+          >
+            Send Verification Email
+          </button>
+        </section>
+
         <div className="rounded-2xl bg-emerald-50 p-6 border border-emerald-100 flex items-start gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
             <ExclamationTriangleIcon className="h-5 w-5" />
@@ -131,7 +165,7 @@ export default function VerifyPage() {
 
         <div>
           <label className="mb-3 block text-sm font-bold text-slate-900">
-            Upload Government ID
+            Upload Verification Document
           </label>
           <label
             htmlFor="verification-upload"

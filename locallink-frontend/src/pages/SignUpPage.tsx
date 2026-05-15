@@ -2,7 +2,7 @@ import { z } from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   EnvelopeClosedIcon,
   EyeNoneIcon,
@@ -10,6 +10,8 @@ import {
   LockClosedIcon,
   PersonIcon,
 } from "@radix-ui/react-icons";
+import { toast } from "sonner";
+import { registerUser } from "../lib/authApi";
 
 const signUpSchema = z
   .object({
@@ -58,6 +60,8 @@ const FEATURES = [
 
 function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
 
   const {
     register,
@@ -74,8 +78,20 @@ function SignUpPage() {
   });
 
   const onSubmit = async (data: SignUpFormData) => {
-    void data;
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    setFormError("");
+    try {
+      await registerUser({
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
+      });
+      toast.success("Account created successfully.");
+      navigate("/jobs");
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : "Unable to sign up.",
+      );
+    }
   };
 
   const inputClass =
@@ -206,6 +222,11 @@ function SignUpPage() {
             >
               {isSubmitting ? "Creating account…" : "Create account"}
             </button>
+            {formError ? (
+              <p className="text-[0.9rem] font-semibold text-(--color-danger)">
+                {formError}
+              </p>
+            ) : null}
           </form>
 
           <p className="text-[0.9rem] text-(--color-text-muted)">
