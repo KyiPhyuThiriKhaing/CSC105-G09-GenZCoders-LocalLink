@@ -1,9 +1,12 @@
 import { prisma } from "./lib/prisma";
 
 const seedUsers = async () => {
+  const hash = "$2b$10$4/o1BJdbqxp6iu1m.xpvbuHr.VA4j7XMBB9Tnzp2.basWHhRDbqc6"; // "password123"
+
   const admin = await prisma.user.upsert({
     where: { email: "admin@locallink.test" },
     update: {
+      passwordHash: hash,
       fullName: "Admin User",
       role: "ADMIN",
       status: "ACTIVE",
@@ -11,7 +14,7 @@ const seedUsers = async () => {
     },
     create: {
       email: "admin@locallink.test",
-      passwordHash: "seeded-admin-hash",
+      passwordHash: hash,
       fullName: "Admin User",
       role: "ADMIN",
       status: "ACTIVE",
@@ -22,6 +25,7 @@ const seedUsers = async () => {
   const maya = await prisma.user.upsert({
     where: { email: "maya@locallink.test" },
     update: {
+      passwordHash: hash,
       fullName: "Maya Rivera",
       status: "ACTIVE",
       phone: "+1 202-555-0102",
@@ -29,7 +33,7 @@ const seedUsers = async () => {
     },
     create: {
       email: "maya@locallink.test",
-      passwordHash: "seeded-user-hash",
+      passwordHash: hash,
       fullName: "Maya Rivera",
       status: "ACTIVE",
       phone: "+1 202-555-0102",
@@ -41,6 +45,7 @@ const seedUsers = async () => {
   const liam = await prisma.user.upsert({
     where: { email: "liam@locallink.test" },
     update: {
+      passwordHash: hash,
       fullName: "Liam Carter",
       status: "PENDING",
       phone: "+1 202-555-0103",
@@ -48,7 +53,7 @@ const seedUsers = async () => {
     },
     create: {
       email: "liam@locallink.test",
-      passwordHash: "seeded-user-hash",
+      passwordHash: hash,
       fullName: "Liam Carter",
       status: "PENDING",
       phone: "+1 202-555-0103",
