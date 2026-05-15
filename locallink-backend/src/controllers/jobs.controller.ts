@@ -6,6 +6,7 @@ import {
   getApplicationForUser,
   getJobById,
   listJobs,
+  updateApplicationStatus,
   updateJob,
 } from "../services/jobs.service";
 
@@ -143,6 +144,39 @@ export const getMyApplicationHandler: RequestHandler = async (req, res, next) =>
     const data = await getApplicationForUser(asId(req.params.id), userId);
     res.status(200).json({ data });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const updateApplicationStatusHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = (req as { userId?: string }).userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const jobId = asId(req.params.id);
+    const applicationId = asId(req.params.applicationId);
+    const status = typeof req.body?.status === "string" ? req.body.status : "";
+
+    const data = await updateApplicationStatus(jobId, applicationId, userId, status);
+    res.status(200).json({ data });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "Invalid application status") {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Application not found") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Forbidden") {
+        res.status(403).json({ message: error.message });
+        return;
+      }
+    }
     next(error);
   }
 };

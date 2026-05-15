@@ -185,6 +185,19 @@ export type HistoryApplication = {
   };
 };
 
+export type HistoryApplicant = {
+  id: string;
+  status: HistoryApplication["status"];
+  message: string | null;
+  createdAt: string;
+  applicant: {
+    id: string;
+    fullName: string;
+    avatarUrl: string | null;
+    email?: string;
+  };
+};
+
 export type HistoryPostedJob = {
   id: string;
   title: string;
@@ -193,6 +206,7 @@ export type HistoryPostedJob = {
   status: string;
   postedAt: string;
   _count: { applications: number };
+  applications: HistoryApplicant[];
 };
 
 export type HistoryResponse = {

@@ -87,3 +87,43 @@ export const getApplicationForUser = async (jobId: string, applicantId: string) 
     select: { id: true, status: true, createdAt: true },
   });
 };
+
+type ReviewStatus = "CONTACTED" | "OFFERED" | "ACCEPTED" | "REJECTED";
+
+const REVIEW_STATUSES: ReviewStatus[] = ["CONTACTED", "OFFERED", "ACCEPTED", "REJECTED"];
+
+export const updateApplicationStatus = async (
+  jobId: string,
+  applicationId: string,
+  reviewerId: string,
+  status: string,
+) => {
+  if (!REVIEW_STATUSES.includes(status as ReviewStatus)) {
+    throw new Error("Invalid application status");
+  }
+
+  const application = await prisma.jobApplication.findUnique({
+    where: { id: applicationId },
+    select: { id: true, jobId: true, job: { select: { posterId: true } } },
+  });
+
+  if (!application || application.jobId !== jobId) {
+    throw new Error("Application not found");
+  }
+  if (application.job.posterId !== reviewerId) {
+    throw new Error("Forbidden");
+  }
+
+  const next = status as ReviewStatus;
+  const now = new Date();
+
+  return prisma.jobApplication.update({
+    where: { id: applicationId },
+    data: {
+      status: next,
+      offeredAt: next === "OFFERED" || next === "ACCEPTED" ? now : undefined,
+      acceptedAt: next === "ACCEPTED" ? now : undefined,
+    },
+    include: { applicant: { select: { id: true, fullName: true, avatarUrl: true } } },
+  });
+};

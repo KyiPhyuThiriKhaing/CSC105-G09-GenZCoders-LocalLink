@@ -53,3 +53,21 @@ export const fetchMyApplication = async (
     throw parseError(error, "Unable to check application status.");
   }
 };
+
+export type ReviewStatus = "CONTACTED" | "OFFERED" | "ACCEPTED" | "REJECTED";
+
+export const updateApplicationStatus = async (
+  jobId: string,
+  applicationId: string,
+  status: ReviewStatus,
+) => {
+  try {
+    const result = await apiClient.patch<{ data: { id: string; status: ApplicationStatus } }>(
+      `/jobs/${jobId}/applications/${applicationId}`,
+      { status },
+    );
+    return result.data.data;
+  } catch (error) {
+    throw parseError(error, "Unable to update application.");
+  }
+};

@@ -1,10 +1,17 @@
-import { ClockIcon, CheckCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
+import {
+  ClockIcon,
+  CheckCircledIcon,
+  ReloadIcon,
+  Cross2Icon,
+} from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import {
   fetchHistory,
+  type HistoryApplicant,
   type HistoryApplication,
   type HistoryPostedJob,
 } from "../lib/authApi";
+import { updateApplicationStatus, type ReviewStatus } from "../lib/jobsApi";
 
 const IN_PROGRESS_STATUSES: HistoryApplication["status"][] = [
   "APPLIED",
@@ -43,6 +50,9 @@ export default function HistoryPage() {
   const [postedJobs, setPostedJobs] = useState<HistoryPostedJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reviewJobId, setReviewJobId] = useState<string | null>(null);
+  const [updatingAppId, setUpdatingAppId] = useState<string | null>(null);
+  const [reviewError, setReviewError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,6 +75,36 @@ export default function HistoryPage() {
       cancelled = true;
     };
   }, []);
+
+  const reviewJob = postedJobs.find((j) => j.id === reviewJobId) ?? null;
+
+  const handleReviewAction = async (
+    applicant: HistoryApplicant,
+    next: ReviewStatus,
+  ) => {
+    if (!reviewJob) return;
+    setUpdatingAppId(applicant.id);
+    setReviewError(null);
+    try {
+      await updateApplicationStatus(reviewJob.id, applicant.id, next);
+      setPostedJobs((prev) =>
+        prev.map((job) =>
+          job.id !== reviewJob.id
+            ? job
+            : {
+                ...job,
+                applications: job.applications.map((a) =>
+                  a.id === applicant.id ? { ...a, status: next } : a,
+                ),
+              },
+        ),
+      );
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : "Unable to update.");
+    } finally {
+      setUpdatingAppId(null);
+    }
+  };
 
   const jobsApplied = applications.filter((a) =>
     IN_PROGRESS_STATUSES.includes(a.status),
@@ -198,8 +238,20 @@ export default function HistoryPage() {
                       {formatPostedAt(job.postedAt)}
                     </p>
                     <div className="mt-6 flex gap-2">
-                      <button className="flex-1 rounded-xl bg-blue-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-blue-700">
-                        Review
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReviewJobId(job.id);
+                          setReviewError(null);
+                        }}
+                        disabled={job._count.applications === 0}
+                        className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
+                          job._count.applications === 0
+                            ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
+                      >
+                        {job._count.applications === 0 ? "No Applicants" : "Review"}
                       </button>
                     </div>
                   </div>
@@ -269,6 +321,108 @@ export default function HistoryPage() {
           )}
         </section>
       </div>
+
+      {reviewJob ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="mb-4 flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                  Review applicants
+                </p>
+                <h3 className="mt-1 text-xl font-extrabold text-slate-900">
+                  {reviewJob.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setReviewJobId(null);
+                  setReviewError(null);
+                }}
+                className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Close"
+              >
+                <Cross2Icon className="h-5 w-5" />
+              </button>
+            </div>
+
+            {reviewError ? (
+              <p className="mb-3 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600">
+                {reviewError}
+              </p>
+            ) : null}
+
+            {reviewJob.applications.length === 0 ? (
+              <div className="rounded-2xl border-2 border-dashed border-slate-200 p-8 text-center text-sm font-semibold text-slate-500">
+                No applicants yet.
+              </div>
+            ) : (
+              <ul className="max-h-96 space-y-3 overflow-y-auto pr-1">
+                {reviewJob.applications.map((app) => (
+                  <li
+                    key={app.id}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={
+                          app.applicant.avatarUrl ??
+                          `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(app.applicant.fullName)}&backgroundColor=f8fafc`
+                        }
+                        alt={app.applicant.fullName}
+                        className="h-10 w-10 rounded-full border border-slate-200 bg-white object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="truncate text-sm font-bold text-slate-900">
+                            {app.applicant.fullName}
+                          </p>
+                          <span className="inline-flex shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-bold text-slate-600 border border-slate-200">
+                            {STATUS_LABEL[app.status]}
+                          </span>
+                        </div>
+                        {app.message ? (
+                          <p className="mt-1 text-sm text-slate-600">
+                            "{app.message}"
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {(["CONTACTED", "OFFERED", "ACCEPTED", "REJECTED"] as ReviewStatus[]).map(
+                        (next) => {
+                          const isCurrent = app.status === next;
+                          const isBusy = updatingAppId === app.id;
+                          return (
+                            <button
+                              key={next}
+                              type="button"
+                              onClick={() => handleReviewAction(app, next)}
+                              disabled={isBusy || isCurrent}
+                              className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                                isCurrent
+                                  ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                                  : next === "ACCEPTED"
+                                    ? "bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
+                                    : next === "REJECTED"
+                                      ? "bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+                                      : "bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-60"
+                              }`}
+                            >
+                              {STATUS_LABEL[next]}
+                            </button>
+                          );
+                        },
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -6,6 +6,7 @@ import {
   getJobByIdHandler,
   getMyApplicationHandler,
   listJobsHandler,
+  updateApplicationStatusHandler,
   updateJobHandler,
 } from "../controllers/jobs.controller";
 
@@ -20,3 +21,4 @@ jobsRouter.patch("/:id", requireUser, updateJobHandler);
 jobsRouter.delete("/:id", requireUser, deleteJobHandler);
 jobsRouter.post("/:id/apply", requireUser, applyToJobHandler);
 jobsRouter.get("/:id/my-application", requireUser, getMyApplicationHandler);
+jobsRouter.patch("/:id/applications/:applicationId", requireUser, updateApplicationStatusHandler);
