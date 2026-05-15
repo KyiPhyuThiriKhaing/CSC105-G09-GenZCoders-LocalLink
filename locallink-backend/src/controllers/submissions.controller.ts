@@ -1,11 +1,15 @@
-import type { RequestHandler, Response } from "express";
+import type { Request, RequestHandler, Response } from "express";
+import path from "path";
+import fs from "fs";
 import {
   createSubmission,
   deleteSubmission,
   getSubmissionById,
+  getSubmissionDocumentById,
   listSubmissions,
   updateSubmissionStatus,
 } from "../services/submissions.service";
+import { uploadsDir } from "../lib/uploads";
 
 const parseStatus = (value: unknown): "PENDING" | "APPROVED" | "REJECTED" | null => {
   if (typeof value !== "string") return null;
@@ -59,6 +63,58 @@ export const createSubmissionHandler: RequestHandler = async (req, res, next) =>
       notes: typeof req.body?.notes === "string" ? req.body.notes : undefined,
     });
     res.status(201).json({ data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadSubmissionDocumentHandler: RequestHandler = (req, res) => {
+  const file = (req as Request & {
+    file?: { originalname: string; filename: string; mimetype: string; size: number };
+  }).file;
+  if (!file) {
+    res.status(400).json({ message: "PDF file is required" });
+    return;
+  }
+
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
+  const fileUrl = `${baseUrl}/uploads/${file.filename}`;
+
+  res.status(201).json({
+    data: {
+      fileName: file.originalname,
+      fileUrl,
+      mimeType: file.mimetype,
+      fileSize: file.size,
+    },
+  });
+};
+
+export const downloadSubmissionDocumentHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const documentId = asId(req.params.documentId);
+    const document = await getSubmissionDocumentById(documentId);
+
+    if (!document) {
+      res.status(404).json({ message: "Resource not found" });
+      return;
+    }
+
+    const localFileName = document.fileUrl.split("/uploads/").pop();
+    if (!localFileName) {
+      res.status(404).json({ message: "Resource not found" });
+      return;
+    }
+
+    const filePath = path.join(uploadsDir, localFileName);
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ message: "Resource not found" });
+      return;
+    }
+
+    res.setHeader("Content-Type", document.mimeType ?? "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${document.fileName}"`);
+    res.sendFile(filePath);
   } catch (error) {
     next(error);
   }

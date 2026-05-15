@@ -89,3 +89,15 @@ export const updateSubmissionStatus = async (
 export const deleteSubmission = async (id: string): Promise<void> => {
   await prisma.verificationSubmission.delete({ where: { id } });
 };
+
+export const getSubmissionDocumentById = async (documentId: string) =>
+  prisma.verificationDocument.findUnique({
+    where: { id: documentId },
+    select: {
+      id: true,
+      fileName: true,
+      fileUrl: true,
+      mimeType: true,
+      fileSize: true,
+    },
+  });

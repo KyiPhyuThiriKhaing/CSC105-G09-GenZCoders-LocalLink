@@ -3,8 +3,8 @@ export type SubmissionStatus = "PENDING" | "APPROVED" | "REJECTED";
 export interface SubmissionDocumentInput {
   fileName: string;
   fileUrl: string;
-  mimeType?: string;
-  fileSize?: number;
+  mimeType?: string | null;
+  fileSize?: number | null;
 }
 
 export interface SubmissionDocument extends SubmissionDocumentInput {

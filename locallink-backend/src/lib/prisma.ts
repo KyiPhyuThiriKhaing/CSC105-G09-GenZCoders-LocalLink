@@ -2,10 +2,7 @@ import "dotenv/config";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../generated/prisma/client";
 
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not set");
-}
+const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
 
 const adapter = new PrismaLibSql({ url: databaseUrl });
 

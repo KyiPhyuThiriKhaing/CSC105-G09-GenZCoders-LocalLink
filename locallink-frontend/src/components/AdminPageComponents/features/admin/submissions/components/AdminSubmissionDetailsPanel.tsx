@@ -38,6 +38,7 @@ export default function AdminSubmissionDetailsPanel({
   onClose,
   onUpdateStatus,
 }: AdminSubmissionDetailsPanelProps) {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000/api";
   const [confirmAction, setConfirmAction] = useState<"approve" | "reject" | null>(null);
   const [adminComment, setAdminComment] = useState("");
   const isApproved = submission?.status === "Approved";
@@ -60,11 +61,10 @@ export default function AdminSubmissionDetailsPanel({
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      setAdminComment("");
-    }
-  }, [isOpen]);
+  const handleClose = () => {
+    setAdminComment("");
+    onClose();
+  };
 
   return (
     <div
@@ -74,7 +74,7 @@ export default function AdminSubmissionDetailsPanel({
       <button
         type="button"
         aria-label="Close details panel"
-        onClick={onClose}
+        onClick={handleClose}
         className={`absolute inset-0 z-0 bg-[rgba(31,18,51,0.45)] transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`}
       />
 
@@ -97,7 +97,7 @@ export default function AdminSubmissionDetailsPanel({
               </div>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-(--color-ink-border-soft) text-(--color-text-muted) transition hover:border-(--color-brand-primary) hover:bg-(--color-brand-primary) hover:text-white"
               >
                 <Cross2Icon />
@@ -194,7 +194,7 @@ export default function AdminSubmissionDetailsPanel({
                     >
                       <FileTextIcon className="text-brand-primary" />
                       <a
-                        href={document.fileUrl}
+                        href={`${apiBaseUrl}/submissions/documents/${document.id}/download`}
                         download
                         className="break-all underline-offset-2 hover:underline"
                       >
