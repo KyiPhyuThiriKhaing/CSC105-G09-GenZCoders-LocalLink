@@ -1,6 +1,41 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getAuthToken } from "../../lib/authApi";
+import { useCurrentUser } from "../../lib/useCurrentUser";
+import { apiClient } from "../../lib/apiClient";
+
+type PreviewJob = {
+  id: string;
+  title: string;
+  location: string;
+  payoutText: string;
+};
 
 function HeroSection() {
+  const { user } = useCurrentUser();
+  const [previewJobs, setPreviewJobs] = useState<PreviewJob[]>([]);
+
+  const postTaskTo = !getAuthToken()
+    ? "/signup"
+    : !user?.idVerifiedAt
+      ? "/profile/verify"
+      : "/jobs/post";
+
+  useEffect(() => {
+    apiClient
+      .get<{ data: Record<string, unknown>[] }>("/jobs")
+      .then(({ data }) => {
+        const jobs = data.data.slice(0, 3).map((j) => ({
+          id: String(j.id),
+          title: String(j.title),
+          location: String(j.location),
+          payoutText: j.payoutText ? String(j.payoutText) : "—",
+        }));
+        setPreviewJobs(jobs);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section className="relative mx-auto mt-4 max-w-6xl px-4 sm:px-6 lg:px-8">
       <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 px-6 py-16 shadow-2xl sm:px-12 sm:py-20 lg:px-16 lg:py-24">
@@ -39,7 +74,7 @@ function HeroSection() {
                 Browse Mini Jobs
               </Link>
               <Link
-                to="/signup"
+                to={postTaskTo}
                 className="w-full sm:w-auto inline-flex h-14 items-center justify-center rounded-full border-2 border-white/20 bg-white/5 px-8 text-base font-bold text-white transition-all hover:bg-white/10 hover:border-white/40 hover:scale-105 backdrop-blur-md"
               >
                 Post a Task
@@ -66,48 +101,40 @@ function HeroSection() {
                 </div>
 
                 <div className="grid gap-3">
-                  {[
-                    {
-                      title: "Furniture Assembly",
-                      sub: "2 helpers nearby",
-                      price: "฿1,500",
-                    },
-                    {
-                      title: "Dog Walking",
-                      sub: "Book in 5 mins",
-                      price: "฿600",
-                    },
-                    {
-                      title: "Grocery Pickup",
-                      sub: "Same-day delivery",
-                      price: "฿400",
-                    },
-                  ].map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 transition-all hover:border-(--color-brand-primary)/30 hover:bg-white hover:shadow-md"
-                    >
-                      <div>
-                        <p className="text-sm font-bold text-slate-900 group-hover:text-(--color-brand-primary) transition-colors">
-                          {item.title}
-                        </p>
-                        <p className="mt-0.5 text-xs font-medium text-slate-500">
-                          {item.sub}
-                        </p>
-                      </div>
-                      <span className="text-base font-extrabold text-slate-900">
-                        {item.price}
-                      </span>
-                    </div>
-                  ))}
+                  {previewJobs.length === 0
+                    ? Array.from({ length: 3 }).map((_, idx) => (
+                        <div
+                          key={idx}
+                          className="h-16 animate-pulse rounded-2xl bg-slate-100"
+                        />
+                      ))
+                    : previewJobs.map((job) => (
+                        <Link
+                          key={job.id}
+                          to={`/jobs/${job.id}`}
+                          className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 transition-all hover:border-(--color-brand-primary)/30 hover:bg-white hover:shadow-md"
+                        >
+                          <div>
+                            <p className="text-sm font-bold text-slate-900 group-hover:text-(--color-brand-primary) transition-colors">
+                              {job.title}
+                            </p>
+                            <p className="mt-0.5 text-xs font-medium text-slate-500">
+                              {job.location}
+                            </p>
+                          </div>
+                          <span className="text-base font-extrabold text-slate-900">
+                            {job.payoutText}
+                          </span>
+                        </Link>
+                      ))}
                 </div>
 
-                <button
-                  type="button"
-                  className="mt-6 w-full rounded-xl bg-(--color-brand-soft) py-3.5 text-sm font-bold text-(--color-brand-primary) transition-colors hover:bg-(--color-brand-primary) hover:text-white"
+                <Link
+                  to="/jobs"
+                  className="mt-6 block w-full rounded-xl bg-(--color-brand-soft) py-3.5 text-center text-sm font-bold text-(--color-brand-primary) transition-colors hover:bg-(--color-brand-primary) hover:text-white"
                 >
-                  View all categories
-                </button>
+                  View All Jobs
+                </Link>
               </div>
             </div>
           </div>

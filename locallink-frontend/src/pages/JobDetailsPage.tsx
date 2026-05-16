@@ -297,16 +297,24 @@ export default function JobDetailsPage() {
                 <p className="mt-3 text-sm font-semibold text-red-600">{applyError}</p>
               ) : null}
               {hasApplied && !applyError ? (
-                <p className="mt-3 text-sm font-semibold text-emerald-600">
-                  Application sent. Check your{" "}
-                  <Link
-                    to="/profile/history"
-                    className="underline hover:text-emerald-700"
-                  >
-                    history
-                  </Link>{" "}
-                  for status.
-                </p>
+                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Application Status</p>
+                  <p className={`text-sm font-bold ${
+                    applicationStatus === "ACCEPTED" || applicationStatus === "COMPLETED" ? "text-emerald-600" :
+                    applicationStatus === "REJECTED" || applicationStatus === "WITHDRAWN" ? "text-red-500" :
+                    applicationStatus === "OFFERED" ? "text-blue-600" :
+                    applicationStatus === "CONTACTED" ? "text-purple-600" :
+                    "text-orange-500"
+                  }`}>
+                    {applicationStatus === "APPLIED" && "Applied — waiting for the poster to review"}
+                    {applicationStatus === "CONTACTED" && "Contacted — the poster reached out to you"}
+                    {applicationStatus === "OFFERED" && "Offered — you've been offered this job"}
+                    {applicationStatus === "ACCEPTED" && "Accepted — you've accepted the offer"}
+                    {applicationStatus === "REJECTED" && "Application rejected"}
+                    {applicationStatus === "WITHDRAWN" && "You withdrew this application"}
+                    {applicationStatus === "COMPLETED" && "Completed"}
+                  </p>
+                </div>
               ) : null}
 
               <div className="my-6 border-t border-slate-200"></div>

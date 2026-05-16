@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
+import { getAuthToken } from "../../lib/authApi";
+import { useCurrentUser } from "../../lib/useCurrentUser";
 
 type PromoCardProps = {
   title: string;
   description: string;
   buttonText: string;
   imageUrl?: string;
+  bullets?: string[];
 };
 
 function PromoCard({
@@ -12,6 +15,7 @@ function PromoCard({
   description,
   buttonText,
   imageUrl,
+  bullets = [],
 }: PromoCardProps) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-4xl bg-white p-8 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] border border-slate-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)]">
@@ -56,11 +60,7 @@ function PromoCard({
             Why it matters
           </p>
           <ul className="space-y-3">
-            {[
-              "Free to join — no subscription needed",
-              "Verified profiles and community reviews",
-              "Safe in-app messaging",
-            ].map((point, idx) => (
+            {bullets.map((point, idx) => (
               <li
                 key={idx}
                 className="flex items-start gap-3 text-sm font-medium text-slate-600"
@@ -87,7 +87,13 @@ function PromoCard({
       )}
 
       <Link
-        to={buttonText.toLowerCase().includes("job") ? "/jobs" : "/signup"}
+        to={
+          buttonText.toLowerCase().includes("job")
+            ? "/jobs"
+            : getAuthToken()
+              ? "/jobs/post"
+              : "/signup"
+        }
         className="mt-auto inline-flex items-center justify-between rounded-xl bg-slate-50 px-6 py-4 text-sm font-bold text-slate-900 transition-all hover:bg-(--color-brand-primary) hover:text-white"
       >
         {buttonText}

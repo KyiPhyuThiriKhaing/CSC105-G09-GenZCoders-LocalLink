@@ -19,11 +19,21 @@ function FeatureCardsSection() {
           title="Find Work Near You"
           description="Browse local tasks that match your skills and earn in your spare time — completely free to join and work."
           buttonText="Browse Jobs"
+          bullets={[
+            "Filter by location, skill, and payout",
+            "Apply in one tap — no lengthy forms",
+            "Get contacted directly by the task poster",
+          ]}
         />
         <PromoCard
           title="Post a Task for Free"
           description="Need a hand with moving, cleaning, or tutoring? Post any task and connect with trusted helpers today."
           buttonText="Post a Task"
+          bullets={[
+            "Free to post — no subscription needed",
+            "Only verified, ID-checked helpers apply",
+            "Chat securely within the app",
+          ]}
         />
       </div>
     </section>

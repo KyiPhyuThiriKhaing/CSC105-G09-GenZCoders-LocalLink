@@ -5,6 +5,7 @@ import {
   Cross2Icon,
 } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   fetchHistory,
   type HistoryApplicant,
@@ -185,9 +186,12 @@ export default function HistoryPage() {
                     <ClockIcon className="text-slate-400" /> {app.job.location}
                   </p>
                   <div className="mt-6">
-                    <button className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-bold text-slate-900 transition-all hover:bg-slate-100">
+                    <Link
+                      to={`/jobs/${app.job.id}`}
+                      className="block w-full rounded-xl bg-slate-50 py-2.5 text-center text-sm font-bold text-slate-900 transition-all hover:bg-slate-100"
+                    >
                       View Status
-                    </button>
+                    </Link>
                   </div>
                 </div>
               ))}
