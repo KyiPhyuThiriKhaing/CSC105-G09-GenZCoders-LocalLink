@@ -9,6 +9,7 @@ import SignUpPage from "./pages/SignUpPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import JobsPage from "./pages/JobsPage.tsx";
 import JobDetailsPage from "./pages/JobDetailsPage.tsx";
+import PublicProfilePage from "./pages/PublicProfilePage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import VerifyPage from "./pages/VerifyPage.tsx";
 import HistoryPage from "./pages/HistoryPage.tsx";
@@ -90,6 +91,10 @@ const router = createBrowserRouter([
             element: <ChatPage />,
           },
         ],
+      },
+      {
+        path: "users/:id",
+        element: <PublicProfilePage />,
       },
     ],
   },

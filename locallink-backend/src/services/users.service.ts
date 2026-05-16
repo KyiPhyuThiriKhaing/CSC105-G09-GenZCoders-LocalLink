@@ -1,23 +1,38 @@
 import type { CreateUserInput, UpdateUserInput, User } from "../models/user.model";
-
-const NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
+import { prisma } from "../lib/prisma";
 
 export const listUsers = async (): Promise<User[]> => {
-  throw new Error(NOT_IMPLEMENTED);
+  return prisma.user.findMany({ select: { id: true, fullName: true, email: true } });
 };
 
-export const getUserById = async (_id: string): Promise<User | null> => {
-  throw new Error(NOT_IMPLEMENTED);
+export const getUserById = async (id: string): Promise<any | null> => {
+  const u = await prisma.user.findUnique({
+    where: { id },
+    include: { skills: { include: { skill: true } } },
+  });
+  if (!u) return null;
+  return {
+    id: u.id,
+    fullName: u.fullName,
+    email: u.email,
+    phone: u.phone ?? null,
+    avatarUrl: u.avatarUrl ?? null,
+    bio: u.bio ?? null,
+    joinedAt: u.joinedAt,
+    emailVerifiedAt: u.emailVerifiedAt ?? null,
+    idVerifiedAt: u.idVerifiedAt ?? null,
+    skills: u.skills?.map((s) => s.skill.name) ?? [],
+  };
 };
 
-export const createUser = async (_payload: CreateUserInput): Promise<User> => {
-  throw new Error(NOT_IMPLEMENTED);
+export const createUser = async (payload: CreateUserInput): Promise<User> => {
+  return prisma.user.create({ data: { fullName: payload.fullName, email: payload.email, passwordHash: payload.password, role: payload.role as any } });
 };
 
-export const updateUser = async (_id: string, _payload: UpdateUserInput): Promise<User | null> => {
-  throw new Error(NOT_IMPLEMENTED);
+export const updateUser = async (id: string, payload: UpdateUserInput): Promise<User | null> => {
+  return prisma.user.update({ where: { id }, data: { fullName: payload.fullName, email: payload.email, role: payload.role as any } });
 };
 
-export const deleteUser = async (_id: string): Promise<void> => {
-  throw new Error(NOT_IMPLEMENTED);
+export const deleteUser = async (id: string): Promise<void> => {
+  await prisma.user.delete({ where: { id } });
 };

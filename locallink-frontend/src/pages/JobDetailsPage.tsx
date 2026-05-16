@@ -217,18 +217,24 @@ export default function JobDetailsPage() {
             {/* Mobile Poster Snapshot */}
             <div className="mt-8 flex items-center justify-between lg:hidden">
               <div className="flex items-center gap-4">
-                <img
-                  src={job.poster.avatar}
-                  alt={job.poster.name}
-                  className="h-12 w-12 rounded-full object-cover border border-slate-200"
-                />
+                {posterId && posterId !== user?.id ? (
+                  <Link to={`/users/${posterId}`} className="flex items-center gap-4">
+                    <img
+                      src={job.poster.avatar}
+                      alt={job.poster.name}
+                      className="h-12 w-12 rounded-full object-cover border border-slate-200"
+                    />
+                  </Link>
+                ) : (
+                  <img
+                    src={job.poster.avatar}
+                    alt={job.poster.name}
+                    className="h-12 w-12 rounded-full object-cover border border-slate-200"
+                  />
+                )}
                 <div>
-                  <p className="text-base font-bold text-slate-900">
-                    Posted by {job.poster.name}
-                  </p>
-                  <p className="text-sm font-medium text-slate-500">
-                    Verified Local
-                  </p>
+                  <p className="text-base font-bold text-slate-900">Posted by {job.poster.name}</p>
+                  <p className="text-sm font-medium text-slate-500">Verified Local</p>
                 </div>
               </div>
             </div>
@@ -320,19 +326,31 @@ export default function JobDetailsPage() {
               <div className="my-6 border-t border-slate-200"></div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={job.poster.avatar}
-                    alt={job.poster.name}
-                    className="h-10 w-10 rounded-full object-cover border border-slate-200"
-                  />
-                  <div>
-                    <p className="text-sm font-bold text-slate-900">
-                      {job.poster.name}
-                    </p>
-                    <p className="text-xs text-slate-500">Verified Local</p>
+                {posterId && posterId !== user?.id ? (
+                  <Link to={`/users/${posterId}`} className="flex items-center gap-3">
+                    <img
+                      src={job.poster.avatar}
+                      alt={job.poster.name}
+                      className="h-10 w-10 rounded-full object-cover border border-slate-200"
+                    />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{job.poster.name}</p>
+                      <p className="text-xs text-slate-500">Verified Local</p>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={job.poster.avatar}
+                      alt={job.poster.name}
+                      className="h-10 w-10 rounded-full object-cover border border-slate-200"
+                    />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{job.poster.name}</p>
+                      <p className="text-xs text-slate-500">Verified Local</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

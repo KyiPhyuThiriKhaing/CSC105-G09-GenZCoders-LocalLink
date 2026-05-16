@@ -474,6 +474,14 @@ export default function ChatPage() {
                     View job
                   </Link>
                 ) : null}
+                {selectedConversation && selectedConversation.participant.id !== user?.id ? (
+                  <Link
+                    to={`/users/${selectedConversation.participant.id}`}
+                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)"
+                  >
+                    View profile
+                  </Link>
+                ) : null}
                 {selectedConversation ? (
                   <>
                     <button
