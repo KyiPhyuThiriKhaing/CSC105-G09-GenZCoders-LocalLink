@@ -30,7 +30,7 @@ const STATUS_LABEL: Record<HistoryApplication["status"], string> = {
   APPLIED: "Applied",
   CONTACTED: "Contacted",
   OFFERED: "Offered",
-  ACCEPTED: "Active",
+  ACCEPTED: "Completed",
   REJECTED: "Rejected",
   WITHDRAWN: "Withdrawn",
   COMPLETED: "Completed",

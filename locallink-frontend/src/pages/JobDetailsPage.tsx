@@ -108,6 +108,22 @@ export default function JobDetailsPage() {
     }
   };
 
+  const handleMessage = async () => {
+    if (!id) return;
+    if (!isAuthed) {
+      navigate("/login");
+      return;
+    }
+    if (isOwnJob) return;
+
+    const params = new URLSearchParams();
+    params.set("jobId", id);
+    if (job?.title) {
+      params.set("jobTitle", job.title);
+    }
+    navigate(`/profile/chat?${params.toString()}`);
+  };
+
   const applyDisabled = isOwnJob || hasApplied || isApplying;
   const applyLabel = !isAuthed
     ? "Log in to Apply"
@@ -206,9 +222,6 @@ export default function JobDetailsPage() {
                   </p>
                 </div>
               </div>
-              <button className="rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-900 transition hover:bg-slate-200">
-                Message
-              </button>
             </div>
 
             <div className="mt-10 mb-8 border-t border-slate-200 pt-8 lg:mt-12 lg:border-t-0 lg:pt-0">
@@ -258,8 +271,17 @@ export default function JobDetailsPage() {
                 >
                   {applyLabel}
                 </button>
-                <button className="w-full rounded-2xl bg-slate-100 py-4 text-base font-bold text-slate-900 transition-colors hover:bg-slate-200">
-                  Save for Later
+                <button
+                  type="button"
+                  onClick={handleMessage}
+                  disabled={isOwnJob}
+                  className={`w-full rounded-2xl py-4 text-base font-bold transition-colors ${
+                    isOwnJob
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-100 text-slate-900 hover:bg-slate-200"
+                  }`}
+                >
+                  Message
                 </button>
               </div>
               {applyError ? (
@@ -294,9 +316,6 @@ export default function JobDetailsPage() {
                     <p className="text-xs text-slate-500">Verified Local</p>
                   </div>
                 </div>
-                <button className="text-sm font-bold text-(--color-brand-primary) hover:underline">
-                  Message
-                </button>
               </div>
             </div>
           </div>

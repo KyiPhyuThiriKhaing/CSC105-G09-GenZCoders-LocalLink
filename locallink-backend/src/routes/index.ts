@@ -4,6 +4,7 @@ import { usersRouter } from "./users.routes";
 import { jobsRouter } from "./jobs.routes";
 import { submissionsRouter } from "./submissions.routes";
 import { adminRouter } from "./admin.routes";
+import { chatRouter } from "./chat.routes";
 
 export const apiRouter = Router();
 
@@ -16,3 +17,4 @@ apiRouter.use("/users", usersRouter);
 apiRouter.use("/jobs", jobsRouter);
 apiRouter.use("/submissions", submissionsRouter);
 apiRouter.use("/admin", adminRouter);
+apiRouter.use("/chat", chatRouter);

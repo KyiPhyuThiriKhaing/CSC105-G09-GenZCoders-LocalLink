@@ -31,6 +31,8 @@ apiClient.interceptors.response.use(
     const status = error?.response?.status;
     const message =
       (error?.response?.data as { message?: string } | undefined)?.message ?? "";
+    const requestUrl = typeof error?.config?.url === "string" ? error.config.url : "";
+    const isAuthEndpoint = requestUrl.includes("/auth/login") || requestUrl.includes("/auth/register");
 
     if (status === 403 && message.toLowerCase().includes("suspended")) {
       localStorage.removeItem("token");
@@ -39,6 +41,16 @@ apiClient.interceptors.response.use(
       localStorage.setItem(AUTH_SUSPENDED_KEY, message || "Account suspended");
       window.dispatchEvent(new Event("auth:changed"));
       window.location.href = "/suspended";
+    }
+
+    if (status === 401 && !isAuthEndpoint) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("auth_user_profile");
+      window.dispatchEvent(new Event("auth:changed"));
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
 
     return Promise.reject(error);
