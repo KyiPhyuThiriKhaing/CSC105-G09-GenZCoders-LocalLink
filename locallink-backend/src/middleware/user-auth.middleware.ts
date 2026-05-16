@@ -14,7 +14,7 @@ export const requireUser: RequestHandler = async (req, res, next) => {
         const payload = verifyToken(token);
         const user = await prisma.user.findUnique({
             where: { id: payload.sub },
-            select: { id: true, status: true, role: true },
+            select: { id: true, status: true, role: true, emailVerifiedAt: true, idVerifiedAt: true },
         });
 
         if (!user) {
@@ -27,7 +27,9 @@ export const requireUser: RequestHandler = async (req, res, next) => {
             return;
         }
 
-        (req as { userId?: string }).userId = user.id;
+        (req as { userId?: string; userEmailVerified?: boolean; userIdVerified?: boolean }).userId = user.id;
+        (req as { userId?: string; userEmailVerified?: boolean; userIdVerified?: boolean }).userEmailVerified = !!user.emailVerifiedAt;
+        (req as { userId?: string; userEmailVerified?: boolean; userIdVerified?: boolean }).userIdVerified = !!user.idVerifiedAt;
         next();
     } catch (error) {
         if (isTokenExpired(error)) {
@@ -40,4 +42,22 @@ export const requireUser: RequestHandler = async (req, res, next) => {
         }
         next(error);
     }
+};
+
+export const requireEmailVerified: RequestHandler = (req, res, next) => {
+    const emailVerified = (req as { userEmailVerified?: boolean }).userEmailVerified;
+    if (!emailVerified) {
+        res.status(403).json({ message: "Email not verified" });
+        return;
+    }
+    next();
+};
+
+export const requireDocumentVerified: RequestHandler = (req, res, next) => {
+    const idVerified = (req as { userIdVerified?: boolean }).userIdVerified;
+    if (!idVerified) {
+        res.status(403).json({ message: "Document not verified" });
+        return;
+    }
+    next();
 };

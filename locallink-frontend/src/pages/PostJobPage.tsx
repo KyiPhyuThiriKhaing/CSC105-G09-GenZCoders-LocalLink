@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useCurrentUser } from "../lib/useCurrentUser";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -9,6 +10,7 @@ import { apiClient } from "../lib/apiClient";
 
 export default function PostJobPage() {
   const navigate = useNavigate();
+  const { user } = useCurrentUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<JobPostFormValues>({
     resolver: zodResolver(jobPostSchema),
@@ -31,6 +33,19 @@ export default function PostJobPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    // Redirect unauthenticated users to login and unverified posters to verify page
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    if (!user?.idVerifiedAt) {
+      navigate("/profile/verify")
+      return;
+    }
+  }, [user, navigate]);
 
   const onSubmit = async (values: JobPostFormValues) => {
     setIsSubmitting(true);

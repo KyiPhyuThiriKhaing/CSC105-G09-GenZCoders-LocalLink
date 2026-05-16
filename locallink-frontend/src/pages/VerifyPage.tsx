@@ -42,6 +42,8 @@ export default function VerifyPage() {
   const isEmailButtonDisabled =
     isEmailVerified || isEmailRequestPending || isRequestingEmail;
 
+  const canSubmitDocument = isEmailVerified;
+
   useEffect(() => {
     if (!user?.id) return;
     let isMounted = true;
@@ -258,7 +260,7 @@ export default function VerifyPage() {
           <label
             htmlFor="verification-upload"
             className={`group flex min-h-64 w-full flex-col items-center justify-center rounded-4xl border-2 border-dashed border-slate-200 bg-white px-6 text-center transition-all ${
-              isReadOnly
+              isReadOnly || !canSubmitDocument
                 ? "cursor-not-allowed opacity-60"
                 : "cursor-pointer hover:border-(--color-brand-primary) hover:bg-(--color-brand-soft)/50"
             }`}
@@ -284,9 +286,12 @@ export default function VerifyPage() {
               accept=".pdf"
               multiple
               onChange={handleFileChange}
-              disabled={isReadOnly}
+              disabled={isReadOnly || !canSubmitDocument}
             />
           </label>
+          {!isEmailVerified ? (
+            <p className="mt-3 text-sm font-semibold text-slate-700">Please verify your email before submitting documents.</p>
+          ) : null}
           {isUploading ? (
             <p className="mt-3 text-sm font-medium text-slate-500">Uploading…</p>
           ) : null}
@@ -388,9 +393,9 @@ export default function VerifyPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isSubmitting || isUploading || isReadOnly}
+            disabled={isSubmitting || isUploading || isReadOnly || !canSubmitDocument}
             className={`mt-5 w-full rounded-xl px-5 py-3 text-sm font-bold transition-all ${
-              isReadOnly
+              isReadOnly || !canSubmitDocument
                 ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                 : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-[1.01]"
             }`}
@@ -401,6 +406,10 @@ export default function VerifyPage() {
                 ? "Resubmit for Review"
                 : "Submit for Review"}
           </button>
+
+          {!canSubmitDocument ? (
+            <p className="mt-3 text-sm font-semibold text-slate-700">You must verify your email before you can submit documents for document verification.</p>
+          ) : null}
 
           {submitMessage ? (
             <p className="mt-3 text-sm font-semibold text-slate-600">

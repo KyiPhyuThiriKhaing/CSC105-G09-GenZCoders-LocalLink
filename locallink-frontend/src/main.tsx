@@ -46,6 +46,10 @@ const router = createBrowserRouter([
         element: <SignUpPage />,
       },
       {
+        path: "verify",
+        element: <VerifyPage />,
+      },
+      {
         path: "jobs",
         element: <JobsPage />,
       },
@@ -87,7 +91,6 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {},
     ],
   },
   {

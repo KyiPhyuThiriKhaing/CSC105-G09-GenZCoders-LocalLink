@@ -3,6 +3,7 @@ import { MagnifyingGlassIcon, ClockIcon, DrawingPinIcon } from "@radix-ui/react-
 import { Link, useNavigate } from "react-router-dom";
 import { apiClient } from "../lib/apiClient";
 import { getAuthToken } from "../lib/authApi";
+import { useCurrentUser } from "../lib/useCurrentUser";
 export interface Job {
   id: string;
   title: string;
@@ -21,11 +22,18 @@ export interface Job {
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const navigate = useNavigate();
+  const { user } = useCurrentUser();
 
   const handlePostJobClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (!getAuthToken()) {
       event.preventDefault();
       navigate("/login");
+      return;
+    }
+    // If authenticated but documents not verified, redirect to verify page
+    if (!user?.idVerifiedAt) {
+      event.preventDefault();
+      navigate("/profile/verify")
     }
   };
   useEffect(() => {
@@ -77,13 +85,21 @@ export default function JobsPage() {
                 className="w-full bg-transparent py-4 pl-14 pr-6 text-base font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none"
               />
             </div>
-            <Link
-              to="/jobs/post"
-              onClick={handlePostJobClick}
+            <button
+              type="button"
+              onClick={(e) => {
+                // reuse existing handler logic
+                handlePostJobClick(e as unknown as React.MouseEvent<HTMLAnchorElement>);
+                // If auth and document verified, navigate to posting page
+                const token = getAuthToken();
+                if (token && user?.idVerifiedAt) {
+                  navigate("/jobs/post");
+                }
+              }}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-(--color-brand-primary) px-8 py-4 text-sm font-bold text-white shadow-lg shadow-(--color-brand-primary)/25 transition-all hover:bg-(--color-brand-primary-hover) hover:scale-[1.02]"
             >
               Post a Job
-            </Link>
+            </button>
           </div>
         </div>
       </div>

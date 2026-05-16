@@ -1,6 +1,6 @@
 import { DotsVerticalIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { getAuthToken } from "../lib/authApi";
@@ -20,6 +20,7 @@ const MUTE_STORAGE_KEY = "chat_muted_conversations";
 export default function ChatPage() {
   const { user } = useCurrentUser();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [jobIdDraft, setJobIdDraft] = useState<string | null>(null);
@@ -108,7 +109,14 @@ export default function ChatPage() {
   }, [token]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    if (token && !user?.emailVerifiedAt) {
+      navigate("/profile/verify")
+      return;
+    }
     setLoadingConversations(true);
     fetchConversations()
       .then((data) => {

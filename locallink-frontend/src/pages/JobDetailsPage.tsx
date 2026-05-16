@@ -29,6 +29,8 @@ export default function JobDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useCurrentUser();
+  const isEmailVerified = Boolean(user?.emailVerifiedAt);
+  const isDocumentVerified = Boolean(user?.idVerifiedAt);
   const [job, setJob] = useState<Job | null>(null);
   const [posterId, setPosterId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,6 +96,10 @@ export default function JobDetailsPage() {
       navigate("/login");
       return;
     }
+    if (!isDocumentVerified) {
+      // Do nothing if document not verified (label shows Document Unverified)
+      return;
+    }
     if (isOwnJob || hasApplied || isApplying) return;
 
     setIsApplying(true);
@@ -115,6 +121,7 @@ export default function JobDetailsPage() {
       return;
     }
     if (isOwnJob) return;
+    if (!isEmailVerified) return; // block messaging for unverified email
 
     const params = new URLSearchParams();
     params.set("jobId", id);
@@ -124,7 +131,7 @@ export default function JobDetailsPage() {
     navigate(`/profile/chat?${params.toString()}`);
   };
 
-  const applyDisabled = isOwnJob || hasApplied || isApplying;
+  const applyDisabled = isOwnJob || hasApplied || isApplying || (!isAuthed ? false : !isDocumentVerified);
   const applyLabel = !isAuthed
     ? "Log in to Apply"
     : isOwnJob
@@ -133,7 +140,9 @@ export default function JobDetailsPage() {
         ? "Applying…"
         : hasApplied
           ? APPLIED_LABEL[applicationStatus!] ?? "Applied"
-          : "Apply Now";
+          : !isDocumentVerified
+            ? "Document Unverified"
+            : "Apply Now";
 
   if (loading) {
     return (
@@ -274,14 +283,14 @@ export default function JobDetailsPage() {
                 <button
                   type="button"
                   onClick={handleMessage}
-                  disabled={isOwnJob}
+                  disabled={isOwnJob || !isEmailVerified}
                   className={`w-full rounded-2xl py-4 text-base font-bold transition-colors ${
-                    isOwnJob
+                    isOwnJob || !isEmailVerified
                       ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                       : "bg-slate-100 text-slate-900 hover:bg-slate-200"
                   }`}
                 >
-                  Message
+                  {(!isAuthed && "Message") || (!isEmailVerified ? "Email Unverified" : "Message")}
                 </button>
               </div>
               {applyError ? (
