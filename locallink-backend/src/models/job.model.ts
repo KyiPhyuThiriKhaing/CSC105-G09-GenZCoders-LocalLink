@@ -38,4 +38,5 @@ export interface UpdateJobInput {
   imageUrl?: string;
   payoutText?: string;
   durationText?: string;
+  status?: "OPEN" | "ASSIGNED" | "COMPLETED" | "CANCELLED";
 }

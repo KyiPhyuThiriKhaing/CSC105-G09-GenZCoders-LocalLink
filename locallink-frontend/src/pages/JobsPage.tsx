@@ -9,6 +9,7 @@ export interface Job {
   title: string;
   description: string;
   location: string;
+  status: string;
   image: string;
   feeRange: string;
   timeRange: string;
@@ -43,6 +44,7 @@ export default function JobsPage() {
         title: String(j.title),
         description: String(j.description),
         location: String(j.location),
+        status: String(j.status ?? "OPEN"),
         image: j.imageUrl ? String(j.imageUrl) : "", // Blank if no image provided
         feeRange: j.payoutText ? String(j.payoutText) : "฿—",
         timeRange: j.durationText ? String(j.durationText) : "—",

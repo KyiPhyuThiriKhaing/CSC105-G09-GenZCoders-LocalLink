@@ -10,6 +10,8 @@ export type ApplicationStatus =
   | "WITHDRAWN"
   | "COMPLETED";
 
+export type JobStatus = "OPEN" | "ASSIGNED" | "COMPLETED" | "CANCELLED";
+
 export type MyApplication = {
   id: string;
   status: ApplicationStatus;
@@ -69,5 +71,17 @@ export const updateApplicationStatus = async (
     return result.data.data;
   } catch (error) {
     throw parseError(error, "Unable to update application.");
+  }
+};
+
+export const updateJobStatus = async (jobId: string, status: JobStatus) => {
+  try {
+    const result = await apiClient.patch<{ data: { id: string; status: JobStatus } }>(
+      `/jobs/${jobId}`,
+      { status },
+    );
+    return result.data.data;
+  } catch (error) {
+    throw parseError(error, "Unable to update job status.");
   }
 };

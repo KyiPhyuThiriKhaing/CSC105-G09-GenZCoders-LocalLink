@@ -36,8 +36,31 @@ export const createJob = async (payload: CreateJobInput): Promise<Job> => {
   });
 };
 
-export const updateJob = async (_id: string, _payload: UpdateJobInput): Promise<Job | null> => {
-  throw new Error(NOT_IMPLEMENTED);
+export const updateJob = async (
+  id: string,
+  payload: UpdateJobInput,
+  userId: string,
+): Promise<Job | null> => {
+  const job = await prisma.job.findUnique({ where: { id }, select: { posterId: true } });
+  if (!job) {
+    return null;
+  }
+  if (job.posterId !== userId) {
+    throw new Error("Forbidden");
+  }
+
+  return prisma.job.update({
+    where: { id },
+    data: {
+      title: payload.title,
+      description: payload.description,
+      location: payload.location,
+      imageUrl: payload.imageUrl,
+      payoutText: payload.payoutText,
+      durationText: payload.durationText,
+      status: payload.status,
+    },
+  });
 };
 
 export const deleteJob = async (_id: string): Promise<void> => {

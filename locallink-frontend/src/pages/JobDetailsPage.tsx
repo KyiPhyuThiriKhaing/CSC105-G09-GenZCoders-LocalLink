@@ -58,6 +58,7 @@ export default function JobDetailsPage() {
           title: String(j.title),
           description: String(j.description),
           location: String(j.location),
+          status: String(j.status),
           image: j.imageUrl ? String(j.imageUrl) : "", // Blank if no image provided
           feeRange: j.payoutText ? String(j.payoutText) : "฿—",
           timeRange: j.durationText ? String(j.durationText) : "—",
@@ -120,6 +121,7 @@ export default function JobDetailsPage() {
       navigate("/login");
       return;
     }
+    if (isClosed) return;
     if (isOwnJob) return;
     if (!isEmailVerified) return; // block messaging for unverified email
 
@@ -131,7 +133,8 @@ export default function JobDetailsPage() {
     navigate(`/profile/chat?${params.toString()}`);
   };
 
-  const applyDisabled = isOwnJob || hasApplied || isApplying || (!isAuthed ? false : !isDocumentVerified);
+  const isClosed = job?.status !== "OPEN";
+  const applyDisabled = isOwnJob || hasApplied || isApplying || isClosed || (!isAuthed ? false : !isDocumentVerified);
   const applyLabel = !isAuthed
     ? "Log in to Apply"
     : isOwnJob
@@ -140,6 +143,8 @@ export default function JobDetailsPage() {
         ? "Applying…"
         : hasApplied
           ? APPLIED_LABEL[applicationStatus!] ?? "Applied"
+          : isClosed
+            ? "Applications Closed"
           : !isDocumentVerified
             ? "Document Unverified"
             : "Apply Now";
@@ -289,14 +294,14 @@ export default function JobDetailsPage() {
                 <button
                   type="button"
                   onClick={handleMessage}
-                  disabled={isOwnJob || !isEmailVerified}
+                  disabled={isOwnJob || isClosed || !isEmailVerified}
                   className={`w-full rounded-2xl py-4 text-base font-bold transition-colors ${
-                    isOwnJob || !isEmailVerified
+                    isOwnJob || isClosed || !isEmailVerified
                       ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                       : "bg-slate-100 text-slate-900 hover:bg-slate-200"
                   }`}
                 >
-                  {(!isAuthed && "Message") || (!isEmailVerified ? "Email Unverified" : "Message")}
+                  {(!isAuthed && "Message") || (isClosed ? "Applications Closed" : !isEmailVerified ? "Email Unverified" : "Message")}
                 </button>
               </div>
               {applyError ? (

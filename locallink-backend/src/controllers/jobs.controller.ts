@@ -75,7 +75,13 @@ export const createJobHandler: RequestHandler = async (req, res, next) => {
 
 export const updateJobHandler: RequestHandler = async (req, res, next) => {
   try {
-    const data = await updateJob(asId(req.params.id), req.body);
+    const userId = (req as { userId?: string }).userId;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const data = await updateJob(asId(req.params.id), req.body, userId);
     if (!data) {
       res.status(404).json({ message: "Job not found" });
       return;
@@ -84,6 +90,10 @@ export const updateJobHandler: RequestHandler = async (req, res, next) => {
   } catch (error) {
     if (error instanceof Error && error.message === NOT_IMPLEMENTED) {
       sendNotImplemented(res, "update job");
+      return;
+    }
+    if (error instanceof Error && error.message === "Forbidden") {
+      res.status(403).json({ message: error.message });
       return;
     }
     next(error);

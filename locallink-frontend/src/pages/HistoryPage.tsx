@@ -12,7 +12,12 @@ import {
   type HistoryApplication,
   type HistoryPostedJob,
 } from "../lib/authApi";
-import { updateApplicationStatus, type ReviewStatus } from "../lib/jobsApi";
+import {
+  updateApplicationStatus,
+  updateJobStatus,
+  type JobStatus,
+  type ReviewStatus,
+} from "../lib/jobsApi";
 
 const IN_PROGRESS_STATUSES: HistoryApplication["status"][] = [
   "APPLIED",
@@ -53,6 +58,7 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [reviewJobId, setReviewJobId] = useState<string | null>(null);
   const [updatingAppId, setUpdatingAppId] = useState<string | null>(null);
+  const [updatingJobId, setUpdatingJobId] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -104,6 +110,21 @@ export default function HistoryPage() {
       setReviewError(err instanceof Error ? err.message : "Unable to update.");
     } finally {
       setUpdatingAppId(null);
+    }
+  };
+
+  const handleJobStatusAction = async (jobId: string, next: JobStatus) => {
+    setUpdatingJobId(jobId);
+    setReviewError(null);
+    try {
+      const updated = await updateJobStatus(jobId, next);
+      setPostedJobs((prev) =>
+        prev.map((job) => (job.id === jobId ? { ...job, status: updated.status } : job)),
+      );
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : "Unable to update job.");
+    } finally {
+      setUpdatingJobId(null);
     }
   };
 
@@ -309,13 +330,19 @@ export default function HistoryPage() {
                     </p>
                     <div className="mt-6">
                       {isActive ? (
-                        <button className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-emerald-700">
-                          Message
-                        </button>
+                        <Link
+                          to={`/jobs/${app.job.id}`}
+                          className="block w-full rounded-xl bg-emerald-600 py-2.5 text-center text-sm font-bold text-white transition-all hover:bg-emerald-700"
+                        >
+                          View job page
+                        </Link>
                       ) : app.status === "COMPLETED" ? (
-                        <button className="w-full rounded-xl bg-slate-50 py-2.5 text-sm font-bold text-slate-900 transition-all hover:bg-slate-100">
-                          Leave Review
-                        </button>
+                        <Link
+                          to={`/jobs/${app.job.id}`}
+                          className="block w-full rounded-xl bg-slate-50 py-2.5 text-center text-sm font-bold text-slate-900 transition-all hover:bg-slate-100"
+                        >
+                          View job page
+                        </Link>
                       ) : null}
                     </div>
                   </div>
@@ -338,17 +365,35 @@ export default function HistoryPage() {
                   {reviewJob.title}
                 </h3>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setReviewJobId(null);
-                  setReviewError(null);
-                }}
-                className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                aria-label="Close"
-              >
-                <Cross2Icon className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleJobStatusAction(reviewJob.id, "CANCELLED")}
+                  disabled={reviewJob.status === "CANCELLED" || updatingJobId === reviewJob.id}
+                  className={`rounded-xl px-3 py-2 text-xs font-bold transition ${reviewJob.status === "CANCELLED" ? "bg-slate-200 text-slate-500 cursor-not-allowed" : "bg-slate-900 text-white hover:bg-slate-800"}`}
+                >
+                  Close Applications
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleJobStatusAction(reviewJob.id, "OPEN")}
+                  disabled={reviewJob.status === "OPEN" || updatingJobId === reviewJob.id}
+                  className={`rounded-xl px-3 py-2 text-xs font-bold transition ${reviewJob.status === "OPEN" ? "bg-slate-200 text-slate-500 cursor-not-allowed" : "bg-emerald-600 text-white hover:bg-emerald-700"}`}
+                >
+                  Reopen Job
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReviewJobId(null);
+                    setReviewError(null);
+                  }}
+                  className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                  aria-label="Close"
+                >
+                  <Cross2Icon className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
             {reviewError ? (
@@ -369,14 +414,20 @@ export default function HistoryPage() {
                     className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
                   >
                     <div className="flex items-start gap-3">
-                      <img
-                        src={
-                          app.applicant.avatarUrl ??
-                          `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(app.applicant.fullName)}&backgroundColor=f8fafc`
-                        }
-                        alt={app.applicant.fullName}
-                        className="h-10 w-10 rounded-full border border-slate-200 bg-white object-cover"
-                      />
+                      <Link
+                        to={`/users/${app.applicant.id}`}
+                        className="shrink-0"
+                        aria-label={`View ${app.applicant.fullName} profile`}
+                      >
+                        <img
+                          src={
+                            app.applicant.avatarUrl ??
+                            `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(app.applicant.fullName)}&backgroundColor=f8fafc`
+                          }
+                          alt={app.applicant.fullName}
+                          className="h-10 w-10 rounded-full border border-slate-200 bg-white object-cover transition hover:scale-105"
+                        />
+                      </Link>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <p className="truncate text-sm font-bold text-slate-900">
