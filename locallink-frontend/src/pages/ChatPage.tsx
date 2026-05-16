@@ -47,6 +47,9 @@ export default function ChatPage() {
 
   const token = getAuthToken();
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const actionsToggleRef = useRef<HTMLButtonElement | null>(null);
+  const actionsBoxRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const el = messagesContainerRef.current;
@@ -57,6 +60,27 @@ export default function ChatPage() {
     () => conversations.find((conv) => conv.id === selectedId) ?? null,
     [conversations, selectedId],
   );
+
+  useEffect(() => {
+    // close actions box when conversation changes
+    setActionsOpen(false);
+  }, [selectedId]);
+
+  // close actions when clicking outside the toggle or the box
+  useEffect(() => {
+    if (!actionsOpen) return;
+    const handleClickOutside = (ev: MouseEvent) => {
+      const target = ev.target as Node | null;
+      if (!target) return;
+      const toggleEl = actionsToggleRef.current;
+      const boxEl = actionsBoxRef.current;
+      if (toggleEl && toggleEl.contains(target as Node)) return;
+      if (boxEl && boxEl.contains(target as Node)) return;
+      setActionsOpen(false);
+    };
+    window.addEventListener("mousedown", handleClickOutside);
+    return () => window.removeEventListener("mousedown", handleClickOutside);
+  }, [actionsOpen]);
 
   const filteredConversations = useMemo(() => {
     const tokenized = searchTerm.trim().toLowerCase();
@@ -339,7 +363,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] -mt-6 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden bg-white sm:rounded-4xl sm:border sm:border-slate-200">
+    <div className="relative flex h-[calc(100vh-8rem)] -mt-6 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden bg-white sm:rounded-4xl sm:border sm:border-slate-200">
       <div className="w-full sm:w-80 lg:w-96 shrink-0 flex flex-col border-r border-slate-200 bg-slate-50">
         <div className="p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
           <h2 className="text-xl font-extrabold text-slate-900 mb-4">
@@ -454,56 +478,89 @@ export default function ChatPage() {
           </div>
         ) : (
           <>
-            <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  {selectedConversation?.participant.fullName ?? "New message"}
-                </h3>
-                {(selectedConversation?.jobTitle || jobTitleDraft) ? (
-                  <p className="text-sm text-slate-500">
-                    {selectedConversation?.jobTitle ?? jobTitleDraft}
-                  </p>
-                ) : null}
+            <div className="border-b border-slate-200 px-6 py-4 flex items-start justify-between gap-4 relative">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-lg font-bold text-slate-900 break-words">
+                    {selectedConversation?.participant.fullName ?? "New message"}
+                  </h3>
+                  {(selectedConversation?.jobTitle || jobTitleDraft) ? (
+                    <p className="text-sm text-slate-500 truncate">{selectedConversation?.jobTitle ?? jobTitleDraft}</p>
+                  ) : null}
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {(selectedConversation?.jobId || jobIdDraft) ? (
-                  <Link
-                    to={`/jobs/${selectedConversation?.jobId ?? jobIdDraft}`}
-                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)"
-                  >
-                    View job
-                  </Link>
-                ) : null}
-                {selectedConversation && selectedConversation.participant.id !== user?.id ? (
-                  <Link
-                    to={`/users/${selectedConversation.participant.id}`}
-                    className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)"
-                  >
-                    View profile
-                  </Link>
-                ) : null}
-                {selectedConversation ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => toggleMute(selectedConversation.id)}
-                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)"
-                    >
-                      {isMuted(selectedConversation.id) ? "Unmute" : "Mute"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleDeleteConversation}
-                      className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:border-red-300 hover:text-red-700"
-                    >
-                      Remove chat
-                    </button>
-                  </>
-                ) : null}
+
+              {/* Toggle button next to title to expand/collapse actions */}
+              <div className="ml-2">
+                <button
+                  ref={actionsToggleRef}
+                  type="button"
+                  onClick={() => setActionsOpen((s) => !s)}
+                  className="rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                  aria-expanded={actionsOpen}
+                  aria-label={actionsOpen ? "Close conversation actions" : "Open conversation actions"}
+                >
+                  <DotsVerticalIcon />
+                </button>
+
+                {/* anchored compact actions box (appears beside title) */}
+                {/* anchored compact actions box (appears beside title) */}
+                <div
+                  ref={actionsBoxRef}
+                  aria-hidden={!actionsOpen}
+                  className={
+                    `absolute top-12 right-6 z-40 hidden sm:block transition-transform transition-opacity duration-150 ease-out origin-top-right ` +
+                    (actionsOpen ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none")
+                  }
+                >
+                  <div className="rounded-2xl bg-white border border-slate-100 p-3 shadow-sm w-44">
+                      <h4 className="text-xs font-bold text-slate-700 mb-2">Conversation</h4>
+                      {(selectedConversation?.jobId || jobIdDraft) ? (
+                        <Link
+                          to={`/jobs/${selectedConversation?.jobId ?? jobIdDraft}`}
+                          className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 mb-2 text-center hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)"
+                          onClick={() => setActionsOpen(false)}
+                        >
+                          View job
+                        </Link>
+                      ) : null}
+                      {selectedConversation && selectedConversation.participant.id !== user?.id ? (
+                        <Link
+                          to={`/users/${selectedConversation.participant.id}`}
+                          className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 mb-2 text-center hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)"
+                          onClick={() => setActionsOpen(false)}
+                        >
+                          View profile
+                        </Link>
+                      ) : null}
+                      <div className="mt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            selectedConversation && toggleMute(selectedConversation.id);
+                            setActionsOpen(false);
+                          }}
+                          className="w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 mb-2 hover:border-(--color-brand-primary) hover:text-(--color-brand-primary)"
+                        >
+                          {selectedConversation && isMuted(selectedConversation.id) ? "Unmute" : "Mute"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleDeleteConversation();
+                            setActionsOpen(false);
+                          }}
+                          className="w-full rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 hover:border-red-300 hover:text-red-700"
+                        >
+                          Remove chat
+                        </button>
+                      </div>
+                    </div>
+                  </div>
               </div>
             </div>
 
-            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-4 space-y-3">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-4 space-y-3 pr-6">
               {loadingMessages ? (
                 <p className="text-sm text-slate-500">Loading messages...</p>
               ) : messages.length === 0 ? (
@@ -636,6 +693,7 @@ export default function ChatPage() {
           </>
         )}
       </div>
+      
     </div>
   );
 }

@@ -63,6 +63,12 @@ export const updateJob = async (
   });
 };
 
+const reviewInclude = {
+  reviewer: { select: { fullName: true, avatarUrl: true } },
+  reviewee: { select: { fullName: true, avatarUrl: true } },
+  job: { select: { title: true } },
+} as const;
+
 export const deleteJob = async (_id: string): Promise<void> => {
   throw new Error(NOT_IMPLEMENTED);
 };
@@ -111,9 +117,9 @@ export const getApplicationForUser = async (jobId: string, applicantId: string) 
   });
 };
 
-type ReviewStatus = "CONTACTED" | "OFFERED" | "ACCEPTED" | "REJECTED";
+type ApplicationStatus = "CONTACTED" | "OFFERED" | "ACCEPTED" | "REJECTED" | "COMPLETED";
 
-const REVIEW_STATUSES: ReviewStatus[] = ["CONTACTED", "OFFERED", "ACCEPTED", "REJECTED"];
+const APPLICATION_STATUSES: ApplicationStatus[] = ["CONTACTED", "OFFERED", "ACCEPTED", "REJECTED", "COMPLETED"];
 
 export const updateApplicationStatus = async (
   jobId: string,
@@ -121,7 +127,9 @@ export const updateApplicationStatus = async (
   reviewerId: string,
   status: string,
 ) => {
-  if (!REVIEW_STATUSES.includes(status as ReviewStatus)) {
+  const normalizedStatus = status.trim().toUpperCase();
+
+  if (!APPLICATION_STATUSES.includes(normalizedStatus as ApplicationStatus)) {
     throw new Error("Invalid application status");
   }
 
@@ -137,7 +145,7 @@ export const updateApplicationStatus = async (
     throw new Error("Forbidden");
   }
 
-  const next = status as ReviewStatus;
+  const next = normalizedStatus as ApplicationStatus;
   const now = new Date();
 
   return prisma.jobApplication.update({
@@ -146,7 +154,150 @@ export const updateApplicationStatus = async (
       status: next,
       offeredAt: next === "OFFERED" || next === "ACCEPTED" ? now : undefined,
       acceptedAt: next === "ACCEPTED" ? now : undefined,
+      completedAt: next === "COMPLETED" ? now : undefined,
     },
     include: { applicant: { select: { id: true, fullName: true, avatarUrl: true } } },
+  });
+};
+
+const assertReviewPermission = async (jobId: string, reviewerId: string, revieweeId: string) => {
+  if (reviewerId === revieweeId) {
+    throw new Error("You cannot review yourself");
+  }
+
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: {
+      id: true,
+      posterId: true,
+      applications: {
+        where: {
+          applicantId: revieweeId,
+          status: "COMPLETED",
+        },
+        select: { id: true },
+      },
+    },
+  });
+
+  if (!job) {
+    throw new Error("Job not found");
+  }
+
+  if (job.posterId !== reviewerId) {
+    throw new Error("Forbidden");
+  }
+
+  if (job.applications.length === 0) {
+    throw new Error("Applicant is not completed on this job");
+  }
+};
+
+export const createJobReview = async (
+  jobId: string,
+  reviewerId: string,
+  revieweeId: string,
+  rating: number,
+  comment?: string | null,
+) => {
+  await assertReviewPermission(jobId, reviewerId, revieweeId);
+
+  const existing = await prisma.review.findUnique({
+    where: {
+      jobId_reviewerId_revieweeId: {
+        jobId,
+        reviewerId,
+        revieweeId,
+      },
+    },
+    select: { id: true },
+  });
+
+  if (existing) {
+    throw new Error("You have already reviewed this applicant for this job");
+  }
+
+  return prisma.review.create({
+    data: {
+      jobId,
+      reviewerId,
+      revieweeId,
+      rating,
+      comment: comment?.trim() || null,
+    },
+    include: reviewInclude,
+  });
+};
+
+export const updateJobReview = async (
+  jobId: string,
+  reviewerId: string,
+  revieweeId: string,
+  rating: number,
+  comment?: string | null,
+) => {
+  await assertReviewPermission(jobId, reviewerId, revieweeId);
+
+  const existing = await prisma.review.findUnique({
+    where: {
+      jobId_reviewerId_revieweeId: {
+        jobId,
+        reviewerId,
+        revieweeId,
+      },
+    },
+  });
+
+  if (!existing) {
+    throw new Error("Review not found");
+  }
+
+  if (existing.deletedAt) {
+    throw new Error("Review has been deleted");
+  }
+
+  return prisma.review.update({
+    where: { id: existing.id },
+    data: {
+      rating,
+      comment: comment?.trim() || null,
+      editedAt: new Date(),
+    },
+    include: reviewInclude,
+  });
+};
+
+export const deleteJobReview = async (
+  jobId: string,
+  reviewerId: string,
+  revieweeId: string,
+) => {
+  await assertReviewPermission(jobId, reviewerId, revieweeId);
+
+  const existing = await prisma.review.findUnique({
+    where: {
+      jobId_reviewerId_revieweeId: {
+        jobId,
+        reviewerId,
+        revieweeId,
+      },
+    },
+  });
+
+  if (!existing) {
+    throw new Error("Review not found");
+  }
+
+  if (existing.deletedAt) {
+    throw new Error("Review has been deleted");
+  }
+
+  return prisma.review.update({
+    where: { id: existing.id },
+    data: {
+      deletedAt: new Date(),
+      comment: null,
+    },
+    include: reviewInclude,
   });
 };

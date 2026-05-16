@@ -288,5 +288,35 @@ export const getUserHistory = async (userId: string) => {
     orderBy: { createdAt: 'desc' }
   });
 
-  return { applications, postedJobs };
+  const postedJobIds = postedJobs.map((job) => job.id);
+  const reviews = postedJobIds.length > 0 ? await prisma.review.findMany({
+    where: {
+      reviewerId: userId,
+      jobId: { in: postedJobIds },
+    },
+    select: {
+      id: true,
+      jobId: true,
+      revieweeId: true,
+      rating: true,
+      comment: true,
+      createdAt: true,
+      editedAt: true,
+      deletedAt: true,
+    },
+  }) : [];
+
+  const reviewLookup = new Map(
+    reviews.map((review) => [`${review.jobId}:${review.revieweeId}`, review]),
+  );
+
+  const postedJobsWithReviews = postedJobs.map((job) => ({
+    ...job,
+    applications: job.applications.map((application) => ({
+      ...application,
+      review: reviewLookup.get(`${job.id}:${application.applicant.id}`) ?? null,
+    })),
+  }));
+
+  return { applications, postedJobs: postedJobsWithReviews };
 };

@@ -196,6 +196,14 @@ export type HistoryApplicant = {
     avatarUrl: string | null;
     email?: string;
   };
+  review?: {
+    id: string;
+    rating: number;
+    comment: string | null;
+    createdAt: string;
+    editedAt: string | null;
+    deletedAt: string | null;
+  } | null;
 };
 
 export type HistoryPostedJob = {

@@ -1,5 +1,7 @@
 import type { RequestHandler, Response } from "express";
+import { z } from "zod";
 import { createUser, deleteUser, getUserById, listUsers, updateUser } from "../services/users.service";
+import { createUserReview } from "../services/users.service";
 
 const NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
 
@@ -13,6 +15,11 @@ const asId = (value: string | string[] | undefined): string => {
   }
   return value ?? "";
 };
+
+const reviewSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().trim().max(1000).optional().nullable(),
+});
 
 export const listUsersHandler: RequestHandler = async (_req, res, next) => {
   try {
@@ -38,6 +45,39 @@ export const getUserByIdHandler: RequestHandler = async (req, res, next) => {
   } catch (error) {
     if (error instanceof Error && error.message === NOT_IMPLEMENTED) {
       sendNotImplemented(res, "get user by id");
+      return;
+    }
+    next(error);
+  }
+};
+
+export const createUserReviewHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const reviewerId = (req as { userId?: string }).userId;
+    if (!reviewerId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const revieweeId = asId(req.params.id);
+    const payload = reviewSchema.parse(req.body);
+    const data = await createUserReview(reviewerId, revieweeId, payload.rating, payload.comment ?? null);
+    res.status(201).json({ data });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ message: error.issues[0]?.message ?? "Invalid input" });
+      return;
+    }
+    if (error instanceof Error && error.message === "You cannot review yourself") {
+      res.status(409).json({ message: error.message });
+      return;
+    }
+    if (error instanceof Error && error.message === "You have already reviewed this user") {
+      res.status(409).json({ message: error.message });
+      return;
+    }
+    if (error instanceof Error && error.message === "No completed job found between these users") {
+      res.status(400).json({ message: error.message });
       return;
     }
     next(error);

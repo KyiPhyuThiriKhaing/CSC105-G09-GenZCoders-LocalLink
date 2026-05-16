@@ -9,9 +9,10 @@ import {
   CheckCircledIcon,
   Cross2Icon,
 } from "@radix-ui/react-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "../lib/useCurrentUser";
+import { apiClient } from "../lib/apiClient";
 import {
   addSkill as addSkillApi,
   fetchSkills,
@@ -29,6 +30,7 @@ export default function MyProfilePage() {
     { type: "success" | "error"; message: string } | null
   >(null);
   const [bioSaving, setBioSaving] = useState(false);
+  const [reviews, setReviews] = useState<any[]>([]);
 
   useEffect(() => {
     if (user?.bio !== undefined && user.bio !== null) {
@@ -47,6 +49,24 @@ export default function MyProfilePage() {
         if (!cancelled) {
           setSkillsError(err instanceof Error ? err.message : "Unable to load skills.");
         }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    apiClient
+      .get<{ data: { reviews?: any[] } }>(`/users/${user.id}`)
+      .then((response) => {
+        if (!cancelled) {
+          setReviews(Array.isArray(response.data.data.reviews) ? response.data.data.reviews : []);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setReviews([]);
       });
     return () => {
       cancelled = true;
@@ -350,9 +370,74 @@ export default function MyProfilePage() {
                 Recent Reviews
               </h2>
             </div>
-            <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">
-              No reviews yet.
-            </div>
+            {reviews.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-sm font-semibold text-slate-500">
+                No reviews yet.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {reviews.map((review) => (
+                  <div key={review.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      {review.reviewer?.id ? (
+                        <Link to={`/users/${review.reviewer.id}`} className="shrink-0">
+                          <img
+                            src={
+                              review.reviewer.avatarUrl ??
+                              `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(review.reviewer.fullName)}`
+                            }
+                            alt={review.reviewer.fullName}
+                            className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+                          />
+                        </Link>
+                      ) : (
+                        <img
+                          src={
+                            review.reviewer.avatarUrl ??
+                            `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(review.reviewer.fullName)}`
+                          }
+                          alt={review.reviewer.fullName}
+                          className="h-10 w-10 rounded-full border border-slate-200 object-cover"
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          {review.reviewer?.id ? (
+                            <Link to={`/users/${review.reviewer.id}`} className="text-inherit">
+                              <p className="truncate text-sm font-bold text-slate-900">{review.reviewer.fullName}</p>
+                            </Link>
+                          ) : (
+                            <p className="truncate text-sm font-bold text-slate-900">{review.reviewer.fullName}</p>
+                          )}
+                          {review.deletedAt ? (
+                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500">
+                              Review Deleted
+                            </span>
+                          ) : (
+                            <div className="flex items-center gap-1 text-amber-500">
+                              {Array.from({ length: review.rating }).map((_, index) => (
+                                <span key={index}>★</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <p className="text-xs text-slate-500">for {review.job.title}</p>
+                          {review.editedAt && !review.deletedAt ? (
+                            <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">
+                              Edited
+                            </span>
+                          ) : null}
+                        </div>
+                        {review.comment && !review.deletedAt ? (
+                          <p className="mt-2 text-sm text-slate-700">{review.comment}</p>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         </div>
       </div>

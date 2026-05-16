@@ -13,7 +13,10 @@ import {
   type HistoryPostedJob,
 } from "../lib/authApi";
 import {
+  createJobReview,
+  deleteJobReview,
   updateApplicationStatus,
+  updateJobReview,
   updateJobStatus,
   type JobStatus,
   type ReviewStatus,
@@ -36,7 +39,7 @@ const STATUS_LABEL: Record<HistoryApplication["status"], string> = {
   APPLIED: "Applied",
   CONTACTED: "Contacted",
   OFFERED: "Offered",
-  ACCEPTED: "Completed",
+  ACCEPTED: "Accepted",
   REJECTED: "Rejected",
   WITHDRAWN: "Withdrawn",
   COMPLETED: "Completed",
@@ -57,6 +60,11 @@ export default function HistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reviewJobId, setReviewJobId] = useState<string | null>(null);
+  const [reviewTargetId, setReviewTargetId] = useState<string | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewNotice, setReviewNotice] = useState<string | null>(null);
   const [updatingAppId, setUpdatingAppId] = useState<string | null>(null);
   const [updatingJobId, setUpdatingJobId] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
@@ -84,6 +92,23 @@ export default function HistoryPage() {
   }, []);
 
   const reviewJob = postedJobs.find((j) => j.id === reviewJobId) ?? null;
+  const reviewTarget =
+    reviewJob?.applications.find((app) => app.applicant.id === reviewTargetId) ?? null;
+
+  const syncReviewInState = (jobId: string, revieweeId: string, review: HistoryApplicant["review"]) => {
+    setPostedJobs((prev) =>
+      prev.map((job) =>
+        job.id !== jobId
+          ? job
+          : {
+              ...job,
+              applications: job.applications.map((app) =>
+                app.applicant.id === revieweeId ? { ...app, review } : app,
+              ),
+            },
+      ),
+    );
+  };
 
   const handleReviewAction = async (
     applicant: HistoryApplicant,
@@ -125,6 +150,68 @@ export default function HistoryPage() {
       setReviewError(err instanceof Error ? err.message : "Unable to update job.");
     } finally {
       setUpdatingJobId(null);
+    }
+  };
+
+  const openReviewForm = (applicant: HistoryApplicant) => {
+    setReviewTargetId(applicant.applicant.id);
+    setReviewRating(applicant.review?.rating ?? 5);
+    setReviewComment(applicant.review?.comment ?? "");
+    setReviewNotice(null);
+    setReviewError(null);
+  };
+
+  const handleReviewSubmit = async () => {
+    if (!reviewJob || !reviewTarget) return;
+    setReviewSubmitting(true);
+    setReviewError(null);
+    setReviewNotice(null);
+    try {
+      const payload = {
+        rating: reviewRating,
+        comment: reviewComment.trim() || null,
+      };
+      const response = reviewTarget.review
+        ? await updateJobReview(reviewJob.id, reviewTarget.applicant.id, payload.rating, payload.comment)
+        : await createJobReview(reviewJob.id, reviewTarget.applicant.id, payload.rating, payload.comment);
+
+      syncReviewInState(reviewJob.id, reviewTarget.applicant.id, {
+        id: response.id,
+        rating: response.rating,
+        comment: response.comment,
+        createdAt: response.createdAt,
+        editedAt: response.editedAt,
+        deletedAt: response.deletedAt,
+      });
+      setReviewNotice(reviewTarget.review ? "Review updated." : "Review submitted.");
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : "Unable to save review.");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
+  const handleReviewDelete = async () => {
+    if (!reviewJob || !reviewTarget?.review) return;
+    setReviewSubmitting(true);
+    setReviewError(null);
+    setReviewNotice(null);
+    try {
+      const response = await deleteJobReview(reviewJob.id, reviewTarget.applicant.id);
+      syncReviewInState(reviewJob.id, reviewTarget.applicant.id, {
+        id: response.id,
+        rating: response.rating,
+        comment: response.comment,
+        createdAt: response.createdAt,
+        editedAt: response.editedAt,
+        deletedAt: response.deletedAt,
+      });
+      setReviewNotice("Review Deleted");
+      setReviewComment("");
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : "Unable to delete review.");
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -267,6 +354,9 @@ export default function HistoryPage() {
                         type="button"
                         onClick={() => {
                           setReviewJobId(job.id);
+                          setReviewTargetId(null);
+                          setReviewNotice(null);
+                          setReviewComment("");
                           setReviewError(null);
                         }}
                         disabled={job._count.applications === 0}
@@ -386,6 +476,8 @@ export default function HistoryPage() {
                   type="button"
                   onClick={() => {
                     setReviewJobId(null);
+                    setReviewTargetId(null);
+                    setReviewNotice(null);
                     setReviewError(null);
                   }}
                   className="rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
@@ -400,6 +492,92 @@ export default function HistoryPage() {
               <p className="mb-3 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-600">
                 {reviewError}
               </p>
+            ) : null}
+
+            {reviewNotice ? (
+              <p className="mb-3 rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-700">
+                {reviewNotice}
+              </p>
+            ) : null}
+
+            {reviewTarget ? (
+              <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                      {reviewTarget.review?.deletedAt ? "Review Deleted" : reviewTarget.review ? "Edit Review" : "Write Review"}
+                    </p>
+                    <h4 className="text-base font-bold text-slate-900">{reviewTarget.applicant.fullName}</h4>
+                    <p className="text-sm text-slate-500">Job: {reviewJob?.title}</p>
+                  </div>
+                  {reviewTarget.review?.deletedAt ? (
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">
+                      Review Deleted
+                    </span>
+                  ) : null}
+                </div>
+
+                {reviewTarget.review?.deletedAt ? (
+                  <p className="rounded-xl bg-slate-50 p-3 text-sm font-semibold text-slate-600">
+                    This review was deleted.
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 text-sm font-bold text-slate-700">Rating</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[1, 2, 3, 4, 5].map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setReviewRating(value)}
+                            className={`rounded-full px-4 py-2 text-sm font-bold transition ${
+                              reviewRating === value
+                                ? "bg-amber-500 text-white"
+                                : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                            }`}
+                          >
+                            {value} ★
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <label className="block">
+                      <span className="mb-2 block text-sm font-bold text-slate-700">Comment</span>
+                      <textarea
+                        value={reviewComment}
+                        onChange={(event) => setReviewComment(event.target.value)}
+                        rows={4}
+                        maxLength={1000}
+                        placeholder="Mention what job they did and how they performed..."
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400"
+                      />
+                    </label>
+
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      {reviewTarget.review ? (
+                        <button
+                          type="button"
+                          onClick={handleReviewDelete}
+                          disabled={reviewSubmitting}
+                          className="rounded-xl bg-red-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          Delete Review
+                        </button>
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={handleReviewSubmit}
+                        disabled={reviewSubmitting}
+                        className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {reviewSubmitting ? "Saving..." : reviewTarget.review ? "Save Changes" : "Submit Review"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : null}
 
             {reviewJob.applications.length === 0 ? (
@@ -442,10 +620,22 @@ export default function HistoryPage() {
                             "{app.message}"
                           </p>
                         ) : null}
+                        {app.review ? (
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">
+                              {app.review.deletedAt ? "Review Deleted" : app.review.editedAt ? "Edited" : "Reviewed"}
+                            </span>
+                            {app.review.deletedAt ? null : (
+                              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">
+                                {app.review.rating} ★
+                              </span>
+                            )}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {(["CONTACTED", "OFFERED", "ACCEPTED", "REJECTED"] as ReviewStatus[]).map(
+                      {(["CONTACTED", "OFFERED", "ACCEPTED", "COMPLETED", "REJECTED"] as ReviewStatus[]).map(
                         (next) => {
                           const isCurrent = app.status === next;
                           const isBusy = updatingAppId === app.id;
@@ -471,6 +661,18 @@ export default function HistoryPage() {
                         },
                       )}
                     </div>
+                    {app.status === "COMPLETED" ? (
+                      <div className="mt-3 flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => openReviewForm(app)}
+                          disabled={Boolean(app.review?.deletedAt)}
+                          className="rounded-xl bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-blue-700"
+                        >
+                          {app.review?.deletedAt ? "Review Deleted" : app.review ? "Edit Review" : "Review"}
+                        </button>
+                      </div>
+                    ) : null}
                   </li>
                 ))}
               </ul>

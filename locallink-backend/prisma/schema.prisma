@@ -275,12 +275,14 @@ model Review {
   rating     Int
   comment    String?
   createdAt  DateTime @default(now())
+  editedAt   DateTime?
+  deletedAt  DateTime?
 
   job      Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
   reviewer User @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
   reviewee User @relation("Reviewee", fields: [revieweeId], references: [id], onDelete: Cascade)
 
-  @@unique([jobId, reviewerId])
+  @@unique([jobId, reviewerId, revieweeId])
   @@index([revieweeId])
 }
 

@@ -1,11 +1,15 @@
 import type { RequestHandler, Response } from "express";
+import { z } from "zod";
 import {
   applyToJob,
   createJob,
+  createJobReview,
   deleteJob,
+  deleteJobReview,
   getApplicationForUser,
   getJobById,
   listJobs,
+  updateJobReview,
   updateApplicationStatus,
   updateJob,
 } from "../services/jobs.service";
@@ -22,6 +26,11 @@ const asId = (value: string | string[] | undefined): string => {
   }
   return value ?? "";
 };
+
+const reviewSchema = z.object({
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().trim().max(1000).optional().nullable(),
+});
 
 export const listJobsHandler: RequestHandler = async (_req, res, next) => {
   try {
@@ -184,6 +193,133 @@ export const updateApplicationStatusHandler: RequestHandler = async (req, res, n
       }
       if (error.message === "Forbidden") {
         res.status(403).json({ message: error.message });
+        return;
+      }
+    }
+    next(error);
+  }
+};
+
+export const createJobReviewHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const reviewerId = (req as { userId?: string }).userId;
+    if (!reviewerId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const jobId = asId(req.params.id);
+    const revieweeId = asId(req.params.revieweeId);
+    const payload = reviewSchema.parse(req.body);
+    const data = await createJobReview(jobId, reviewerId, revieweeId, payload.rating, payload.comment ?? null);
+    res.status(201).json({ data });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ message: error.issues[0]?.message ?? "Invalid input" });
+      return;
+    }
+    if (error instanceof Error) {
+      if (error.message === "You cannot review yourself") {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error.message === "You have already reviewed this applicant for this job") {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Job not found") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Applicant is not completed on this job") {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Forbidden") {
+        res.status(403).json({ message: error.message });
+        return;
+      }
+    }
+    next(error);
+  }
+};
+
+export const updateJobReviewHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const reviewerId = (req as { userId?: string }).userId;
+    if (!reviewerId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const jobId = asId(req.params.id);
+    const revieweeId = asId(req.params.revieweeId);
+    const payload = reviewSchema.parse(req.body);
+    const data = await updateJobReview(jobId, reviewerId, revieweeId, payload.rating, payload.comment ?? null);
+    res.status(200).json({ data });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ message: error.issues[0]?.message ?? "Invalid input" });
+      return;
+    }
+    if (error instanceof Error) {
+      if (error.message === "You cannot review yourself") {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Review not found") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Review has been deleted") {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Applicant is not completed on this job") {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Forbidden") {
+        res.status(403).json({ message: error.message });
+        return;
+      }
+    }
+    next(error);
+  }
+};
+
+export const deleteJobReviewHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const reviewerId = (req as { userId?: string }).userId;
+    if (!reviewerId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const jobId = asId(req.params.id);
+    const revieweeId = asId(req.params.revieweeId);
+    const data = await deleteJobReview(jobId, reviewerId, revieweeId);
+    res.status(200).json({ data });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "Review not found") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Review has been deleted") {
+        res.status(409).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Applicant is not completed on this job") {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error.message === "Forbidden") {
+        res.status(403).json({ message: error.message });
+        return;
+      }
+      if (error.message === "You cannot review yourself") {
+        res.status(409).json({ message: error.message });
         return;
       }
     }
