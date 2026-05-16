@@ -21,13 +21,14 @@ export default function PostJobPage() {
       image: "",
       feeRange: "",
       timeRange: "",
-      contact: "",
+      contactEmail: "",
+      contactPhone: "",
       description: "",
       requirements: "",
     },
   });
 
-  const { register, handleSubmit, formState, reset, watch } = form;
+  const { register, handleSubmit, formState, reset, watch, getValues } = form;
   const imageUrl = watch("image");
 
   useEffect(() => {
@@ -47,6 +48,16 @@ export default function PostJobPage() {
     }
   }, [user, navigate]);
 
+  useEffect(() => {
+    if (!user) return;
+    const current = getValues();
+    reset({
+      ...current,
+      contactEmail: user.email ?? "",
+      contactPhone: user.phone ?? "",
+    });
+  }, [user, getValues, reset]);
+
   const onSubmit = async (values: JobPostFormValues) => {
     setIsSubmitting(true);
     try {
@@ -59,7 +70,7 @@ export default function PostJobPage() {
         payoutText: values.feeRange,
         durationText: values.timeRange,
         imageUrl: values.image || "",
-        contactInfo: values.contact,
+        contactInfo: `${values.contactEmail || ""}${values.contactPhone ? ` • ${values.contactPhone}` : ""}`,
         requirementsText: values.requirements,
       });
 
@@ -215,12 +226,21 @@ export default function PostJobPage() {
                   <label className="grid gap-2 text-sm">
                     <span className="font-semibold text-slate-900">Contact details</span>
                     <input
-                      {...register("contact")}
-                      placeholder="Email or phone number"
+                      {...register("contactEmail")}
+                      placeholder="Email"
                       className="h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring)"
                     />
-                    {formState.errors.contact ? (
-                      <span className="text-xs text-red-600">{formState.errors.contact.message}</span>
+                    {formState.errors.contactEmail ? (
+                      <span className="text-xs text-red-600">{(formState.errors.contactEmail as any).message}</span>
+                    ) : null}
+
+                    <input
+                      {...register("contactPhone")}
+                      placeholder="Phone number"
+                      className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-(--color-brand-primary) focus:ring-2 focus:ring-(--color-brand-focus-ring)"
+                    />
+                    {formState.errors.contactPhone ? (
+                      <span className="text-xs text-red-600">{(formState.errors.contactPhone as any).message}</span>
                     ) : null}
                   </label>
 

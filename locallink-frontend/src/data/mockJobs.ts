@@ -200,9 +200,13 @@ export const jobPostSchema = z.object({
   image: z.string().url("Enter a valid image URL.").or(z.literal("")),
   feeRange: z.string().min(3, "Enter an expected pay range."),
   timeRange: z.string().min(3, "Enter the estimated duration."),
-  contact: z.string().min(5, "Enter how applicants should contact you."),
+  contactEmail: z.union([z.string().email("Enter a valid email."), z.literal("")]),
+  contactPhone: z.union([z.string().min(3, "Enter a valid phone number."), z.literal("")]),
   description: z.string().min(20, "Tell helpers more about the task.").max(1000),
   requirements: z.string().max(400).optional(),
+}).refine((data) => (data.contactEmail?.length || data.contactPhone?.length) > 0, {
+  message: "Enter at least one contact method.",
+  path: ["contactEmail"],
 });
 
 export type JobPostFormValues = z.infer<typeof jobPostSchema>;
