@@ -110,10 +110,10 @@ Default local URLs:
 
 | Student ID | GitHub Username | Week 6-8 (Assigned Feature) | Week 11 (Progress Report) | Week 12 (Progress Report) |
 |------------|-----------------|------------------------------|---------------------------|---------------------------|
-| 839 | YuukinoTakkashi1998 | Admin Panel | Frontend patching + bug fixes | Admin backend endpoints + Prisma wiring + admin auth |
-| 835 | wunnakueleon | Backend / API | User Auth implementation | Backend auth endpoints (register/login/verify) + JWT setup + Prisma auth logic |
-|  |  |  |  |  |
-|  |  |  |  |  |
+| 839 | YuukinoTakkashi1998 | Admin Panel | Admin Dashboard layout, User Management hooks, Submissions filters, Initial Backend setup. | Backend Admin API, Chat integrations, verification logic, suspensions, and DB schema. |
+| 835 | wunnakueleon | Backend / API | React routing setup, Login & Sign Up validation (Zod + Hook Form), Initial Tailwind CSS layout. | Backend User endpoints, Job application/view logic, and Axios routing integrations. |
+| 851 | KyiPhyuThiriKhaing | Frontend / Jobs | Job Listing forms, Job Details screens, Mobile Navigation updates, mock data abstraction. | Job Details UI integration with API, Seed data setups, Documentation & backend routing. |
+| 853 | laurahsu-loop | Profile / Uploads | PopOut sidebars, Initial Profile pages, Verification & History pages layout. | Integrated Profiles, Document settings, tracking models, and history pages with routing logic. |
 
 ## Notes
 
