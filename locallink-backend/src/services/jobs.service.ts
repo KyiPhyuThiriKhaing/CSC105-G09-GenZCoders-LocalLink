@@ -4,7 +4,7 @@ import { prisma } from "../lib/prisma";
 const NOT_IMPLEMENTED = "NOT_IMPLEMENTED";
 
 export const listJobs = async (): Promise<Job[]> => {
-  return prisma.job.findMany({ orderBy: { postedAt: "desc" } });
+  return prisma.job.findMany({ where: { status: "OPEN" }, orderBy: { postedAt: "desc" } });
 };
 
 export const getJobById = async (id: string): Promise<Job | null> => {
