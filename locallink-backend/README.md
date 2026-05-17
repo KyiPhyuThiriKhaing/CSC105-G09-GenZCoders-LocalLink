@@ -128,3 +128,29 @@ Sample payloads for testing:
   "notes": "All documents verified"
 }
 ```
+
+## Socket.io Testing
+
+The Socket.io server runs on the same port as the API (e.g., `http://localhost:3000`).
+
+To test real-time connections using a tool like Postman or Postwoman, or a custom script:
+
+1. Connect to `ws://localhost:3000` or `http://localhost:3000` with the Socket.io client.
+2. An `auth` token must be provided containing the user's JWT.
+
+### Connection Example
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000", {
+  auth: {
+    token: "YOUR_JWT_HERE"
+  }
+});
+```
+
+### Events
+
+- Emit `join_conversation` with the `conversationId` string to start receiving messages for that chat loop.
+- Emit `send_message` with `{ conversationId, body }` to send a message.
+- Listen for `new_message` to receive the incoming chat payload from other users in the conversation.
