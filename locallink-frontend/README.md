@@ -21,6 +21,12 @@ Install dependencies:
 npm install
 ```
 
+Create a `.env` file to point to the backend API:
+
+```env
+VITE_API_URL="http://localhost:3000/api"
+```
+
 Start dev server:
 
 ```bash
@@ -68,14 +74,13 @@ npm run preview
 
 ## Current Status
 
-The frontend layout and navigation are implemented, including the home page, job listings, job posting flow, profile sections, chat, and admin views.
+The frontend is fully functional and integrated with the backend APIs. Major features include:
 
-Many pages still rely on mock/static data and are not fully wired to backend APIs.
+- **Authentication:** Login and Sign Up dispatch real authentication requests using JWT and sync with backend endpoints (`/auth/login`, `/auth/register`).
+- **Core Functionality:** Job lists, job details, and job posting (`/jobs/post`) are wired to backend services.
+- **Communication:** Real-time and REST-based chat integrations are implemented in the profile sections (`/profile/chat`).
+- **Admin & Profiles:** The admin dashboard, user management, identity verification (submissions), and personal profiles retrieve and dispatch live data using customized API clients (`adminApi.ts`, `authApi.ts`, `chatApi.ts`).
 
-Examples:
-
-- Login and Sign Up validate form input but do not yet dispatch real authentication requests.
-- Job details, profile sections, chat, admin dashboard, submissions, and users pages use local mock data.
-- `/jobs/post` provides a UI for posting a job, but backend submission integration is pending.
+While some dummy artifacts remain for backward-compatibility or layout testing, the primary workflows are communicating with the server environment.
 
 For full project overview and backend setup, see the root README at `../README.md`.

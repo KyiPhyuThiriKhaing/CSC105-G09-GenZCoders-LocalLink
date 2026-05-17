@@ -32,11 +32,11 @@ For detailed setup and folder-specific instructions, see:
 
 ### Frontend
 
-The frontend includes the main public pages, profile sections, and admin views. UI implementation is largely complete, while backend integration and data wiring are still in progress.
+The frontend features the main public pages, profile sections, and admin views. The UI is implemented with React 19 and Tailwind CSS, and is actively integrated with the backend API for authentication, job browsing, chat, and admin endpoints.
 
 ### Backend
 
-The backend scaffold is set up with Express and Prisma. Core API routes, controllers, and services remain under development.
+The backend is built with Express and Prisma (SQLite). It implements complete REST APIs and services for authentication (JWT), user management, job postings, messaging (Socket.io), and admin moderation.
 
 ## Tech Stack
 
